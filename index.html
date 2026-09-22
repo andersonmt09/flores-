@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#071616" />
     <meta
       name="description"
-      content="Un jardín nocturno de flores amarillas, creado para alguien especial."
+      content="Una experiencia floral tridimensional de luz, movimiento y color."
     />
-    <title>Flores amarillas · Para ti</title>
+    <title>Jardín en 3D</title>
     <style>
       :root {
         color-scheme: dark;
@@ -305,7 +305,7 @@
   </head>
   <body>
     <div class="atmosphere"></div>
-    <main id="app" aria-label="Jardín de flores amarillas en tres dimensiones"></main>
+    <main id="app" aria-label="Jardín tridimensional de luz y flores"></main>
     <div class="vignette"></div>
     <div class="grain"></div>
 
@@ -335,15 +335,15 @@
     <div class="fallback" id="fallback" role="status" aria-live="polite">
       <div class="fallback__card">
         <span class="fallback__flower" aria-hidden="true">✦</span>
-        <p>Preparando un pequeño jardín de flores amarillas…</p>
+        <p>Preparando el jardín…</p>
       </div>
     </div>
 
     <script type="importmap">
       {
         "imports": {
-          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
         }
       }
     </script>
@@ -373,8 +373,8 @@
       const scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(0x103330, 0.042);
 
-      const camera = new THREE.PerspectiveCamera(43, window.innerWidth / window.innerHeight, 0.1, 200);
-      camera.position.set(0.45, 4.9, 11.2);
+      const camera = new THREE.PerspectiveCamera(43, window.innerWidth / window.innerHeight, 0.1, 240);
+      camera.position.set(0.8, 5.3, 12.4);
 
       scene.add(new THREE.HemisphereLight(0xfff3c0, 0x07211e, 1.38));
 
@@ -393,6 +393,10 @@
       const frontLight = new THREE.PointLight(0xffaa35, 15, 15, 2);
       frontLight.position.set(1.3, 2.6, 5.3);
       scene.add(frontLight);
+
+      const softAmber = new THREE.PointLight(0xffc978, 14, 20, 2);
+      softAmber.position.set(-4, 3.2, -2);
+      scene.add(softAmber);
 
       const petalMaterials = [
         new THREE.MeshStandardMaterial({
@@ -417,6 +421,14 @@
           metalness: 0.025,
           emissive: 0x5f3900,
           emissiveIntensity: 0.34,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshStandardMaterial({
+          color: 0xffe873,
+          roughness: 0.45,
+          metalness: 0.025,
+          emissive: 0x6d4308,
+          emissiveIntensity: 0.25,
           side: THREE.DoubleSide
         })
       ];
@@ -563,13 +575,14 @@
         );
         group.add(stem);
 
-        [0.24, 0.53].forEach((point, index) => {
+        [0.24, 0.5, 0.72].forEach((point, index) => {
+          if (index === 2 && config.scale < 0.6) return;
           const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
           leaf.position.copy(curve.getPoint(point));
           leaf.rotation.order = "YXZ";
           leaf.rotation.y = config.seed * 3.6 + index * 2.48;
           leaf.rotation.x = -Math.PI / 2 + 0.46 + index * 0.1;
-          leaf.scale.setScalar(config.scale * (0.73 - index * 0.12));
+          leaf.scale.setScalar(config.scale * (0.74 - index * 0.11));
           group.add(leaf);
         });
 
@@ -588,6 +601,15 @@
           0.33,
           0.1
         );
+        addPetalLayer(
+          head,
+          material,
+          Math.max(5, config.petals - 6),
+          config.scale * 0.4,
+          (Math.PI / config.petals) * 0.5,
+          0.62,
+          0.17
+        );
 
         const center = new THREE.Mesh(
           new THREE.SphereGeometry(0.5 * config.scale, 24, 16),
@@ -604,21 +626,57 @@
         centerTop.scale.set(1, 1, 0.4);
         centerTop.position.z = 0.14 * config.scale;
         head.add(centerTop);
-        addSeeds(head, config.scale);
+        if (config.detail !== false) addSeeds(head, config.scale);
         group.add(head);
 
         return { group, head, phase: config.seed * Math.PI * 2, spin: config.spin };
       }
 
-      const layout = [
-        { x: 0, z: 0, height: 3.92, petals: 16, scale: 1.1, tilt: 0.1, bendX: 0.05, bendZ: 0.1, spin: 0.2, materialIndex: 0, seed: 0.13 },
-        { x: -1.92, z: 0.66, height: 2.78, petals: 14, scale: 0.91, tilt: 0.3, bendX: 0.55, bendZ: 0.22, spin: 0.9, materialIndex: 1, seed: 0.41 },
-        { x: 2.08, z: -0.5, height: 3.05, petals: 14, scale: 0.97, tilt: 0.26, bendX: -0.6, bendZ: -0.18, spin: 1.7, materialIndex: 2, seed: 0.67 },
-        { x: -1.18, z: -1.72, height: 2.15, petals: 12, scale: 0.79, tilt: 0.46, bendX: 0.38, bendZ: -0.55, spin: 2.4, materialIndex: 0, seed: 0.22 },
-        { x: 1.34, z: 1.61, height: 2.37, petals: 12, scale: 0.84, tilt: 0.4, bendX: -0.45, bendZ: 0.52, spin: 3.1, materialIndex: 1, seed: 0.85 },
-        { x: -2.75, z: -0.88, height: 1.87, petals: 11, scale: 0.69, tilt: 0.56, bendX: 0.72, bendZ: -0.32, spin: 3.9, materialIndex: 2, seed: 0.55 },
-        { x: 2.78, z: 1.04, height: 1.98, petals: 11, scale: 0.75, tilt: 0.5, bendX: -0.68, bendZ: 0.38, spin: 4.6, materialIndex: 0, seed: 0.93 }
+      const heroLayout = [
+        { x: 0, z: 0, height: 3.92, petals: 16, scale: 1.1, tilt: 0.1, bendX: 0.05, bendZ: 0.1, spin: 0.2, materialIndex: 0, seed: 0.13, detail: true },
+        { x: -1.92, z: 0.66, height: 2.78, petals: 14, scale: 0.91, tilt: 0.3, bendX: 0.55, bendZ: 0.22, spin: 0.9, materialIndex: 1, seed: 0.41, detail: true },
+        { x: 2.08, z: -0.5, height: 3.05, petals: 14, scale: 0.97, tilt: 0.26, bendX: -0.6, bendZ: -0.18, spin: 1.7, materialIndex: 2, seed: 0.67, detail: true },
+        { x: -1.18, z: -1.72, height: 2.15, petals: 12, scale: 0.79, tilt: 0.46, bendX: 0.38, bendZ: -0.55, spin: 2.4, materialIndex: 0, seed: 0.22, detail: true },
+        { x: 1.34, z: 1.61, height: 2.37, petals: 12, scale: 0.84, tilt: 0.4, bendX: -0.45, bendZ: 0.52, spin: 3.1, materialIndex: 1, seed: 0.85, detail: true },
+        { x: -2.75, z: -0.88, height: 1.87, petals: 11, scale: 0.69, tilt: 0.56, bendX: 0.72, bendZ: -0.32, spin: 3.9, materialIndex: 2, seed: 0.55, detail: true },
+        { x: 2.78, z: 1.04, height: 1.98, petals: 11, scale: 0.75, tilt: 0.5, bendX: -0.68, bendZ: 0.38, spin: 4.6, materialIndex: 0, seed: 0.93, detail: true },
+        { x: 0.4, z: 2.6, height: 2.05, petals: 12, scale: 0.78, tilt: 0.44, bendX: -0.2, bendZ: 0.6, spin: 5.3, materialIndex: 3, seed: 0.31, detail: true },
+        { x: -0.6, z: -3, height: 1.9, petals: 11, scale: 0.72, tilt: 0.52, bendX: 0.15, bendZ: -0.62, spin: 6, materialIndex: 3, seed: 0.71, detail: true }
       ];
+
+      function seededRandom(seed) {
+        let state = seed % 2147483647;
+        if (state <= 0) state += 2147483646;
+        return () => {
+          state = (state * 16807) % 2147483647;
+          return (state - 1) / 2147483646;
+        };
+      }
+
+      function makeFieldFlowers(count, random) {
+        return Array.from({ length: count }, () => {
+          const angle = random() * Math.PI * 2;
+          const radius = 3.6 + random() * 6.2;
+          return {
+            x: Math.cos(angle) * radius,
+            z: Math.sin(angle) * radius,
+            height: 1.05 + random() * 1.15,
+            petals: 8 + Math.floor(random() * 5),
+            scale: 0.34 + random() * 0.34,
+            tilt: 0.34 + random() * 0.34,
+            bendX: (random() - 0.5) * 1.4,
+            bendZ: (random() - 0.5) * 1.4,
+            spin: random() * Math.PI * 2,
+            materialIndex: Math.floor(random() * petalMaterials.length),
+            seed: random(),
+            detail: false
+          };
+        });
+      }
+
+      const random = seededRandom(20260921);
+      const fieldFlowerCount = window.matchMedia("(max-width: 640px)").matches ? 10 : 20;
+      const layout = heroLayout.concat(makeFieldFlowers(fieldFlowerCount, random));
 
       function createShadowTexture() {
         const canvas = document.createElement("canvas");
@@ -659,39 +717,109 @@
         scene.add(shadow);
       });
 
-      const pollenCount = 112;
-      const pollenPositions = new Float32Array(pollenCount * 3);
-      const pollenBaseX = new Float32Array(pollenCount);
-      const pollenBaseZ = new Float32Array(pollenCount);
-      const pollenSpeed = new Float32Array(pollenCount);
+      const particleBatches = [];
+      const particleBatchCount = window.matchMedia("(max-width: 640px)").matches ? 4 : 6;
+      const particlesPerBatch = window.matchMedia("(max-width: 640px)").matches ? 28 : 46;
 
-      for (let i = 0; i < pollenCount; i += 1) {
-        const x = (Math.random() - 0.5) * 14;
-        const y = Math.random() * 7.7 - 0.25;
-        const z = (Math.random() - 0.5) * 14;
-        pollenPositions[i * 3] = x;
-        pollenPositions[i * 3 + 1] = y;
-        pollenPositions[i * 3 + 2] = z;
-        pollenBaseX[i] = x;
-        pollenBaseZ[i] = z;
-        pollenSpeed[i] = 0.28 + Math.random() * 0.66;
-      }
+      for (let batchIndex = 0; batchIndex < particleBatchCount; batchIndex += 1) {
+        const positions = new Float32Array(particlesPerBatch * 3);
+        const baseX = new Float32Array(particlesPerBatch);
+        const baseZ = new Float32Array(particlesPerBatch);
+        const speed = new Float32Array(particlesPerBatch);
+        const driftPhase = new Float32Array(particlesPerBatch);
 
-      const pollenGeometry = new THREE.BufferGeometry();
-      pollenGeometry.setAttribute("position", new THREE.BufferAttribute(pollenPositions, 3));
-      const pollen = new THREE.Points(
-        pollenGeometry,
-        new THREE.PointsMaterial({
-          color: 0xffe59a,
-          size: 0.062,
+        for (let i = 0; i < particlesPerBatch; i += 1) {
+          const x = (random() - 0.5) * 17;
+          const y = random() * 8.2;
+          const z = (random() - 0.5) * 17;
+          positions[i * 3] = x;
+          positions[i * 3 + 1] = y;
+          positions[i * 3 + 2] = z;
+          baseX[i] = x;
+          baseZ[i] = z;
+          speed[i] = 0.32 + random() * 1.05;
+          driftPhase[i] = random() * Math.PI * 2;
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        const baseSize = 0.05 + random() * 0.035;
+        const material = new THREE.PointsMaterial({
+          color: new THREE.Color().setHSL((42 + random() * 18) / 360, 0.85, 0.64),
+          size: baseSize,
           transparent: true,
-          opacity: 0.74,
+          opacity: 0.75,
           depthWrite: false,
           blending: THREE.AdditiveBlending,
           sizeAttenuation: true
-        })
-      );
-      scene.add(pollen);
+        });
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+        particleBatches.push({
+          geometry,
+          material,
+          baseX,
+          baseZ,
+          speed,
+          driftPhase,
+          baseSize,
+          phase: random() * Math.PI * 2,
+          pulseSpeed: 0.6 + random() * 0.9
+        });
+      }
+
+      function createGlowTexture() {
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 128;
+        const context = canvas.getContext("2d");
+        const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
+        gradient.addColorStop(0, "rgba(255,244,196,1)");
+        gradient.addColorStop(0.35, "rgba(255,212,112,0.55)");
+        gradient.addColorStop(1, "rgba(255,180,60,0)");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, 128, 128);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        return texture;
+      }
+
+      const glowTexture = createGlowTexture();
+      const fireflies = [];
+      const fireflyCount = window.matchMedia("(max-width: 640px)").matches ? 12 : 22;
+
+      for (let i = 0; i < fireflyCount; i += 1) {
+        const material = new THREE.SpriteMaterial({
+          map: glowTexture,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          opacity: 0.8
+        });
+        const sprite = new THREE.Sprite(material);
+        const scale = 0.2 + random() * 0.26;
+        sprite.scale.set(scale, scale, 1);
+
+        const angle = random() * Math.PI * 2;
+        const radius = 1.4 + random() * 6.6;
+        const baseX = Math.cos(angle) * radius;
+        const baseY = 0.35 + random() * 3.3;
+        const baseZ = Math.sin(angle) * radius;
+        sprite.position.set(baseX, baseY, baseZ);
+        scene.add(sprite);
+        fireflies.push({
+          sprite,
+          material,
+          baseX,
+          baseY,
+          baseZ,
+          phaseX: random() * Math.PI * 2,
+          phaseY: random() * Math.PI * 2,
+          phaseZ: random() * Math.PI * 2,
+          speed: 0.22 + random() * 0.45,
+          pulseSpeed: 0.7 + random() * 1.3,
+          pulsePhase: random() * Math.PI * 2
+        });
+      }
 
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
@@ -700,7 +828,7 @@
       controls.rotateSpeed = 0.76;
       controls.zoomSpeed = 0.82;
       controls.minDistance = 4.25;
-      controls.maxDistance = 20;
+      controls.maxDistance = 28;
       controls.minPolarAngle = 0.2;
       controls.maxPolarAngle = Math.PI * 0.52;
       controls.target.set(0, 2.2, 0);
@@ -746,7 +874,7 @@
         const height = window.innerHeight;
         const aspect = width / height;
         camera.aspect = aspect;
-        camera.fov = aspect < 1 ? Math.min(78, 43 * Math.pow(1 / aspect, 0.5)) : 43;
+        camera.fov = aspect < 1 ? Math.min(84, 43 * Math.pow(1 / aspect, 0.5)) : 43;
         camera.updateProjectionMatrix();
         controls.target.set(0, aspect < 1 ? 2.36 : 2.2, 0);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -765,25 +893,56 @@
         const delta = Math.min(clock.getDelta(), 0.05);
         if (!isPaused) elapsed += delta;
 
+        const wind = Math.sin(elapsed * 0.18) * 0.5 + 0.5;
+        const windAmplitude = (0.028 + 0.022 * wind) * (isPaused ? 0 : 1);
+
         for (const flower of flowers) {
           const phase = flower.phase;
-          const amplitude = isPaused ? 0 : 1;
-          flower.group.rotation.z = Math.sin(elapsed * 0.7 + phase) * 0.024 * amplitude;
-          flower.group.rotation.x = Math.cos(elapsed * 0.53 + phase * 1.3) * 0.018 * amplitude;
-          flower.head.rotation.z = flower.spin + Math.sin(elapsed * 0.9 + phase) * 0.03 * amplitude;
+          flower.group.rotation.z = Math.sin(elapsed * 0.72 + phase) * windAmplitude;
+          flower.group.rotation.x = Math.cos(elapsed * 0.55 + phase * 1.3) * windAmplitude * 0.85;
+          flower.head.rotation.z =
+            flower.spin + Math.sin(elapsed * 0.95 + phase) * 0.036 * (0.6 + wind) * (isPaused ? 0 : 1);
         }
 
-        const position = pollenGeometry.attributes.position;
         if (!isPaused) {
-          for (let i = 0; i < pollenCount; i += 1) {
-            let y = position.getY(i) + delta * pollenSpeed[i] * 0.2;
-            if (y > 7.5) y = -0.35;
-            position.setY(i, y);
-            position.setX(i, pollenBaseX[i] + Math.sin(elapsed * 0.42 + i * 0.7) * 0.3);
-            position.setZ(i, pollenBaseZ[i] + Math.cos(elapsed * 0.36 + i * 1.3) * 0.3);
+          for (const batch of particleBatches) {
+            const position = batch.geometry.attributes.position;
+            for (let i = 0; i < position.count; i += 1) {
+              let y = position.getY(i) + delta * batch.speed[i] * 0.24;
+              if (y > 8.4) y = -0.4;
+              position.setY(i, y);
+              position.setX(
+                i,
+                batch.baseX[i] + Math.sin(elapsed * 0.42 + batch.driftPhase[i]) * 0.38
+              );
+              position.setZ(
+                i,
+                batch.baseZ[i] + Math.cos(elapsed * 0.36 + batch.driftPhase[i] * 1.4) * 0.38
+              );
+            }
+            position.needsUpdate = true;
+
+            const twinkle = Math.sin(elapsed * batch.pulseSpeed + batch.phase) * 0.5 + 0.5;
+            batch.material.size = batch.baseSize * (0.7 + twinkle * 0.7);
+            batch.material.opacity = 0.5 + twinkle * 0.42;
           }
-          position.needsUpdate = true;
+
+          for (const firefly of fireflies) {
+            firefly.sprite.position.x =
+              firefly.baseX + Math.sin(elapsed * firefly.speed + firefly.phaseX) * 0.7;
+            firefly.sprite.position.y =
+              firefly.baseY +
+              Math.sin(elapsed * firefly.speed * 0.72 + firefly.phaseY) * 0.55 +
+              Math.sin(elapsed * 0.25 + firefly.phaseY) * 0.2;
+            firefly.sprite.position.z =
+              firefly.baseZ + Math.cos(elapsed * firefly.speed + firefly.phaseZ) * 0.7;
+            firefly.material.opacity =
+              0.3 + 0.55 * Math.abs(Math.sin(elapsed * firefly.pulseSpeed + firefly.pulsePhase));
+          }
+
           haloLight.intensity = 38 + Math.sin(elapsed * 0.8) * 4;
+          frontLight.intensity = 15 + Math.sin(elapsed * 0.8) * 3;
+          softAmber.intensity = 12 + Math.sin(elapsed * 0.6 + 1.4) * 5;
         }
 
         controls.update();

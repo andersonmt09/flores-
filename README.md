@@ -1,4 +1,4 @@
-# Flores amarillas
+# Jardín en 3D
 
 Un pequeño jardín nocturno en 3D, creado con Three.js.
 
@@ -13,7 +13,7 @@ Puedes arrastrar para mirar el ramo desde otro ángulo, usar el gesto de pellizc
 ## Detalles
 
 - Flores, tallos, hojas y centros creados en código.
-- Iluminación cálida, partículas de polen y animaciones suaves.
+- Iluminación cálida, polvo dorado, luciérnagas y animaciones suaves.
 - Diseño adaptable para móvil y escritorio.
 - Respeta `prefers-reduced-motion` para reducir el movimiento cuando el sistema lo solicita.
 
