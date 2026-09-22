@@ -398,6 +398,14 @@
       softAmber.position.set(-4, 3.2, -2);
       scene.add(softAmber);
 
+      const redAccentLight = new THREE.PointLight(0xff3b30, 10, 19, 2);
+      redAccentLight.position.set(3.6, 2.6, -2.4);
+      scene.add(redAccentLight);
+
+      const redAccentLight2 = new THREE.PointLight(0xff4433, 8, 17, 2);
+      redAccentLight2.position.set(-3.4, 2.4, 2);
+      scene.add(redAccentLight2);
+
       const petalMaterials = [
         new THREE.MeshStandardMaterial({
           color: 0xffc928,
@@ -460,6 +468,53 @@
         side: THREE.DoubleSide
       });
 
+      const spiderPetalMaterials = [
+        new THREE.MeshStandardMaterial({
+          color: 0xe61a2e,
+          roughness: 0.36,
+          metalness: 0.05,
+          emissive: 0x55000a,
+          emissiveIntensity: 0.58,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshStandardMaterial({
+          color: 0xff3327,
+          roughness: 0.38,
+          metalness: 0.05,
+          emissive: 0x5c0008,
+          emissiveIntensity: 0.55,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshStandardMaterial({
+          color: 0xc4101f,
+          roughness: 0.34,
+          metalness: 0.06,
+          emissive: 0x3e0004,
+          emissiveIntensity: 0.62,
+          side: THREE.DoubleSide
+        })
+      ];
+      const spiderStemMaterial = new THREE.MeshStandardMaterial({
+        color: 0x5c1a1a,
+        roughness: 0.68,
+        metalness: 0
+      });
+      const spiderCenterMaterial = new THREE.MeshStandardMaterial({
+        color: 0x6e0f14,
+        roughness: 0.6,
+        metalness: 0
+      });
+      const stamenMaterial = new THREE.MeshStandardMaterial({
+        color: 0xb3202a,
+        roughness: 0.48,
+        metalness: 0.02
+      });
+      const antherMaterial = new THREE.MeshStandardMaterial({
+        color: 0x4a0a0d,
+        roughness: 0.55,
+        metalness: 0
+      });
+
       function createPetalGeometry() {
         const shape = new THREE.Shape();
         shape.moveTo(0, 0);
@@ -518,9 +573,57 @@
         return geometry;
       }
 
+      function createSpiderPetalGeometry() {
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.bezierCurveTo(0.1, 0.12, 0.15, 0.58, 0.08, 1.08);
+        shape.bezierCurveTo(0.045, 1.38, 0.02, 1.55, 0, 1.64);
+        shape.bezierCurveTo(-0.02, 1.55, -0.045, 1.38, -0.08, 1.08);
+        shape.bezierCurveTo(-0.15, 0.58, -0.1, 0.12, 0, 0);
+
+        const geometry = new THREE.ExtrudeGeometry(shape, {
+          depth: 0.02,
+          bevelEnabled: true,
+          bevelThickness: 0.008,
+          bevelSize: 0.012,
+          bevelOffset: 0,
+          bevelSegments: 1,
+          curveSegments: 16,
+          steps: 1
+        });
+
+        const position = geometry.attributes.position;
+        const vertex = new THREE.Vector3();
+        for (let i = 0; i < position.count; i += 1) {
+          vertex.fromBufferAttribute(position, i);
+          const progress = THREE.MathUtils.clamp(vertex.y / 1.64, 0, 1);
+          const curl = progress * progress * progress * 1.55;
+          const ripple = Math.sin(progress * Math.PI * 3) * 0.028 * progress;
+          position.setZ(i, vertex.z + curl);
+          position.setX(i, vertex.x + ripple);
+        }
+        position.needsUpdate = true;
+        geometry.computeVertexNormals();
+        return geometry;
+      }
+
+      function createStamenCurve() {
+        return new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(0, 0.34, 0.1),
+          new THREE.Vector3(0, 0.74, 0.4),
+          new THREE.Vector3(0, 0.92, 0.76),
+          new THREE.Vector3(0, 0.88, 1.06)
+        ]);
+      }
+
       const petalGeometry = createPetalGeometry();
       const leafGeometry = createLeafGeometry();
       const seedGeometry = new THREE.SphereGeometry(0.037, 8, 6);
+      const spiderPetalGeometry = createSpiderPetalGeometry();
+      const stamenCurve = createStamenCurve();
+      const stamenGeometry = new THREE.TubeGeometry(stamenCurve, 18, 0.011, 6, false);
+      const antherGeometry = new THREE.SphereGeometry(0.035, 8, 6);
       const flowers = [];
 
       function addPetalLayer(head, material, count, scale, angleOffset, tilt, zOffset) {
@@ -533,6 +636,27 @@
           petal.scale.setScalar(scale * (0.93 + ((i * 17) % 5) * 0.018));
           petal.position.z = zOffset;
           holder.add(petal);
+          head.add(holder);
+        }
+      }
+
+      function addStamenLayer(head, count, scale, angleOffset, tilt) {
+        const tipPosition = stamenCurve.getPoint(1).clone().multiplyScalar(scale);
+        tipPosition.applyAxisAngle(new THREE.Vector3(1, 0, 0), tilt);
+
+        for (let i = 0; i < count; i += 1) {
+          const holder = new THREE.Group();
+          holder.rotation.z = angleOffset + (i / count) * Math.PI * 2;
+
+          const stamen = new THREE.Mesh(stamenGeometry, stamenMaterial);
+          stamen.rotation.x = tilt;
+          stamen.scale.setScalar(scale);
+          holder.add(stamen);
+
+          const anther = new THREE.Mesh(antherGeometry, antherMaterial);
+          anther.position.copy(tipPosition);
+          anther.scale.setScalar(Math.max(0.7, scale));
+          holder.add(anther);
           head.add(holder);
         }
       }
@@ -632,6 +756,55 @@
         return { group, head, phase: config.seed * Math.PI * 2, spin: config.spin };
       }
 
+      function createSpiderLily(config) {
+        const group = new THREE.Group();
+        group.position.set(config.x, 0, config.z);
+
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(config.bendX * 0.18, config.height * 0.35, config.bendZ * 0.18),
+          new THREE.Vector3(config.bendX * 0.6, config.height * 0.7, config.bendZ * 0.6),
+          new THREE.Vector3(config.bendX, config.height, config.bendZ)
+        ]);
+
+        const stem = new THREE.Mesh(
+          new THREE.TubeGeometry(curve, 20, 0.03 * config.scale, 8, false),
+          spiderStemMaterial
+        );
+        group.add(stem);
+
+        const head = new THREE.Group();
+        head.position.copy(curve.getPoint(1));
+        head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
+        const material = spiderPetalMaterials[config.materialIndex % spiderPetalMaterials.length];
+
+        for (const layer of [
+          { count: 6, scale: config.scale, angle: 0, tilt: -0.06, offset: 0.015 },
+          { count: 6, scale: config.scale * 0.82, angle: Math.PI / 6, tilt: 0.1, offset: 0.03 }
+        ]) {
+          for (let i = 0; i < layer.count; i += 1) {
+            const holder = new THREE.Group();
+            holder.rotation.z = layer.angle + (i / layer.count) * Math.PI * 2;
+            const petal = new THREE.Mesh(spiderPetalGeometry, material);
+            petal.rotation.x = layer.tilt;
+            petal.scale.setScalar(layer.scale);
+            petal.position.z = layer.offset;
+            holder.add(petal);
+            head.add(holder);
+          }
+        }
+
+        const center = new THREE.Mesh(
+          new THREE.SphereGeometry(0.085 * config.scale, 10, 8),
+          spiderCenterMaterial
+        );
+        head.add(center);
+        addStamenLayer(head, 6, 1.18 * config.scale, Math.PI / 12, 0);
+        group.add(head);
+
+        return { group, head, phase: config.seed * Math.PI * 2, spin: config.spin };
+      }
+
       const heroLayout = [
         { x: 0, z: 0, height: 3.92, petals: 16, scale: 1.1, tilt: 0.1, bendX: 0.05, bendZ: 0.1, spin: 0.2, materialIndex: 0, seed: 0.13, detail: true },
         { x: -1.92, z: 0.66, height: 2.78, petals: 14, scale: 0.91, tilt: 0.3, bendX: 0.55, bendZ: 0.22, spin: 0.9, materialIndex: 1, seed: 0.41, detail: true },
@@ -653,30 +826,138 @@
         };
       }
 
-      function makeFieldFlowers(count, random) {
-        return Array.from({ length: count }, () => {
+      function scatterPoints(
+        count,
+        random,
+        { centerX = 0, centerZ = 0, minRadius = 0, maxRadius, minSpacing, avoid = [] }
+      ) {
+        const placed = [];
+        let attempts = 0;
+        const maxAttempts = count * 80;
+
+        while (placed.length < count && attempts < maxAttempts) {
+          attempts += 1;
           const angle = random() * Math.PI * 2;
-          const radius = 3.6 + random() * 6.2;
-          return {
-            x: Math.cos(angle) * radius,
-            z: Math.sin(angle) * radius,
-            height: 1.05 + random() * 1.15,
-            petals: 8 + Math.floor(random() * 5),
-            scale: 0.34 + random() * 0.34,
-            tilt: 0.34 + random() * 0.34,
-            bendX: (random() - 0.5) * 1.4,
-            bendZ: (random() - 0.5) * 1.4,
-            spin: random() * Math.PI * 2,
-            materialIndex: Math.floor(random() * petalMaterials.length),
-            seed: random(),
-            detail: false
-          };
-        });
+          const radius = minRadius + random() * (maxRadius - minRadius);
+          const x = centerX + Math.cos(angle) * radius;
+          const z = centerZ + Math.sin(angle) * radius;
+          const hasConflict = [...avoid, ...placed].some((point) => {
+            const spacing = point.spacing ?? minSpacing;
+            return Math.hypot(point.x - x, point.z - z) < spacing;
+          });
+
+          if (!hasConflict) placed.push({ x, z, spacing: minSpacing });
+        }
+
+        return placed;
+      }
+
+      function makeFieldFlowers(count, random) {
+        const heroAvoid = heroLayout.map((flower) => ({
+          x: flower.x,
+          z: flower.z,
+          spacing: 1.05
+        }));
+
+        return scatterPoints(count, random, {
+          minRadius: 3.4,
+          maxRadius: 8.2,
+          minSpacing: 0.98,
+          avoid: heroAvoid
+        }).map((point) => ({
+          x: point.x,
+          z: point.z,
+          height: 1.05 + random() * 1.15,
+          petals: 8 + Math.floor(random() * 5),
+          scale: 0.34 + random() * 0.34,
+          tilt: 0.34 + random() * 0.34,
+          bendX: (random() - 0.5) * 1.2,
+          bendZ: (random() - 0.5) * 1.2,
+          spin: random() * Math.PI * 2,
+          materialIndex: Math.floor(random() * petalMaterials.length),
+          seed: random(),
+          detail: false
+        }));
       }
 
       const random = seededRandom(20260921);
       const fieldFlowerCount = window.matchMedia("(max-width: 640px)").matches ? 10 : 20;
       const layout = heroLayout.concat(makeFieldFlowers(fieldFlowerCount, random));
+
+      function createSpiderLilyLayout(random) {
+        const compactViewport = window.matchMedia("(max-width: 640px)").matches;
+        const yellowAvoid = layout.map((flower) => ({
+          x: flower.x,
+          z: flower.z,
+          spacing: 1.35
+        }));
+        const clusters = compactViewport
+          ? [
+              { x: 4.1, z: -2.2, count: 3, radius: 1.8 },
+              { x: -3.7, z: 2.4, count: 2, radius: 1.7 },
+              { x: -0.5, z: -4.3, count: 2, radius: 1.35 }
+            ]
+          : [
+              { x: 4.1, z: -2.2, count: 5, radius: 2.1 },
+              { x: -3.7, z: 2.4, count: 4, radius: 1.95 },
+              { x: -0.5, z: -4.3, count: 3, radius: 1.5 }
+            ];
+        const points = [];
+
+        for (const cluster of clusters) {
+          const avoided = yellowAvoid.concat(
+            points.map((point) => ({ x: point.x, z: point.z, spacing: 0.54 }))
+          );
+          const clusterPoints = scatterPoints(cluster.count, random, {
+            centerX: cluster.x,
+            centerZ: cluster.z,
+            minRadius: 0.2,
+            maxRadius: cluster.radius,
+            minSpacing: 0.54,
+            avoid: avoided
+          }).map((point) => ({
+            ...point,
+            patchX: cluster.x,
+            patchZ: cluster.z,
+            patchRadius: cluster.radius,
+            loose: false
+          }));
+          points.push(...clusterPoints);
+        }
+
+        const loosePoints = scatterPoints(compactViewport ? 1 : 2, random, {
+          minRadius: 2.4,
+          maxRadius: 8.8,
+          minSpacing: 1.8,
+          avoid: yellowAvoid.concat(points.map((point) => ({ x: point.x, z: point.z, spacing: 1.6 })))
+        }).map((point) => ({
+          ...point,
+          patchX: point.x,
+          patchZ: point.z,
+          patchRadius: 1,
+          loose: true
+        }));
+        points.push(...loosePoints);
+
+        return points.map((point) => {
+          const distance = Math.hypot(point.x - point.patchX, point.z - point.patchZ);
+          const edge = point.loose ? 0 : Math.min(distance / point.patchRadius, 1);
+          return {
+            x: point.x,
+            z: point.z,
+            height: (point.loose ? 1.8 : 2.3) - edge * 0.85 + random() * (point.loose ? 0.35 : 0.25),
+            scale: (point.loose ? 0.55 : 0.58) + (1 - edge) * 0.24 + random() * 0.08,
+            tilt: 0.14 + edge * 0.24 + random() * 0.08,
+            bendX: (random() - 0.5) * 0.85,
+            bendZ: (random() - 0.5) * 0.85,
+            spin: random() * Math.PI * 2,
+            materialIndex: Math.floor(random() * spiderPetalMaterials.length),
+            seed: random()
+          };
+        });
+      }
+
+      const spiderLayout = createSpiderLilyLayout(random);
 
       function createShadowTexture() {
         const canvas = document.createElement("canvas");
@@ -714,6 +995,22 @@
           config.z + config.bendZ * 0.5
         );
         shadow.scale.setScalar(2.12 * config.scale + config.height * 0.25);
+        scene.add(shadow);
+      });
+
+      spiderLayout.forEach((config) => {
+        const flower = createSpiderLily(config);
+        flowers.push(flower);
+        scene.add(flower.group);
+
+        const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
+        shadow.rotation.x = -Math.PI / 2;
+        shadow.position.set(
+          config.x + config.bendX * 0.5,
+          0.01,
+          config.z + config.bendZ * 0.5
+        );
+        shadow.scale.setScalar(1.7 * config.scale + config.height * 0.28);
         scene.add(shadow);
       });
 
@@ -765,6 +1062,57 @@
           baseSize,
           phase: random() * Math.PI * 2,
           pulseSpeed: 0.6 + random() * 0.9
+        });
+      }
+
+      const redParticleBatchCount = window.matchMedia("(max-width: 640px)").matches ? 1 : 2;
+      const redParticlesPerBatch = window.matchMedia("(max-width: 640px)").matches ? 20 : 30;
+
+      for (let batchIndex = 0; batchIndex < redParticleBatchCount; batchIndex += 1) {
+        const positions = new Float32Array(redParticlesPerBatch * 3);
+        const baseX = new Float32Array(redParticlesPerBatch);
+        const baseZ = new Float32Array(redParticlesPerBatch);
+        const speed = new Float32Array(redParticlesPerBatch);
+        const driftPhase = new Float32Array(redParticlesPerBatch);
+
+        for (let i = 0; i < redParticlesPerBatch; i += 1) {
+          const x = (random() - 0.5) * 17;
+          const y = random() * 8.2;
+          const z = (random() - 0.5) * 17;
+          positions[i * 3] = x;
+          positions[i * 3 + 1] = y;
+          positions[i * 3 + 2] = z;
+          baseX[i] = x;
+          baseZ[i] = z;
+          speed[i] = 0.28 + random() * 0.95;
+          driftPhase[i] = random() * Math.PI * 2;
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        const hue = random() < 0.5 ? random() * 0.03 : 0.97 + random() * 0.03;
+        const baseSize = 0.052 + random() * 0.03;
+        const material = new THREE.PointsMaterial({
+          color: new THREE.Color().setHSL(hue, 0.9, 0.53),
+          size: baseSize,
+          transparent: true,
+          opacity: 0.7,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          sizeAttenuation: true
+        });
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+        particleBatches.push({
+          geometry,
+          material,
+          baseX,
+          baseZ,
+          speed,
+          driftPhase,
+          baseSize,
+          phase: random() * Math.PI * 2,
+          pulseSpeed: 0.55 + random() * 0.9
         });
       }
 
@@ -943,6 +1291,8 @@
           haloLight.intensity = 38 + Math.sin(elapsed * 0.8) * 4;
           frontLight.intensity = 15 + Math.sin(elapsed * 0.8) * 3;
           softAmber.intensity = 12 + Math.sin(elapsed * 0.6 + 1.4) * 5;
+          redAccentLight.intensity = 10 + Math.sin(elapsed * 0.7 + 2.1) * 2.8;
+          redAccentLight2.intensity = 8 + Math.sin(elapsed * 0.65 + 0.6) * 2.4;
         }
 
         controls.update();

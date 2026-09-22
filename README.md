@@ -12,8 +12,8 @@ Puedes arrastrar para mirar el ramo desde otro ángulo, usar el gesto de pellizc
 
 ## Detalles
 
-- Flores, tallos, hojas y centros creados en código.
-- Iluminación cálida, polvo dorado, luciérnagas y animaciones suaves.
+- Ramo dorado, lirios rojos, tallos, hojas y centros creados en código.
+- Iluminación cálida, acentos carmesí, polvo flotante, luciérnagas y animaciones suaves.
 - Diseño adaptable para móvil y escritorio.
 - Respeta `prefers-reduced-motion` para reducir el movimiento cuando el sistema lo solicita.
 
