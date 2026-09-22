@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#071616" />
+    <meta
+      name="description"
+      content="Un jardín nocturno de flores amarillas, creado para alguien especial."
+    />
+    <title>Flores amarillas · Para ti</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --cream: #fff7df;
+        --muted: rgba(255, 247, 223, 0.68);
+        --gold: #ffd45a;
+        --line: rgba(255, 224, 126, 0.24);
+        --glass: rgba(9, 29, 29, 0.32);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at 50% 34%, #285c55 0%, #123635 37%, #071616 74%),
+          #071616;
+        color: var(--cream);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      #app,
+      canvas,
+      .atmosphere,
+      .vignette,
+      .grain {
+        position: fixed;
+        inset: 0;
+      }
+
+      #app {
+        z-index: 1;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+      }
+
+      .atmosphere {
+        z-index: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse 42% 30% at 50% 38%, rgba(255, 201, 58, 0.15), transparent 70%),
+          radial-gradient(ellipse 28% 22% at 18% 78%, rgba(92, 177, 130, 0.12), transparent 75%);
+      }
+
+      .vignette {
+        z-index: 2;
+        pointer-events: none;
+        background:
+          linear-gradient(180deg, rgba(2, 12, 13, 0.22), transparent 30%, transparent 68%, rgba(2, 12, 13, 0.5)),
+          radial-gradient(ellipse at center, transparent 36%, rgba(1, 10, 11, 0.54) 100%);
+      }
+
+      .grain {
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.09;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+        mix-blend-mode: soft-light;
+      }
+
+      .ui {
+        position: fixed;
+        inset: 0;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding:
+          max(1.25rem, env(safe-area-inset-top, 0px))
+          clamp(1.15rem, 4vw, 3.5rem)
+          max(1.25rem, env(safe-area-inset-bottom, 0px));
+        pointer-events: none;
+        opacity: 0;
+        animation: arrive 1.15s cubic-bezier(0.22, 1, 0.36, 1) 180ms forwards;
+      }
+
+      @keyframes arrive {
+        to {
+          opacity: 1;
+        }
+      }
+
+      .masthead {
+        max-width: min(31rem, 80vw);
+        animation: rise 1s cubic-bezier(0.22, 1, 0.36, 1) 280ms both;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(0.8rem);
+        }
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin: 0 0 0.8rem;
+        color: var(--gold);
+        font-size: clamp(0.61rem, 1.5vw, 0.72rem);
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        width: 1.75rem;
+        height: 1px;
+        background: currentColor;
+        content: "";
+        opacity: 0.76;
+      }
+
+      h1 {
+        max-width: 11ch;
+        margin: 0;
+        color: var(--cream);
+        font-family: Iowan Old Style, Baskerville, "Times New Roman", Georgia, serif;
+        font-size: clamp(2.5rem, 7.1vw, 5.35rem);
+        font-weight: 500;
+        letter-spacing: -0.052em;
+        line-height: 0.91;
+        text-wrap: balance;
+        text-shadow: 0 0 42px rgba(255, 208, 79, 0.11);
+      }
+
+      .message {
+        max-width: 24rem;
+        margin: 1rem 0 0;
+        color: var(--muted);
+        font-family: Iowan Old Style, Baskerville, Georgia, serif;
+        font-size: clamp(1rem, 2vw, 1.18rem);
+        font-style: italic;
+        letter-spacing: 0.01em;
+        line-height: 1.45;
+      }
+
+      .footer {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      .interaction {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        max-width: 28rem;
+        padding: 0.62rem 0.84rem;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--glass);
+        box-shadow: 0 0.5rem 2.2rem rgba(0, 0, 0, 0.14);
+        color: rgba(255, 247, 223, 0.76);
+        font-size: clamp(0.68rem, 1.8vw, 0.78rem);
+        letter-spacing: 0.025em;
+        line-height: 1.2;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: opacity 500ms ease, transform 500ms ease;
+      }
+
+      .interaction svg {
+        flex: 0 0 auto;
+        width: 1rem;
+        height: 1rem;
+        color: var(--gold);
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.6rem;
+        pointer-events: auto;
+      }
+
+      .round-button {
+        display: inline-grid;
+        width: 2.45rem;
+        height: 2.45rem;
+        place-items: center;
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        background: var(--glass);
+        color: var(--cream);
+        cursor: pointer;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+      }
+
+      .round-button:hover {
+        border-color: rgba(255, 224, 126, 0.52);
+        background: rgba(255, 218, 109, 0.13);
+        transform: translateY(-2px);
+      }
+
+      .round-button:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 3px;
+      }
+
+      .round-button svg {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      .fallback {
+        position: fixed;
+        inset: 0;
+        z-index: 4;
+        display: grid;
+        place-items: center;
+        padding: 1.5rem;
+        background:
+          radial-gradient(circle at 50% 42%, #2d6c56 0%, #123735 40%, #071616 100%),
+          #071616;
+        opacity: 1;
+        transition: opacity 500ms ease, visibility 500ms ease;
+      }
+
+      .fallback__card {
+        max-width: 25rem;
+        text-align: center;
+      }
+
+      .fallback__flower {
+        display: block;
+        margin-bottom: 1.15rem;
+        color: var(--gold);
+        font-size: 3.8rem;
+        filter: drop-shadow(0 0 1.8rem rgba(255, 202, 57, 0.5));
+      }
+
+      .fallback p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .webgl-ready .fallback {
+        visibility: hidden;
+        opacity: 0;
+      }
+
+      @media (max-width: 540px) {
+        .ui {
+          padding-left: 1.15rem;
+          padding-right: 1.15rem;
+        }
+
+        .masthead {
+          max-width: 16rem;
+        }
+
+        .footer {
+          align-items: center;
+        }
+
+        .interaction {
+          max-width: calc(100vw - 5.5rem);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="atmosphere"></div>
+    <main id="app" aria-label="Jardín de flores amarillas en tres dimensiones"></main>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+
+    <div class="ui">
+      <header class="masthead">
+        <p class="eyebrow">Un pequeño jardín</p>
+      </header>
+
+      <footer class="footer">
+        <div class="interaction" id="gestureHint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+            <path d="M4 12.3c1.9-2.2 4.6-3.3 8-3.3s6.1 1.1 8 3.3c-1.9 2.2-4.6 3.3-8 3.3s-6.1-1.1-8-3.3Z"/>
+            <path d="M12 9v6M9 12h6"/>
+          </svg>
+          <span>Arrastra para explorar · pellizca para acercar</span>
+        </div>
+        <div class="controls">
+          <button class="round-button" id="motionToggle" type="button" aria-label="Pausar movimiento" title="Pausar movimiento">
+            <svg id="pauseIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M8 5v14M16 5v14"/>
+            </svg>
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <div class="fallback" id="fallback" role="status" aria-live="polite">
+      <div class="fallback__card">
+        <span class="fallback__flower" aria-hidden="true">✦</span>
+        <p>Preparando un pequeño jardín de flores amarillas…</p>
+      </div>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      const container = document.getElementById("app");
+      const motionToggle = document.getElementById("motionToggle");
+      const pauseIcon = document.getElementById("pauseIcon");
+      const gestureHint = document.getElementById("gestureHint");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: "high-performance"
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      container.appendChild(renderer.domElement);
+      document.documentElement.classList.add("webgl-ready");
+
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x103330, 0.042);
+
+      const camera = new THREE.PerspectiveCamera(43, window.innerWidth / window.innerHeight, 0.1, 200);
+      camera.position.set(0.45, 4.9, 11.2);
+
+      scene.add(new THREE.HemisphereLight(0xfff3c0, 0x07211e, 1.38));
+
+      const keyLight = new THREE.DirectionalLight(0xffe6a2, 2.55);
+      keyLight.position.set(6.5, 12, 7);
+      scene.add(keyLight);
+
+      const fillLight = new THREE.DirectionalLight(0x76c9bd, 0.78);
+      fillLight.position.set(-8, 5, -8);
+      scene.add(fillLight);
+
+      const haloLight = new THREE.PointLight(0xffc94d, 38, 27, 2);
+      haloLight.position.set(0, 5.8, -5.6);
+      scene.add(haloLight);
+
+      const frontLight = new THREE.PointLight(0xffaa35, 15, 15, 2);
+      frontLight.position.set(1.3, 2.6, 5.3);
+      scene.add(frontLight);
+
+      const petalMaterials = [
+        new THREE.MeshStandardMaterial({
+          color: 0xffc928,
+          roughness: 0.46,
+          metalness: 0.02,
+          emissive: 0x6e4200,
+          emissiveIntensity: 0.32,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshStandardMaterial({
+          color: 0xffdf64,
+          roughness: 0.5,
+          metalness: 0.02,
+          emissive: 0x693f07,
+          emissiveIntensity: 0.25,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshStandardMaterial({
+          color: 0xf6b91d,
+          roughness: 0.42,
+          metalness: 0.025,
+          emissive: 0x5f3900,
+          emissiveIntensity: 0.34,
+          side: THREE.DoubleSide
+        })
+      ];
+
+      const centerMaterial = new THREE.MeshStandardMaterial({
+        color: 0x4a2d0e,
+        roughness: 0.9,
+        metalness: 0
+      });
+      const centerTopMaterial = new THREE.MeshStandardMaterial({
+        color: 0x81521b,
+        roughness: 0.82,
+        metalness: 0
+      });
+      const seedMaterial = new THREE.MeshStandardMaterial({
+        color: 0x201104,
+        roughness: 0.86,
+        metalness: 0
+      });
+      const stemMaterial = new THREE.MeshStandardMaterial({
+        color: 0x2d7843,
+        roughness: 0.76,
+        metalness: 0
+      });
+      const leafMaterial = new THREE.MeshStandardMaterial({
+        color: 0x40834b,
+        roughness: 0.72,
+        metalness: 0,
+        side: THREE.DoubleSide
+      });
+
+      function createPetalGeometry() {
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.bezierCurveTo(0.27, 0.16, 0.47, 0.74, 0.03, 1.28);
+        shape.bezierCurveTo(-0.42, 0.82, -0.3, 0.18, 0, 0);
+
+        const geometry = new THREE.ExtrudeGeometry(shape, {
+          depth: 0.05,
+          bevelEnabled: true,
+          bevelThickness: 0.025,
+          bevelSize: 0.042,
+          bevelOffset: 0,
+          bevelSegments: 2,
+          curveSegments: 16,
+          steps: 1
+        });
+
+        const position = geometry.attributes.position;
+        const vertex = new THREE.Vector3();
+        for (let i = 0; i < position.count; i += 1) {
+          vertex.fromBufferAttribute(position, i);
+          const progress = THREE.MathUtils.clamp(vertex.y / 1.28, 0, 1);
+          position.setZ(i, vertex.z + progress * progress * 0.29);
+        }
+        position.needsUpdate = true;
+        geometry.computeVertexNormals();
+        return geometry;
+      }
+
+      function createLeafGeometry() {
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.bezierCurveTo(0.35, 0.22, 0.48, 0.88, 0, 1.34);
+        shape.bezierCurveTo(-0.43, 0.85, -0.34, 0.22, 0, 0);
+
+        const geometry = new THREE.ExtrudeGeometry(shape, {
+          depth: 0.028,
+          bevelEnabled: true,
+          bevelThickness: 0.012,
+          bevelSize: 0.028,
+          bevelOffset: 0,
+          bevelSegments: 2,
+          curveSegments: 12,
+          steps: 1
+        });
+
+        const position = geometry.attributes.position;
+        const vertex = new THREE.Vector3();
+        for (let i = 0; i < position.count; i += 1) {
+          vertex.fromBufferAttribute(position, i);
+          const progress = THREE.MathUtils.clamp(vertex.y / 1.34, 0, 1);
+          position.setZ(i, vertex.z - progress * progress * 0.3);
+        }
+        position.needsUpdate = true;
+        geometry.computeVertexNormals();
+        return geometry;
+      }
+
+      const petalGeometry = createPetalGeometry();
+      const leafGeometry = createLeafGeometry();
+      const seedGeometry = new THREE.SphereGeometry(0.037, 8, 6);
+      const flowers = [];
+
+      function addPetalLayer(head, material, count, scale, angleOffset, tilt, zOffset) {
+        for (let i = 0; i < count; i += 1) {
+          const holder = new THREE.Group();
+          holder.rotation.z = angleOffset + (i / count) * Math.PI * 2;
+
+          const petal = new THREE.Mesh(petalGeometry, material);
+          petal.rotation.x = tilt;
+          petal.scale.setScalar(scale * (0.93 + ((i * 17) % 5) * 0.018));
+          petal.position.z = zOffset;
+          holder.add(petal);
+          head.add(holder);
+        }
+      }
+
+      function addSeeds(head, scale) {
+        const seeds = new THREE.Group();
+        const count = 58;
+        const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+        for (let i = 0; i < count; i += 1) {
+          const fraction = (i + 0.5) / count;
+          const radius = Math.sqrt(fraction) * 0.31 * scale;
+          const angle = i * goldenAngle;
+          const seed = new THREE.Mesh(seedGeometry, seedMaterial);
+          seed.position.set(
+            Math.cos(angle) * radius,
+            Math.sin(angle) * radius,
+            0.225 * scale + (1 - fraction) * 0.018
+          );
+          seed.scale.setScalar(0.55 + (i % 4) * 0.1);
+          seeds.add(seed);
+        }
+        head.add(seeds);
+      }
+
+      function createFlower(config) {
+        const group = new THREE.Group();
+        group.position.set(config.x, 0, config.z);
+
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(config.bendX * 0.18, config.height * 0.32, config.bendZ * 0.18),
+          new THREE.Vector3(config.bendX * 0.6, config.height * 0.68, config.bendZ * 0.6),
+          new THREE.Vector3(config.bendX, config.height, config.bendZ)
+        ]);
+
+        const stem = new THREE.Mesh(
+          new THREE.TubeGeometry(curve, 24, 0.047 * config.scale, 8, false),
+          stemMaterial
+        );
+        group.add(stem);
+
+        [0.24, 0.53].forEach((point, index) => {
+          const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+          leaf.position.copy(curve.getPoint(point));
+          leaf.rotation.order = "YXZ";
+          leaf.rotation.y = config.seed * 3.6 + index * 2.48;
+          leaf.rotation.x = -Math.PI / 2 + 0.46 + index * 0.1;
+          leaf.scale.setScalar(config.scale * (0.73 - index * 0.12));
+          group.add(leaf);
+        });
+
+        const head = new THREE.Group();
+        head.position.copy(curve.getPoint(1));
+        head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
+        const material = petalMaterials[config.materialIndex % petalMaterials.length];
+
+        addPetalLayer(head, material, config.petals, config.scale, 0, 0.1, 0.02);
+        addPetalLayer(
+          head,
+          material,
+          Math.max(7, config.petals - 3),
+          config.scale * 0.69,
+          Math.PI / config.petals,
+          0.33,
+          0.1
+        );
+
+        const center = new THREE.Mesh(
+          new THREE.SphereGeometry(0.5 * config.scale, 24, 16),
+          centerMaterial
+        );
+        center.scale.set(1, 1, 0.44);
+        center.position.z = 0.02;
+        head.add(center);
+
+        const centerTop = new THREE.Mesh(
+          new THREE.SphereGeometry(0.34 * config.scale, 20, 14),
+          centerTopMaterial
+        );
+        centerTop.scale.set(1, 1, 0.4);
+        centerTop.position.z = 0.14 * config.scale;
+        head.add(centerTop);
+        addSeeds(head, config.scale);
+        group.add(head);
+
+        return { group, head, phase: config.seed * Math.PI * 2, spin: config.spin };
+      }
+
+      const layout = [
+        { x: 0, z: 0, height: 3.92, petals: 16, scale: 1.1, tilt: 0.1, bendX: 0.05, bendZ: 0.1, spin: 0.2, materialIndex: 0, seed: 0.13 },
+        { x: -1.92, z: 0.66, height: 2.78, petals: 14, scale: 0.91, tilt: 0.3, bendX: 0.55, bendZ: 0.22, spin: 0.9, materialIndex: 1, seed: 0.41 },
+        { x: 2.08, z: -0.5, height: 3.05, petals: 14, scale: 0.97, tilt: 0.26, bendX: -0.6, bendZ: -0.18, spin: 1.7, materialIndex: 2, seed: 0.67 },
+        { x: -1.18, z: -1.72, height: 2.15, petals: 12, scale: 0.79, tilt: 0.46, bendX: 0.38, bendZ: -0.55, spin: 2.4, materialIndex: 0, seed: 0.22 },
+        { x: 1.34, z: 1.61, height: 2.37, petals: 12, scale: 0.84, tilt: 0.4, bendX: -0.45, bendZ: 0.52, spin: 3.1, materialIndex: 1, seed: 0.85 },
+        { x: -2.75, z: -0.88, height: 1.87, petals: 11, scale: 0.69, tilt: 0.56, bendX: 0.72, bendZ: -0.32, spin: 3.9, materialIndex: 2, seed: 0.55 },
+        { x: 2.78, z: 1.04, height: 1.98, petals: 11, scale: 0.75, tilt: 0.5, bendX: -0.68, bendZ: 0.38, spin: 4.6, materialIndex: 0, seed: 0.93 }
+      ];
+
+      function createShadowTexture() {
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 256;
+        const context = canvas.getContext("2d");
+        const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
+        gradient.addColorStop(0, "rgba(0, 0, 0, 0.52)");
+        gradient.addColorStop(0.46, "rgba(0, 0, 0, 0.2)");
+        gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, 256, 256);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        return texture;
+      }
+
+      const shadowMaterial = new THREE.MeshBasicMaterial({
+        map: createShadowTexture(),
+        transparent: true,
+        depthWrite: false,
+        opacity: 0.8
+      });
+      const shadowGeometry = new THREE.PlaneGeometry(1, 1);
+
+      layout.forEach((config) => {
+        const flower = createFlower(config);
+        flowers.push(flower);
+        scene.add(flower.group);
+
+        const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
+        shadow.rotation.x = -Math.PI / 2;
+        shadow.position.set(
+          config.x + config.bendX * 0.5,
+          0.01,
+          config.z + config.bendZ * 0.5
+        );
+        shadow.scale.setScalar(2.12 * config.scale + config.height * 0.25);
+        scene.add(shadow);
+      });
+
+      const pollenCount = 112;
+      const pollenPositions = new Float32Array(pollenCount * 3);
+      const pollenBaseX = new Float32Array(pollenCount);
+      const pollenBaseZ = new Float32Array(pollenCount);
+      const pollenSpeed = new Float32Array(pollenCount);
+
+      for (let i = 0; i < pollenCount; i += 1) {
+        const x = (Math.random() - 0.5) * 14;
+        const y = Math.random() * 7.7 - 0.25;
+        const z = (Math.random() - 0.5) * 14;
+        pollenPositions[i * 3] = x;
+        pollenPositions[i * 3 + 1] = y;
+        pollenPositions[i * 3 + 2] = z;
+        pollenBaseX[i] = x;
+        pollenBaseZ[i] = z;
+        pollenSpeed[i] = 0.28 + Math.random() * 0.66;
+      }
+
+      const pollenGeometry = new THREE.BufferGeometry();
+      pollenGeometry.setAttribute("position", new THREE.BufferAttribute(pollenPositions, 3));
+      const pollen = new THREE.Points(
+        pollenGeometry,
+        new THREE.PointsMaterial({
+          color: 0xffe59a,
+          size: 0.062,
+          transparent: true,
+          opacity: 0.74,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          sizeAttenuation: true
+        })
+      );
+      scene.add(pollen);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.enablePan = false;
+      controls.rotateSpeed = 0.76;
+      controls.zoomSpeed = 0.82;
+      controls.minDistance = 4.25;
+      controls.maxDistance = 20;
+      controls.minPolarAngle = 0.2;
+      controls.maxPolarAngle = Math.PI * 0.52;
+      controls.target.set(0, 2.2, 0);
+      controls.autoRotateSpeed = 0.46;
+      controls.update();
+
+      let isPaused = reduceMotion;
+      let idleTimer = null;
+
+      function setMotionState(paused) {
+        isPaused = paused;
+        controls.autoRotate = !paused;
+        motionToggle.setAttribute("aria-label", paused ? "Reanudar movimiento" : "Pausar movimiento");
+        motionToggle.title = paused ? "Reanudar movimiento" : "Pausar movimiento";
+        pauseIcon.innerHTML = paused
+          ? '<path d="m8 5 11 7-11 7V5Z"/>'
+          : '<path d="M8 5v14M16 5v14"/>';
+      }
+
+      setMotionState(isPaused);
+
+      motionToggle.addEventListener("click", () => {
+        if (idleTimer) clearTimeout(idleTimer);
+        setMotionState(!isPaused);
+      });
+
+      controls.addEventListener("start", () => {
+        if (idleTimer) clearTimeout(idleTimer);
+        controls.autoRotate = false;
+        gestureHint.style.opacity = "0";
+        gestureHint.style.transform = "translateY(8px)";
+      });
+
+      controls.addEventListener("end", () => {
+        if (isPaused) return;
+        idleTimer = window.setTimeout(() => {
+          if (!isPaused) controls.autoRotate = true;
+        }, 3300);
+      });
+
+      function resize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const aspect = width / height;
+        camera.aspect = aspect;
+        camera.fov = aspect < 1 ? Math.min(78, 43 * Math.pow(1 / aspect, 0.5)) : 43;
+        camera.updateProjectionMatrix();
+        controls.target.set(0, aspect < 1 ? 2.36 : 2.2, 0);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(width, height);
+      }
+
+      window.addEventListener("resize", resize, { passive: true });
+      window.addEventListener("orientationchange", () => window.setTimeout(resize, 120));
+      resize();
+
+      const clock = new THREE.Clock();
+      let elapsed = 0;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const delta = Math.min(clock.getDelta(), 0.05);
+        if (!isPaused) elapsed += delta;
+
+        for (const flower of flowers) {
+          const phase = flower.phase;
+          const amplitude = isPaused ? 0 : 1;
+          flower.group.rotation.z = Math.sin(elapsed * 0.7 + phase) * 0.024 * amplitude;
+          flower.group.rotation.x = Math.cos(elapsed * 0.53 + phase * 1.3) * 0.018 * amplitude;
+          flower.head.rotation.z = flower.spin + Math.sin(elapsed * 0.9 + phase) * 0.03 * amplitude;
+        }
+
+        const position = pollenGeometry.attributes.position;
+        if (!isPaused) {
+          for (let i = 0; i < pollenCount; i += 1) {
+            let y = position.getY(i) + delta * pollenSpeed[i] * 0.2;
+            if (y > 7.5) y = -0.35;
+            position.setY(i, y);
+            position.setX(i, pollenBaseX[i] + Math.sin(elapsed * 0.42 + i * 0.7) * 0.3);
+            position.setZ(i, pollenBaseZ[i] + Math.cos(elapsed * 0.36 + i * 1.3) * 0.3);
+          }
+          position.needsUpdate = true;
+          haloLight.intensity = 38 + Math.sin(elapsed * 0.8) * 4;
+        }
+
+        controls.update();
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>
