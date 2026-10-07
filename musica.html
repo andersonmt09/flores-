@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#071616" />
+  <title>Tus Canciones</title>
+  <style>
+    :root {
+      --cream: #fff7df;
+      --muted: rgba(255, 247, 223, 0.68);
+      --gold: #ffd45a;
+      --glass: rgba(9, 29, 29, 0.45);
+      --line: rgba(255, 224, 126, 0.24);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 34%, #285c55 0%, #123635 37%, #071616 74%), #071616;
+      color: var(--cream);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Partículas o estrellas de fondo */
+    .background-effects {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+    }
+
+    .nav-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1.5rem;
+      z-index: 10;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: opacity 0.2s;
+    }
+
+    .back-btn:hover {
+      opacity: 0.7;
+    }
+
+    .player-container {
+      position: relative;
+      z-index: 1;
+      width: 90%;
+      max-width: 380px;
+      padding: 2rem;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    .album-art {
+      width: 220px;
+      height: 220px;
+      margin: 0 auto 1.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2d6c56, #071616);
+      border: 2px solid var(--line);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: spin 15s linear infinite paused;
+    }
+
+    .album-art.playing {
+      animation-play-state: running;
+    }
+
+    /* Centro del disco */
+    .album-art::after {
+      content: "";
+      width: 40px;
+      height: 40px;
+      background: #071616;
+      border-radius: 50%;
+      border: 2px solid var(--line);
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .song-title {
+      font-family: Iowan Old Style, Baskerville, Georgia, serif;
+      font-size: 1.5rem;
+      margin: 0 0 0.2rem;
+      color: var(--cream);
+      letter-spacing: 0.02em;
+    }
+
+    .song-artist {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin: 0 0 1.5rem;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .btn-control {
+      background: transparent;
+      border: none;
+      color: var(--cream);
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.2s, color 0.2s;
+      display: grid;
+      place-items: center;
+    }
+
+    .btn-control:hover {
+      color: var(--gold);
+      transform: scale(1.1);
+    }
+
+    .btn-play {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 50%;
+      background: rgba(255, 218, 109, 0.15);
+      border: 1px solid var(--line);
+      color: var(--gold);
+    }
+
+    .btn-play:hover {
+      background: rgba(255, 218, 109, 0.25);
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin: 1.5rem 0;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffd45a 0%, #ff9a9e 100%);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-effects"></div>
+
+  <nav class="nav-top">
+    <a href="index.html" class="back-btn">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Volver al jardín
+    </a>
+  </nav>
+
+  <div class="player-container">
+    <div class="album-art" id="albumArt"></div>
+    
+    <h2 class="song-title">Canción para ti</h2>
+    <p class="song-artist">Artista Favorito</p>
+
+    <!-- Audio Tag, aquí pondrás tu link mp3 -->
+    <audio id="audioPlayer" src=""></audio>
+
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-control" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="19 20 9 12 19 4 19 20"></polygon>
+          <line x1="5" y1="19" x2="5" y2="5"></line>
+        </svg>
+      </button>
+
+      <button class="btn-control btn-play" id="playBtn" aria-label="Reproducir">
+        <svg id="playIcon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+      </button>
+
+      <button class="btn-control" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 4 15 12 5 20 5 4"></polygon>
+          <line x1="19" y1="5" x2="19" y2="19"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const playBtn = document.getElementById('playBtn');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const playIcon = document.getElementById('playIcon');
+    const albumArt = document.getElementById('albumArt');
+    
+    let isPlaying = false;
+
+    playBtn.addEventListener('click', () => {
+      // Como no hay src de audio todavía, solo simulamos la animación
+      isPlaying = !isPlaying;
+      
+      if(isPlaying) {
+        // audioPlayer.play();
+        playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+        albumArt.classList.add('playing');
+      } else {
+        // audioPlayer.pause();
+        playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+        albumArt.classList.remove('playing');
+      }
+    });
+  </script>
+</body>
+</html>

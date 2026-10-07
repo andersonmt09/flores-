@@ -387,28 +387,13 @@
     <div class="ui">
       <header class="masthead">
         <div class="top-menu-container">
-          <button class="round-button" id="topMenuToggle" type="button" aria-label="Menú">
+          <a href="musica.html" class="round-button" aria-label="Ir a Música" title="Música" style="text-decoration: none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="4" y1="12" x2="20" y2="12"></line>
-              <line x1="4" y1="6" x2="20" y2="6"></line>
-              <line x1="4" y1="18" x2="20" y2="18"></line>
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
             </svg>
-          </button>
-          <div class="music-panel" id="topMenuPanel">
-            <p class="panel-title">Tus Canciones</p>
-            <ul class="song-list" id="playlist">
-              <li class="song-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="play-icon"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>Canción 1 (Próximamente)</span>
-              </li>
-              <li class="song-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="play-icon"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>Canción 2 (Próximamente)</span>
-              </li>
-            </ul>
-            <!-- Etiqueta de audio oculta lista para ser usada después -->
-            <audio id="bgMusic" src=""></audio>
-          </div>
+          </a>
         </div>
       </header>
 
@@ -455,14 +440,8 @@
       const motionToggle = document.getElementById("motionToggle");
       const pauseIcon = document.getElementById("pauseIcon");
       const gestureHint = document.getElementById("gestureHint");
-      const topMenuToggle = document.getElementById("topMenuToggle");
-      const topMenuPanel = document.getElementById("topMenuPanel");
       const splashScreen = document.getElementById("splashScreen");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      topMenuToggle.addEventListener("click", () => {
-        topMenuPanel.classList.toggle("active");
-      });
 
       setTimeout(() => {
         if (splashScreen) splashScreen.classList.add("hidden");
