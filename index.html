@@ -235,6 +235,72 @@
         height: 1rem;
       }
 
+      .music-menu-container {
+        position: relative;
+      }
+
+      .music-panel {
+        position: absolute;
+        bottom: 3rem;
+        right: 0;
+        width: 200px;
+        background: var(--glass);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1rem;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+      }
+
+      .music-panel.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .music-panel .panel-title {
+        margin: 0 0 0.5rem;
+        font-size: 0.85rem;
+        color: var(--gold);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .music-panel .song-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .music-panel .song-list li {
+        font-size: 0.8rem;
+        color: var(--muted);
+        padding: 0.4rem 0;
+        border-bottom: 1px solid rgba(255, 224, 126, 0.1);
+      }
+
+      .music-panel .song-list li:last-child {
+        border-bottom: none;
+      }
+
+      .pretty-bar {
+        width: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #ffd45a 0%, #ff9a9e 50%, #fecfef 100%);
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        animation: loadBar 2s cubic-bezier(0.22, 1, 0.36, 1) forwards 1s;
+      }
+
+      @keyframes loadBar {
+        to { width: 100%; }
+      }
+
       .fallback {
         position: fixed;
         inset: 0;
@@ -312,6 +378,8 @@
     <div class="ui">
       <header class="masthead">
         <p class="eyebrow">Un pequeño jardín</p>
+        <h1>PARA TI</h1>
+        <div class="pretty-bar"></div>
       </header>
 
       <footer class="footer">
@@ -328,6 +396,21 @@
               <path d="M8 5v14M16 5v14"/>
             </svg>
           </button>
+          <div class="music-menu-container">
+            <button class="round-button" id="musicToggle" type="button" aria-label="Menú de canciones" title="Canciones">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+              </svg>
+            </button>
+            <div class="music-panel" id="musicPanel">
+              <p class="panel-title">Tus Canciones</p>
+              <ul class="song-list">
+                <li>Canciones favoritas...</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
@@ -355,7 +438,13 @@
       const motionToggle = document.getElementById("motionToggle");
       const pauseIcon = document.getElementById("pauseIcon");
       const gestureHint = document.getElementById("gestureHint");
+      const musicToggle = document.getElementById("musicToggle");
+      const musicPanel = document.getElementById("musicPanel");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      musicToggle.addEventListener("click", () => {
+        musicPanel.classList.toggle("active");
+      });
 
       const renderer = new THREE.WebGLRenderer({
         antialias: true,
