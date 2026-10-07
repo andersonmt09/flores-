@@ -279,14 +279,30 @@
       }
 
       .music-panel .song-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
         font-size: 0.8rem;
         color: var(--muted);
-        padding: 0.4rem 0;
+        padding: 0.5rem 0;
         border-bottom: 1px solid rgba(255, 224, 126, 0.1);
+        cursor: pointer;
+        transition: color 0.2s ease;
+      }
+
+      .music-panel .song-list li:hover {
+        color: var(--cream);
       }
 
       .music-panel .song-list li:last-child {
         border-bottom: none;
+      }
+
+      .play-icon {
+        width: 1rem;
+        height: 1rem;
+        color: var(--gold);
+        flex-shrink: 0;
       }
 
       .splash-screen {
@@ -378,11 +394,19 @@
             </svg>
           </button>
           <div class="music-panel" id="topMenuPanel">
-            <p class="panel-title">Menú</p>
-            <ul class="song-list">
-              <li>Tus Canciones</li>
-              <li>Próximamente...</li>
+            <p class="panel-title">Tus Canciones</p>
+            <ul class="song-list" id="playlist">
+              <li class="song-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="play-icon"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Canción 1 (Próximamente)</span>
+              </li>
+              <li class="song-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="play-icon"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Canción 2 (Próximamente)</span>
+              </li>
             </ul>
+            <!-- Etiqueta de audio oculta lista para ser usada después -->
+            <audio id="bgMusic" src=""></audio>
           </div>
         </div>
       </header>
