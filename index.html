@@ -11,7 +11,7 @@
     <title>Jardín en 3D</title>
     <style>
       :root {
-        color-scheme: díark;
+        color-scheme: dark;
         --cream: #fff7df;
         --muted: rgba(255, 247, 223, 0.68);
         --gold: #ffd45a;
@@ -81,7 +81,7 @@
         z-index: 2;
         pointer-events: none;
         opacity: 0.09;
-        background-image: url("díata:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
         mix-blend-mode: soft-light;
       }
 
@@ -929,7 +929,7 @@
       scene.add(redAccentLight2);
 
       const petalMaterials = [
-        new THREE.MeshStandíardMaterial({
+        new THREE.MeshStandardMaterial({
           color: 0xffc928,
           roughness: 0.46,
           metalness: 0.02,
@@ -937,7 +937,7 @@
           emissiveIntensity: 0.32,
           side: THREE.DoubleSide
         }),
-        new THREE.MeshStandíardMaterial({
+        new THREE.MeshStandardMaterial({
           color: 0xffdf64,
           roughness: 0.5,
           metalness: 0.02,
@@ -945,7 +945,7 @@
           emissiveIntensity: 0.25,
           side: THREE.DoubleSide
         }),
-        new THREE.MeshStandíardMaterial({
+        new THREE.MeshStandardMaterial({
           color: 0xf6b91d,
           roughness: 0.42,
           metalness: 0.025,
@@ -953,7 +953,7 @@
           emissiveIntensity: 0.34,
           side: THREE.DoubleSide
         }),
-        new THREE.MeshStandíardMaterial({
+        new THREE.MeshStandardMaterial({
           color: 0xffe873,
           roughness: 0.45,
           metalness: 0.025,
@@ -963,27 +963,27 @@
         })
       ];
 
-      const centerMaterial = new THREE.MeshStandíardMaterial({
+      const centerMaterial = new THREE.MeshStandardMaterial({
         color: 0x4a2d0e,
         roughness: 0.9,
         metalness: 0
       });
-      const centerTopMaterial = new THREE.MeshStandíardMaterial({
+      const centerTopMaterial = new THREE.MeshStandardMaterial({
         color: 0x81521b,
         roughness: 0.82,
         metalness: 0
       });
-      const seedMaterial = new THREE.MeshStandíardMaterial({
+      const seedMaterial = new THREE.MeshStandardMaterial({
         color: 0x201104,
         roughness: 0.86,
         metalness: 0
       });
-      const stemMaterial = new THREE.MeshStandíardMaterial({
+      const stemMaterial = new THREE.MeshStandardMaterial({
         color: 0x2d7843,
         roughness: 0.76,
         metalness: 0
       });
-      const leafMaterial = new THREE.MeshStandíardMaterial({
+      const leafMaterial = new THREE.MeshStandardMaterial({
         color: 0x40834b,
         roughness: 0.72,
         metalness: 0,
@@ -991,7 +991,7 @@
       });
 
       const spiderPetalMaterials = [
-        new THREE.MeshStandíardMaterial({
+        new THREE.MeshStandardMaterial({
           color: 0xe61a2e,
           roughness: 0.36,
           metalness: 0.05,
@@ -999,7 +999,7 @@
           emissiveIntensity: 0.58,
           side: THREE.DoubleSide
         }),
-        new THREE.MeshStandíardMaterial({
+        new THREE.MeshStandardMaterial({
           color: 0xff3327,
           roughness: 0.38,
           metalness: 0.05,
@@ -1007,7 +1007,7 @@
           emissiveIntensity: 0.55,
           side: THREE.DoubleSide
         }),
-        new THREE.MeshStandíardMaterial({
+        new THREE.MeshStandardMaterial({
           color: 0xc4101f,
           roughness: 0.34,
           metalness: 0.06,
@@ -1016,22 +1016,22 @@
           side: THREE.DoubleSide
         })
       ];
-      const spiderStemMaterial = new THREE.MeshStandíardMaterial({
+      const spiderStemMaterial = new THREE.MeshStandardMaterial({
         color: 0x5c1a1a,
         roughness: 0.68,
         metalness: 0
       });
-      const spiderCenterMaterial = new THREE.MeshStandíardMaterial({
+      const spiderCenterMaterial = new THREE.MeshStandardMaterial({
         color: 0x6e0f14,
         roughness: 0.6,
         metalness: 0
       });
-      const stamenMaterial = new THREE.MeshStandíardMaterial({
+      const stamenMaterial = new THREE.MeshStandardMaterial({
         color: 0xb3202a,
         roughness: 0.48,
         metalness: 0.02
       });
-      const antherMaterial = new THREE.MeshStandíardMaterial({
+      const antherMaterial = new THREE.MeshStandardMaterial({
         color: 0x4a0a0d,
         roughness: 0.55,
         metalness: 0
@@ -1061,7 +1061,7 @@
           const progress = THREE.MathUtils.clamp(vertex.y / 1.28, 0, 1);
           position.setZ(i, vertex.z + progress * progress * 0.29);
         }
-        position.needsUpdíate = true;
+        position.needsUpdate = true;
         geometry.computeVertexNormals();
         return geometry;
       }
@@ -1090,7 +1090,7 @@
           const progress = THREE.MathUtils.clamp(vertex.y / 1.34, 0, 1);
           position.setZ(i, vertex.z - progress * progress * 0.3);
         }
-        position.needsUpdíate = true;
+        position.needsUpdate = true;
         geometry.computeVertexNormals();
         return geometry;
       }
@@ -1124,7 +1124,7 @@
           position.setZ(i, vertex.z + curl);
           position.setX(i, vertex.x + ripple);
         }
-        position.needsUpdíate = true;
+        position.needsUpdate = true;
         geometry.computeVertexNormals();
         return geometry;
       }
@@ -1206,20 +1206,20 @@
 
       
 // ---------- MATERIALES DE TULIPANES ----------
-const tulipStemMaterial = new THREE.MeshStandíardMaterial({ color: 0x6fa84a, roughness: 0.65 });
-const tulipLeafMaterial = new THREE.MeshStandíardMaterial({
+const tulipStemMaterial = new THREE.MeshStandardMaterial({ color: 0x6fa84a, roughness: 0.65 });
+const tulipLeafMaterial = new THREE.MeshStandardMaterial({
   color: 0x5d9b6a, roughness: 0.55, side: THREE.DoubleSide, vertexColors: true
 });
 const tulipPetalMaterials = [0xd9142b, 0xf06292, 0xffc107, 0xff7a1a, 0x8e3fb5, 0xf4efe6, 0xe8446d, 0x1e88e5, 0x0d47a1, 0x2962ff, 0x00b0ff, 0x1565c0, 0x1565c0, 0x0d47a1, 0x1e88e5].map(
   (color) =>
-    new THREE.MeshStandíardMaterial({
+    new THREE.MeshStandardMaterial({
       color, roughness: 0.42, metalness: 0.0, side: THREE.DoubleSide, vertexColors: true
     })
 );
-const tulipCenterMaterial = new THREE.MeshStandíardMaterial({ color: 0x3a2a4a, roughness: 0.6 });
-const tulipFilamentMaterial = new THREE.MeshStandíardMaterial({ color: 0xe9e2b0, roughness: 0.7 });
-const tulipAntherMaterial = new THREE.MeshStandíardMaterial({ color: 0x2b1b3a, roughness: 0.5 });
-const tulipPistilMaterial = new THREE.MeshStandíardMaterial({ color: 0xb5c95a, roughness: 0.6 });
+const tulipCenterMaterial = new THREE.MeshStandardMaterial({ color: 0x3a2a4a, roughness: 0.6 });
+const tulipFilamentMaterial = new THREE.MeshStandardMaterial({ color: 0xe9e2b0, roughness: 0.7 });
+const tulipAntherMaterial = new THREE.MeshStandardMaterial({ color: 0x2b1b3a, roughness: 0.5 });
+const tulipPistilMaterial = new THREE.MeshStandardMaterial({ color: 0xb5c95a, roughness: 0.6 });
 
 function createTulipPetalGeometry(outer) {
   const segU = 22, segV = 10;
@@ -1843,7 +1843,7 @@ function createFlower(config) {
 
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
-      controls.díampingFactor = 0.06;
+      controls.dampingFactor = 0.06;
       controls.enablePan = false;
       controls.rotateSpeed = 0.76;
       controls.zoomSpeed = 0.82;
@@ -1853,7 +1853,7 @@ function createFlower(config) {
       controls.maxPolarAngle = Math.PI * 0.52;
       controls.target.set(0, 2.2, 0);
       controls.autoRotateSpeed = 0.46;
-      controls.updíate();
+      controls.update();
 
       let isPaused = reduceMotion;
       let idleTimer = null;
@@ -1861,8 +1861,8 @@ function createFlower(config) {
       function setMotionState(paused) {
         isPaused = paused;
         controls.autoRotate = !paused;
-        motionToggle.setAttribute("aria-label", paused ? "Reanudíar movimiento" : "Pausar movimiento");
-        motionToggle.title = paused ? "Reanudíar movimiento" : "Pausar movimiento";
+        motionToggle.setAttribute("aria-label", paused ? "Reanudar movimiento" : "Pausar movimiento");
+        motionToggle.title = paused ? "Reanudar movimiento" : "Pausar movimiento";
         pauseIcon.innerHTML = paused
           ? '<path d="m8 5 11 7-11 7V5Z"/>'
           : '<path d="M8 5v14M16 5v14"/>';
@@ -1895,7 +1895,7 @@ function createFlower(config) {
         const aspect = width / height;
         camera.aspect = aspect;
         camera.fov = aspect < 1 ? Math.min(84, 43 * Math.pow(1 / aspect, 0.5)) : 43;
-        camera.updíateProjectionMatrix();
+        camera.updateProjectionMatrix();
         controls.target.set(0, aspect < 1 ? 2.36 : 2.2, 0);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setSize(width, height);
@@ -1949,7 +1949,7 @@ function createFlower(config) {
                 batch.baseZ[i] + Math.cos(elapsed * 0.36 + batch.driftPhase[i] * 1.4) * 0.38
               );
             }
-            position.needsUpdíate = true;
+            position.needsUpdate = true;
 
             const twinkle = Math.sin(elapsed * batch.pulseSpeed + batch.phase) * 0.5 + 0.5;
             batch.material.size = batch.baseSize * (0.7 + twinkle * 0.7);
@@ -1989,7 +1989,7 @@ function createFlower(config) {
           redAccentLight2.intensity = 8 + Math.sin(elapsed * 0.65 + 0.6) * 2.4;
         }
 
-        controls.updíate();
+        controls.update();
         renderer.render(scene, camera);
       }
 
@@ -2062,7 +2062,7 @@ function createFlower(config) {
     src: "assets/music/qeJKadkYX40.m4a"
   },
   {
-    title: "Almas perdidías",
+    title: "Almas perdidas",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/qeJKadkYX40/hqdefault.jpg",
     src: "assets/music/qeJKadkYX40.m4a"
@@ -2104,13 +2104,13 @@ function createFlower(config) {
     src: "assets/music/lfCDiBAqH6s.m4a"
   },
   {
-    title: "Bambúú",
+    title: "Bambú",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/-LtINl7lFss/maxresdefault.webp",
     src: "assets/music/-LtINl7lFss.m4a"
   },
   {
-    title: "Bambúú (COLORS / COQE)",
+    title: "Bambú (COLORS / COQE)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/-LtINl7lFss/hqdefault.jpg",
     src: "assets/music/-LtINl7lFss.m4a"
@@ -2122,13 +2122,13 @@ function createFlower(config) {
     src: "assets/music/69F3NYS9W-Q.m4a"
   },
   {
-    title: "Cadía Uno a Lo Suyo (ft. El Chojin & Almanegra)",
+    title: "Cada Uno a Lo Suyo (ft. El Chojin & Almanegra)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/BH7fwwL2WXE/hqdefault.jpg",
     src: "assets/music/BH7fwwL2WXE.m4a"
   },
   {
-    title: "Calle Escondidía (ft. Error 999 & Mismo Perro)",
+    title: "Calle Escondida (ft. Error 999 & Mismo Perro)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/APV0rbNX1LM/hqdefault.jpg",
     src: "assets/music/APV0rbNX1LM.m4a"
@@ -2178,8 +2178,8 @@ function createFlower(config) {
   {
     title: "Como La Luna ft. Selene",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/JruiMásnZT-E/maxresdefault.jpg",
-    src: "assets/music/JruiMásnZT-E.m4a"
+    cover: "https://i.ytimg.com/vi/JruiMsnZT-E/maxresdefault.jpg",
+    src: "assets/music/JruiMsnZT-E.m4a"
   },
   {
     title: "Como Yotas",
@@ -2290,7 +2290,7 @@ function createFlower(config) {
     src: "assets/music/PEVztafebuk.m4a"
   },
   {
-    title: "El Día Quée El Mundo Cambie",
+    title: "El Día Que El Mundo Cambie",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/BNCZ_fK-BuY/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGD8gZShSMA8=&rs=AOn4CLAPM6-zD_06hLwUXGSD9YoVT8NOnA",
     src: "assets/music/BNCZ_fK-BuY.m4a"
@@ -2320,7 +2320,7 @@ function createFlower(config) {
     src: "assets/music/bE8KYHJF3tI.m4a"
   },
   {
-    title: "El Quée Duro Se Para",
+    title: "El Que Duro Se Para",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/JmA4g3CFUUo/maxresdefault.jpg",
     src: "assets/music/JmA4g3CFUUo.m4a"
@@ -2350,7 +2350,7 @@ function createFlower(config) {
     src: "assets/music/lMFRq6rzPME.m4a"
   },
   {
-    title: "El úúltimo trago",
+    title: "El último trago",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/bE8KYHJF3tI/hqdefault.jpg",
     src: "assets/music/bE8KYHJF3tI.m4a"
@@ -2386,7 +2386,7 @@ function createFlower(config) {
     src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
-    title: "Felicidíad",
+    title: "Felicidad",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/DDok_Ut69iE/maxresdefault.jpg",
     src: "assets/music/DDok_Ut69iE.m4a"
@@ -2476,7 +2476,7 @@ function createFlower(config) {
     src: "assets/music/9rqgrKpUmuA.m4a"
   },
   {
-    title: "La ciudíad del humo",
+    title: "La ciudad del humo",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/Ls1cOqGf7oI/hqdefault.jpg",
     src: "assets/music/Ls1cOqGf7oI.m4a"
@@ -2548,7 +2548,7 @@ function createFlower(config) {
     src: "assets/music/PHA_N_LXjyc.m4a"
   },
   {
-    title: "Le Decían Quée No Podía",
+    title: "Le Decían Que No Podía",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/eXRfRwkYZEs/maxresdefault.jpg",
     src: "assets/music/eXRfRwkYZEs.m4a"
@@ -2592,8 +2592,8 @@ function createFlower(config) {
   {
     title: "Luna llena",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/JruiMásnZT-E/hqdefault.jpg",
-    src: "assets/music/JruiMásnZT-E.m4a"
+    cover: "https://img.youtube.com/vi/JruiMsnZT-E/hqdefault.jpg",
+    src: "assets/music/JruiMsnZT-E.m4a"
   },
   {
     title: "Lágrimas",
@@ -2602,7 +2602,7 @@ function createFlower(config) {
     src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
-    title: "Madrugadías ft. Gona",
+    title: "Madrugadas ft. Gona",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/Xysz1kxL5qQ/maxresdefault.webp",
     src: "assets/music/Xysz1kxL5qQ.m4a"
@@ -2680,13 +2680,13 @@ function createFlower(config) {
     src: "assets/music/HIxEaIBSiTI.m4a"
   },
   {
-    title: "Nadía",
+    title: "Nada",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/XQWKBRuUWw4/maxresdefault.jpg",
     src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
-    title: "Nadía es para siempre",
+    title: "Nada es para siempre",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
     src: "assets/music/XQWKBRuUWw4.m4a"
@@ -2710,7 +2710,7 @@ function createFlower(config) {
     src: "assets/music/90UfJKzBBOA.m4a"
   },
   {
-    title: "No Sabía Quée Sabía",
+    title: "No Sabía Que Sabía",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/RpfWsx45Rgo/maxresdefault.webp",
     src: "assets/music/RpfWsx45Rgo.m4a"
@@ -2746,7 +2746,7 @@ function createFlower(config) {
     src: "assets/music/BWvIHzlaH8o.m4a"
   },
   {
-    title: "Oscuridíad",
+    title: "Oscuridad",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/gNPJMEoP6KI/hqdefault.jpg",
     src: "assets/music/gNPJMEoP6KI.m4a"
@@ -2764,7 +2764,7 @@ function createFlower(config) {
     src: "assets/music/UUUoEUUfp8s.m4a"
   },
   {
-    title: "Paisaje De Mi Heridía ft. Kazu",
+    title: "Paisaje De Mi Herida ft. Kazu",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/OpJmg6eVGAs/hqdefault.jpg",
     src: "assets/music/OpJmg6eVGAs.m4a"
@@ -2806,31 +2806,31 @@ function createFlower(config) {
     src: "assets/music/Zv4I8_Fg2G4.m4a"
   },
   {
-    title: "Quée den la vuelta (ft. Jam Block Jr & Hi-Kymon)",
+    title: "Que den la vuelta (ft. Jam Block Jr & Hi-Kymon)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/9yBUd8iS5uc/hqdefault.jpg",
     src: "assets/music/9yBUd8iS5uc.m4a"
   },
   {
-    title: "Quée Nadía Te Aplaste",
+    title: "Que Nada Te Aplaste",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/maxresdefault.jpg",
     src: "assets/music/-WPPMOE2jeE.m4a"
   },
   {
-    title: "Quéimera",
+    title: "Quimera",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/3N9Q8XIqhUo/hqdefault.jpg",
     src: "assets/music/3N9Q8XIqhUo.m4a"
   },
   {
-    title: "Quéé Más Da (ft. Melodico & La Loquera)",
+    title: "Qué Más Da (ft. Melodico & La Loquera)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/WdGZ4LOn0lQ/hqdefault.jpg",
     src: "assets/music/WdGZ4LOn0lQ.m4a"
   },
   {
-    title: "Rapero Porque Quéiero",
+    title: "Rapero Porque Quiero",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/BbTgoluQyu4/maxresdefault.webp",
     src: "assets/music/BbTgoluQyu4.m4a"
@@ -2842,19 +2842,19 @@ function createFlower(config) {
     src: "assets/music/7TpeooPW_0Q.m4a"
   },
   {
-    title: "Realidíad Mental - Lo Quée Más Importa",
+    title: "Realidad Mental - Lo Que Más Importa",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/VnznSUg2rT4/maxresdefault.webp",
     src: "assets/music/VnznSUg2rT4.m4a"
   },
   {
-    title: "Realidíad Mental - Vivir El Tiempo",
+    title: "Realidad Mental - Vivir El Tiempo",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/WJnumOjQEn8/maxresdefault.jpg",
     src: "assets/music/WJnumOjQEn8.m4a"
   },
   {
-    title: "Realidíad Mental - Ya Verás",
+    title: "Realidad Mental - Ya Verás",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/kiTKGKjjS2I/maxresdefault.webp",
     src: "assets/music/kiTKGKjjS2I.m4a"
@@ -2886,8 +2886,8 @@ function createFlower(config) {
   {
     title: "Ser feliz es gratis",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/KHQuéqfbcII0/hqdefault.jpg",
-    src: "assets/music/KHQuéqfbcII0.m4a"
+    cover: "https://img.youtube.com/vi/KHQuqfbcII0/hqdefault.jpg",
+    src: "assets/music/KHQuqfbcII0.m4a"
   },
   {
     title: "Si No Estas",
@@ -2902,7 +2902,7 @@ function createFlower(config) {
     src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
-    title: "Sigo aquíí (ft. Ali A.K.A Mind)",
+    title: "Sigo aquí (ft. Ali A.K.A Mind)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/giOWXLeBMbg/hqdefault.jpg",
     src: "assets/music/giOWXLeBMbg.m4a"
@@ -2938,13 +2938,13 @@ function createFlower(config) {
     src: "assets/music/Aaa5_xY4Kko.m4a"
   },
   {
-    title: "Soledíad",
+    title: "Soledad",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/0RvSHbhsXLY/hqdefault.jpg",
     src: "assets/music/0RvSHbhsXLY.m4a"
   },
   {
-    title: "Solitario Soldíado",
+    title: "Solitario Soldado",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/-RDWIsrVt0s/maxresdefault.webp",
     src: "assets/music/-RDWIsrVt0s.m4a"
@@ -2968,7 +2968,7 @@ function createFlower(config) {
     src: "assets/music/BMMt6ADT6W8.m4a"
   },
   {
-    title: "Tarde Quée Temprano",
+    title: "Tarde Que Temprano",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/GIS450UJbMQ/maxresdefault.jpg",
     src: "assets/music/GIS450UJbMQ.m4a"
@@ -2998,7 +2998,7 @@ function createFlower(config) {
     src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
-    title: "Todo o nadía",
+    title: "Todo o nada",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
     src: "assets/music/XQWKBRuUWw4.m4a"
@@ -3148,7 +3148,7 @@ function loadSong(index) {
         }
       }
 
-      function updíatePlayState() {
+      function updatePlayState() {
         if (audioPlayer.paused) {
           isPlaying = false;
           playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
@@ -3172,7 +3172,7 @@ function loadSong(index) {
         if (isPlaying) audioPlayer.play();
       }
 
-      function updíateProgress(e) {
+      function updateProgress(e) {
         const duration = e.target.duration;
         const currentTime = e.target.currentTime;
         if(isNaN(duration)) return;
@@ -3245,11 +3245,11 @@ function loadSong(index) {
         }
 
         if(audioPlayer) {
-        audioPlayer.addEventListener('play', updíatePlayState);
-        audioPlayer.addEventListener('pause', updíatePlayState);
-        audioPlayer.addEventListener('timeupdíate', updíateProgress);
+        audioPlayer.addEventListener('play', updatePlayState);
+        audioPlayer.addEventListener('pause', updatePlayState);
+        audioPlayer.addEventListener('timeupdate', updateProgress);
         audioPlayer.addEventListener('ended', nextSong);
-        audioPlayer.addEventListener('loadedmetadíata', () => {
+        audioPlayer.addEventListener('loadedmetadata', () => {
           let durationMins = Math.floor(audioPlayer.duration / 60);
           let durationSecs = Math.floor(audioPlayer.duration % 60);
           if (durationSecs < 10) durationSecs = '0' + durationSecs;

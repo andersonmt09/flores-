@@ -66,7 +66,7 @@ const playlist = [
     src: "assets/music/qeJKadkYX40.m4a"
   },
   {
-    title: "Almas perdidías",
+    title: "Almas perdidas",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/qeJKadkYX40/hqdefault.jpg",
     src: "assets/music/qeJKadkYX40.m4a"
@@ -108,13 +108,13 @@ const playlist = [
     src: "assets/music/lfCDiBAqH6s.m4a"
   },
   {
-    title: "Bambúú",
+    title: "Bambú",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/-LtINl7lFss/maxresdefault.webp",
     src: "assets/music/-LtINl7lFss.m4a"
   },
   {
-    title: "Bambúú (COLORS / COQE)",
+    title: "Bambú (COLORS / COQE)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/-LtINl7lFss/hqdefault.jpg",
     src: "assets/music/-LtINl7lFss.m4a"
@@ -126,13 +126,13 @@ const playlist = [
     src: "assets/music/69F3NYS9W-Q.m4a"
   },
   {
-    title: "Cadía Uno a Lo Suyo (ft. El Chojin & Almanegra)",
+    title: "Cada Uno a Lo Suyo (ft. El Chojin & Almanegra)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/BH7fwwL2WXE/hqdefault.jpg",
     src: "assets/music/BH7fwwL2WXE.m4a"
   },
   {
-    title: "Calle Escondidía (ft. Error 999 & Mismo Perro)",
+    title: "Calle Escondida (ft. Error 999 & Mismo Perro)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/APV0rbNX1LM/hqdefault.jpg",
     src: "assets/music/APV0rbNX1LM.m4a"
@@ -182,8 +182,8 @@ const playlist = [
   {
     title: "Como La Luna ft. Selene",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/JruiMásnZT-E/maxresdefault.jpg",
-    src: "assets/music/JruiMásnZT-E.m4a"
+    cover: "https://i.ytimg.com/vi/JruiMsnZT-E/maxresdefault.jpg",
+    src: "assets/music/JruiMsnZT-E.m4a"
   },
   {
     title: "Como Yotas",
@@ -294,7 +294,7 @@ const playlist = [
     src: "assets/music/PEVztafebuk.m4a"
   },
   {
-    title: "El Día Quée El Mundo Cambie",
+    title: "El Día Que El Mundo Cambie",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/BNCZ_fK-BuY/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGD8gZShSMA8=&rs=AOn4CLAPM6-zD_06hLwUXGSD9YoVT8NOnA",
     src: "assets/music/BNCZ_fK-BuY.m4a"
@@ -324,7 +324,7 @@ const playlist = [
     src: "assets/music/bE8KYHJF3tI.m4a"
   },
   {
-    title: "El Quée Duro Se Para",
+    title: "El Que Duro Se Para",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/JmA4g3CFUUo/maxresdefault.jpg",
     src: "assets/music/JmA4g3CFUUo.m4a"
@@ -354,7 +354,7 @@ const playlist = [
     src: "assets/music/lMFRq6rzPME.m4a"
   },
   {
-    title: "El úúltimo trago",
+    title: "El último trago",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/bE8KYHJF3tI/hqdefault.jpg",
     src: "assets/music/bE8KYHJF3tI.m4a"
@@ -390,7 +390,7 @@ const playlist = [
     src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
-    title: "Felicidíad",
+    title: "Felicidad",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/DDok_Ut69iE/maxresdefault.jpg",
     src: "assets/music/DDok_Ut69iE.m4a"
@@ -480,7 +480,7 @@ const playlist = [
     src: "assets/music/9rqgrKpUmuA.m4a"
   },
   {
-    title: "La ciudíad del humo",
+    title: "La ciudad del humo",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/Ls1cOqGf7oI/hqdefault.jpg",
     src: "assets/music/Ls1cOqGf7oI.m4a"
@@ -552,7 +552,7 @@ const playlist = [
     src: "assets/music/PHA_N_LXjyc.m4a"
   },
   {
-    title: "Le Decían Quée No Podía",
+    title: "Le Decían Que No Podía",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/eXRfRwkYZEs/maxresdefault.jpg",
     src: "assets/music/eXRfRwkYZEs.m4a"
@@ -596,8 +596,8 @@ const playlist = [
   {
     title: "Luna llena",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/JruiMásnZT-E/hqdefault.jpg",
-    src: "assets/music/JruiMásnZT-E.m4a"
+    cover: "https://img.youtube.com/vi/JruiMsnZT-E/hqdefault.jpg",
+    src: "assets/music/JruiMsnZT-E.m4a"
   },
   {
     title: "Lágrimas",
@@ -606,7 +606,7 @@ const playlist = [
     src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
-    title: "Madrugadías ft. Gona",
+    title: "Madrugadas ft. Gona",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/Xysz1kxL5qQ/maxresdefault.webp",
     src: "assets/music/Xysz1kxL5qQ.m4a"
@@ -684,13 +684,13 @@ const playlist = [
     src: "assets/music/HIxEaIBSiTI.m4a"
   },
   {
-    title: "Nadía",
+    title: "Nada",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/XQWKBRuUWw4/maxresdefault.jpg",
     src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
-    title: "Nadía es para siempre",
+    title: "Nada es para siempre",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
     src: "assets/music/XQWKBRuUWw4.m4a"
@@ -714,7 +714,7 @@ const playlist = [
     src: "assets/music/90UfJKzBBOA.m4a"
   },
   {
-    title: "No Sabía Quée Sabía",
+    title: "No Sabía Que Sabía",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/RpfWsx45Rgo/maxresdefault.webp",
     src: "assets/music/RpfWsx45Rgo.m4a"
@@ -750,7 +750,7 @@ const playlist = [
     src: "assets/music/BWvIHzlaH8o.m4a"
   },
   {
-    title: "Oscuridíad",
+    title: "Oscuridad",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/gNPJMEoP6KI/hqdefault.jpg",
     src: "assets/music/gNPJMEoP6KI.m4a"
@@ -768,7 +768,7 @@ const playlist = [
     src: "assets/music/UUUoEUUfp8s.m4a"
   },
   {
-    title: "Paisaje De Mi Heridía ft. Kazu",
+    title: "Paisaje De Mi Herida ft. Kazu",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/OpJmg6eVGAs/hqdefault.jpg",
     src: "assets/music/OpJmg6eVGAs.m4a"
@@ -810,31 +810,31 @@ const playlist = [
     src: "assets/music/Zv4I8_Fg2G4.m4a"
   },
   {
-    title: "Quée den la vuelta (ft. Jam Block Jr & Hi-Kymon)",
+    title: "Que den la vuelta (ft. Jam Block Jr & Hi-Kymon)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/9yBUd8iS5uc/hqdefault.jpg",
     src: "assets/music/9yBUd8iS5uc.m4a"
   },
   {
-    title: "Quée Nadía Te Aplaste",
+    title: "Que Nada Te Aplaste",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/maxresdefault.jpg",
     src: "assets/music/-WPPMOE2jeE.m4a"
   },
   {
-    title: "Quéimera",
+    title: "Quimera",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/3N9Q8XIqhUo/hqdefault.jpg",
     src: "assets/music/3N9Q8XIqhUo.m4a"
   },
   {
-    title: "Quéé Más Da (ft. Melodico & La Loquera)",
+    title: "Qué Más Da (ft. Melodico & La Loquera)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/WdGZ4LOn0lQ/hqdefault.jpg",
     src: "assets/music/WdGZ4LOn0lQ.m4a"
   },
   {
-    title: "Rapero Porque Quéiero",
+    title: "Rapero Porque Quiero",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/BbTgoluQyu4/maxresdefault.webp",
     src: "assets/music/BbTgoluQyu4.m4a"
@@ -846,19 +846,19 @@ const playlist = [
     src: "assets/music/7TpeooPW_0Q.m4a"
   },
   {
-    title: "Realidíad Mental - Lo Quée Más Importa",
+    title: "Realidad Mental - Lo Que Más Importa",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/VnznSUg2rT4/maxresdefault.webp",
     src: "assets/music/VnznSUg2rT4.m4a"
   },
   {
-    title: "Realidíad Mental - Vivir El Tiempo",
+    title: "Realidad Mental - Vivir El Tiempo",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/WJnumOjQEn8/maxresdefault.jpg",
     src: "assets/music/WJnumOjQEn8.m4a"
   },
   {
-    title: "Realidíad Mental - Ya Verás",
+    title: "Realidad Mental - Ya Verás",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/kiTKGKjjS2I/maxresdefault.webp",
     src: "assets/music/kiTKGKjjS2I.m4a"
@@ -890,8 +890,8 @@ const playlist = [
   {
     title: "Ser feliz es gratis",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/KHQuéqfbcII0/hqdefault.jpg",
-    src: "assets/music/KHQuéqfbcII0.m4a"
+    cover: "https://img.youtube.com/vi/KHQuqfbcII0/hqdefault.jpg",
+    src: "assets/music/KHQuqfbcII0.m4a"
   },
   {
     title: "Si No Estas",
@@ -906,7 +906,7 @@ const playlist = [
     src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
-    title: "Sigo aquíí (ft. Ali A.K.A Mind)",
+    title: "Sigo aquí (ft. Ali A.K.A Mind)",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/giOWXLeBMbg/hqdefault.jpg",
     src: "assets/music/giOWXLeBMbg.m4a"
@@ -942,13 +942,13 @@ const playlist = [
     src: "assets/music/Aaa5_xY4Kko.m4a"
   },
   {
-    title: "Soledíad",
+    title: "Soledad",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/0RvSHbhsXLY/hqdefault.jpg",
     src: "assets/music/0RvSHbhsXLY.m4a"
   },
   {
-    title: "Solitario Soldíado",
+    title: "Solitario Soldado",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi_webp/-RDWIsrVt0s/maxresdefault.webp",
     src: "assets/music/-RDWIsrVt0s.m4a"
@@ -972,7 +972,7 @@ const playlist = [
     src: "assets/music/BMMt6ADT6W8.m4a"
   },
   {
-    title: "Tarde Quée Temprano",
+    title: "Tarde Que Temprano",
     artist: "Penyair",
     cover: "https://i.ytimg.com/vi/GIS450UJbMQ/maxresdefault.jpg",
     src: "assets/music/GIS450UJbMQ.m4a"
@@ -1002,7 +1002,7 @@ const playlist = [
     src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
-    title: "Todo o nadía",
+    title: "Todo o nada",
     artist: "Penyair",
     cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
     src: "assets/music/XQWKBRuUWw4.m4a"
