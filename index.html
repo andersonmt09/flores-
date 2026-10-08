@@ -775,7 +775,7 @@
         </button>
       </nav>
       <div class="playlist-full-container">
-        <h1 style="color: var(--gold); text-align: center; font-family: Iowan Old Style, serif; margin-bottom: 2rem;">Catálogo de Penyair</h1>
+        <h1 style="color: var(--gold); text-align: center; font-family: 'Iowan Old Style', serif; font-size: clamp(2rem, 5vw, 2.5rem); margin: 0 auto 2rem; width: 100%;">Catálogo de Penyair</h1>
         <input type="text" class="playlist-search" id="playlistSearch" placeholder="Buscar canción..." style="max-width: 600px; margin: 0 auto 2rem; display: block; width: 90%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1rem; border-radius: 20px; color: white;">
         <ul class="playlist-items" id="playlistItems" style="max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; padding: 0 1rem; list-style: none;">
         </ul>
@@ -1206,7 +1206,7 @@ const tulipStemMaterial = new THREE.MeshStandardMaterial({ color: 0x6fa84a, roug
 const tulipLeafMaterial = new THREE.MeshStandardMaterial({
   color: 0x5d9b6a, roughness: 0.55, side: THREE.DoubleSide, vertexColors: true
 });
-const tulipPetalMaterials = [0xd9142b, 0xf06292, 0xffc107, 0xff7a1a, 0x8e3fb5, 0xf4efe6, 0xe8446d].map(
+const tulipPetalMaterials = [0xd9142b, 0xf06292, 0xffc107, 0xff7a1a, 0x8e3fb5, 0xf4efe6, 0xe8446d, 0x1e88e5, 0x0d47a1].map(
   (color) =>
     new THREE.MeshStandardMaterial({
       color, roughness: 0.42, metalness: 0.0, side: THREE.DoubleSide, vertexColors: true
@@ -1537,7 +1537,7 @@ function createFlower(config) {
       }
 
       const random = seededRandom(20260921);
-      const fieldFlowerCount = window.matchMedia("(max-width: 640px)").matches ? 10 : 20;
+      const fieldFlowerCount = window.matchMedia("(max-width: 640px)").matches ? 20 : 40;
       const layout = heroLayout.concat(makeFieldFlowers(fieldFlowerCount, random));
 
       function createSpiderLilyLayout(random) {
