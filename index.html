@@ -1843,7 +1843,7 @@
       // Fetch from Custom Render API
       async function fetchPenyairSongs() {
         try {
-          const response = await fetch('https://flores-11.onrender.com/search?q=Penyair+canciones+oficiales');
+          const response = await fetch('/search?q=Penyair+canciones+oficiales');
           const data = await response.json();
           if (data && data.results) {
             data.results.forEach(track => {
@@ -1854,7 +1854,7 @@
                 title: track.title,
                 artist: "Penyair", // yt-dlp search might not give artist strictly, so default it
                 cover: coverImg,
-                src: `https://flores-11.onrender.com/stream/${track.id}`
+                src: `/stream/${track.id}`
               });
             });
             renderPlaylist(playlistSearch ? playlistSearch.value : "");
