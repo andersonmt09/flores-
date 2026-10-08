@@ -554,11 +554,13 @@
         line-height: 1.2;
       }
 
-            .playlist-item-artist {
-        font-size: 0.8rem;
+                  .playlist-item-artist {
+        font-size: 0.85rem;
         color: rgba(255,255,255,0.6);
         margin: 0;
         text-align: center;
+        width: 100%;
+        display: block;
       }
 
             .album-art {
@@ -660,11 +662,13 @@
         text-align: center;
         line-height: 1.2;
       }
-            .playlist-item-artist {
-        font-size: 0.8rem;
+                  .playlist-item-artist {
+        font-size: 0.85rem;
         color: rgba(255,255,255,0.6);
         margin: 0;
         text-align: center;
+        width: 100%;
+        display: block;
       }
 
     
@@ -1206,7 +1210,7 @@ const tulipStemMaterial = new THREE.MeshStandardMaterial({ color: 0x6fa84a, roug
 const tulipLeafMaterial = new THREE.MeshStandardMaterial({
   color: 0x5d9b6a, roughness: 0.55, side: THREE.DoubleSide, vertexColors: true
 });
-const tulipPetalMaterials = [0xd9142b, 0xf06292, 0xffc107, 0xff7a1a, 0x8e3fb5, 0xf4efe6, 0xe8446d, 0x1e88e5, 0x0d47a1].map(
+const tulipPetalMaterials = [0xd9142b, 0xf06292, 0xffc107, 0xff7a1a, 0x8e3fb5, 0xf4efe6, 0xe8446d, 0x1e88e5, 0x0d47a1, 0x2962ff, 0x00b0ff, 0x1565c0, 0x1565c0, 0x0d47a1, 0x1e88e5].map(
   (color) =>
     new THREE.MeshStandardMaterial({
       color, roughness: 0.42, metalness: 0.0, side: THREE.DoubleSide, vertexColors: true
@@ -1537,7 +1541,7 @@ function createFlower(config) {
       }
 
       const random = seededRandom(20260921);
-      const fieldFlowerCount = window.matchMedia("(max-width: 640px)").matches ? 20 : 40;
+      const fieldFlowerCount = window.matchMedia("(max-width: 640px)").matches ? 40 : 80;
       const layout = heroLayout.concat(makeFieldFlowers(fieldFlowerCount, random));
 
       function createSpiderLilyLayout(random) {
@@ -1938,6 +1942,19 @@ function createFlower(config) {
             const twinkle = Math.sin(elapsed * batch.pulseSpeed + batch.phase) * 0.5 + 0.5;
             batch.material.size = batch.baseSize * (0.7 + twinkle * 0.7);
             batch.material.opacity = 0.5 + twinkle * 0.42;
+          }
+          for (const flower of flowers) {
+            if (flower.bloomProgress === undefined) {
+              flower.bloomProgress = 0;
+              flower.bloomSpeed = 0.3 + Math.random() * 0.4;
+              flower.group.scale.setScalar(0);
+            }
+            if (flower.bloomProgress < 1 && !isPaused) {
+              flower.bloomProgress += delta * flower.bloomSpeed;
+              if (flower.bloomProgress > 1) flower.bloomProgress = 1;
+              const easeOut = 1 - Math.pow(1 - flower.bloomProgress, 4);
+              flower.group.scale.setScalar(easeOut);
+            }
           }
 
           for (const firefly of fireflies) {
