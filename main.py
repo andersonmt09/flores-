@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.responses import StreamingResponse, FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import yt_dlp
 import requests
@@ -66,7 +66,8 @@ def stream(video_id: str):
 
 @app.get("/")
 def serve_root():
-    return FileResponse("index.html")
+    with open("index.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read(), headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache"})
 
 @app.get("/{full_path:path}")
 def serve_static(full_path: str):
