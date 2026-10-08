@@ -46,6 +46,7 @@ def stream(video_id: str):
         'format': 'bestaudio/best',
         'noplaylist': True,
         'quiet': True,
+        'extractor_args': {'youtube': {'client': ['android', 'ios']}}
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
