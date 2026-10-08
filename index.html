@@ -1842,6 +1842,9 @@
 
       // Fetch from Custom Render API
       async function fetchPenyairSongs() {
+        if(playlistContainer) {
+          playlistContainer.innerHTML = '<li style="text-align: center; color: var(--gold); padding: 1rem; opacity: 0.8; font-size: 0.9rem;">Buscando discografía en YouTube... (puede tardar 15s)</li>';
+        }
         try {
           const response = await fetch('/search?q=ytsearch15:Penyair+canciones+oficiales');
           const data = await response.json();
@@ -1849,18 +1852,20 @@
             data.results.forEach(track => {
               // Ensure we don't get empty thumbnails or bad titles
               const coverImg = track.thumbnail || 'assets/images/saber_amar_cover.jpg';
-              // Filter out weird long compilation videos or non-music if possible by duration, but let's just add them
               playlist.push({
                 title: track.title,
-                artist: "Penyair", // yt-dlp search might not give artist strictly, so default it
+                artist: "Penyair",
                 cover: coverImg,
                 src: `/stream/${track.id}`
               });
             });
             renderPlaylist(playlistSearch ? playlistSearch.value : "");
+          } else {
+            renderPlaylist(playlistSearch ? playlistSearch.value : "");
           }
         } catch (error) {
           console.error('Error fetching from Render API:', error);
+          renderPlaylist(playlistSearch ? playlistSearch.value : "");
         }
       }
 
