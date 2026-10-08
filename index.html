@@ -1933,7 +1933,21 @@ function createFlower(config) {
             flower.spin + Math.sin(elapsed * 0.95 + phase) * 0.036 * (0.6 + wind) * (isPaused ? 0 : 1);
         }
 
-        if (!isPaused) {
+                  for (const flower of flowers) {
+            if (flower.bloomProgress === undefined) {
+              flower.bloomProgress = 0;
+              flower.bloomSpeed = 0.3 + Math.random() * 0.4;
+              flower.group.scale.setScalar(0);
+            }
+            if (flower.bloomProgress < 1) {
+              flower.bloomProgress += delta * flower.bloomSpeed;
+              if (flower.bloomProgress > 1) flower.bloomProgress = 1;
+              const easeOut = 1 - Math.pow(1 - flower.bloomProgress, 4);
+              flower.group.scale.setScalar(easeOut);
+            }
+          }
+
+          if (!isPaused) {
           for (const batch of particleBatches) {
             const position = batch.geometry.attributes.position;
             for (let i = 0; i < position.count; i += 1) {
@@ -1955,19 +1969,7 @@ function createFlower(config) {
             batch.material.size = batch.baseSize * (0.7 + twinkle * 0.7);
             batch.material.opacity = 0.5 + twinkle * 0.42;
           }
-          for (const flower of flowers) {
-            if (flower.bloomProgress === undefined) {
-              flower.bloomProgress = 0;
-              flower.bloomSpeed = 0.3 + Math.random() * 0.4;
-              flower.group.scale.setScalar(0);
-            }
-            if (flower.bloomProgress < 1) {
-              flower.bloomProgress += delta * flower.bloomSpeed;
-              if (flower.bloomProgress > 1) flower.bloomProgress = 1;
-              const easeOut = 1 - Math.pow(1 - flower.bloomProgress, 4);
-              flower.group.scale.setScalar(easeOut);
-            }
-          }
+
 
           for (const firefly of fireflies) {
             firefly.sprite.position.x =
