@@ -237,7 +237,7 @@
 
       .top-menu-container {
         position: relative;
-        display: inline-block;
+        display: block; margin: 0 auto 2rem; width: 250px; height: 250px;
         pointer-events: auto;
       }
 
@@ -545,10 +545,10 @@
         text-align: left;
       }
 
-      .album-art {
-        width: 200px;
-        height: 200px;
-        margin: 0 auto 1.5rem;
+            .album-art {
+        width: 100%;
+        height: 100%;
+        margin: 0;
         border-radius: 50%;
         background-size: cover;
         background-position: center;
@@ -669,9 +669,12 @@
       @keyframes spin {
         to { transform: translate(-50%, -50%) rotate(360deg); }
       }
-      .album-container-wrapper {
+            .album-container-wrapper {
         position: relative;
-        display: inline-block;
+        display: block; 
+        margin: 0 auto 2rem; 
+        width: 250px; 
+        height: 250px;
         border-radius: 50%;
       }
 
@@ -1804,6 +1807,12 @@
       // Music Player Logic
       const playlist = [
   {
+    title: "Penyair - Saber Amar (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/69F3NYS9W-Q/maxresdefault.jpg",
+    src: "assets/music/69F3NYS9W-Q.m4a"
+  },
+  {
     title: "Penyair - Mujer Sin Nombre ft @El_Muisca  (Video Oficial)",
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi/yOX7cfNhdzQ/maxresdefault.jpg",
@@ -1882,16 +1891,16 @@
     src: "assets/music/moFKxKShgCg.m4a"
   },
   {
-    title: "Penyair - Máscaras x G Promode (Video Oficial)",
-    artist: "Penyair Oficial",
-    cover: "https://i.ytimg.com/vi/HIxEaIBSiTI/maxresdefault.jpg",
-    src: "assets/music/HIxEaIBSiTI.m4a"
-  },
-  {
     title: "Penyair - Efímero ft @EstebanRojas06 (Video Oficial)",
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi/lMFRq6rzPME/maxresdefault.jpg",
     src: "assets/music/lMFRq6rzPME.m4a"
+  },
+  {
+    title: "Penyair - Máscaras x G Promode (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/HIxEaIBSiTI/maxresdefault.jpg",
+    src: "assets/music/HIxEaIBSiTI.m4a"
   },
   {
     title: "Penyair - Tú tienes el son ft @CharlesAns ll Antes del alba (Video Oficial)",
@@ -1906,16 +1915,16 @@
     src: "assets/music/VnznSUg2rT4.m4a"
   },
   {
-    title: "Penyair - Saber Amar (Video Oficial)",
-    artist: "Penyair Oficial",
-    cover: "https://i.ytimg.com/vi/69F3NYS9W-Q/maxresdefault.jpg",
-    src: "assets/music/69F3NYS9W-Q.m4a"
-  },
-  {
     title: "Penyair - Solo Es Una (Video Oficial)",
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi/XVvXuK4hZ_c/maxresdefault.jpg",
     src: "assets/music/XVvXuK4hZ_c.m4a"
+  },
+  {
+    title: "Penyair - El día que el mundo cambie 🌎 (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/BNCZ_fK-BuY/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGD8gZShSMA8=&rs=AOn4CLAPM6-zD_06hLwUXGSD9YoVT8NOnA",
+    src: "assets/music/BNCZ_fK-BuY.m4a"
   },
   {
     title: "Penyair - Compasión x @LaLoqueraProduccionesOficial (Visualizer)",
@@ -1936,10 +1945,10 @@
     src: "assets/music/A1eu6Spaz3g.m4a"
   },
   {
-    title: "Penyair - Que nada te aplaste prod @Hi-Kymon (Video oficial)",
+    title: "Penyair - Igual ft @SANTARMOFICIAL ll Antes del alba (video oficial)",
     artist: "Penyair Oficial",
-    cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/maxresdefault.jpg",
-    src: "assets/music/-WPPMOE2jeE.m4a"
+    cover: "https://i.ytimg.com/vi_webp/-cG1v34b62c/maxresdefault.webp",
+    src: "assets/music/-cG1v34b62c.m4a"
   },
   {
     title: "Penyair - El Diablo x G Promode (Video Oficial)",
@@ -1954,6 +1963,12 @@
     src: "assets/music/vFQ_0jRTUt0.m4a"
   },
   {
+    title: "Penyair - Que nada te aplaste prod @Hi-Kymon (Video oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/maxresdefault.jpg",
+    src: "assets/music/-WPPMOE2jeE.m4a"
+  },
+  {
     title: "Capitulo 7 - Penyair (Video Oficial)",
     artist: "el area 351",
     cover: "https://i.ytimg.com/vi_webp/1_NpskHPn0w/maxresdefault.webp",
@@ -1964,6 +1979,12 @@
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi_webp/R4HqzKnLffI/maxresdefault.webp",
     src: "assets/music/R4HqzKnLffI.m4a"
+  },
+  {
+    title: "el RedCode FT Penyair & DjMook// EL 1 % // #MONTAÑERO3",
+    artist: "El RedCode OFICIAL",
+    cover: "https://i.ytimg.com/vi_webp/UI40eF5MbbI/maxresdefault.webp",
+    src: "assets/music/UI40eF5MbbI.m4a"
   },
   {
     title: "Penyair - La papa y la leña ft @La_Muchacha_Isabel (Video oficial)",
@@ -1978,6 +1999,12 @@
     src: "assets/music/x77asaCh5V8.m4a"
   },
   {
+    title: "Penyair - Rapero Porque Quiero",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/BbTgoluQyu4/maxresdefault.webp",
+    src: "assets/music/BbTgoluQyu4.m4a"
+  },
+  {
     title: "Perder",
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi_webp/Ay9h07Z2vcI/maxresdefault.webp",
@@ -1990,10 +2017,358 @@
     src: "assets/music/DdylyF4gWPc.m4a"
   },
   {
+    title: "Penyair - La música ft. @AndyPalabras  (Audio)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/Um-T2wsssag/maxresdefault.jpg",
+    src: "assets/music/Um-T2wsssag.m4a"
+  },
+  {
     title: "Penyair - El que duro se para ft @ProofOficial  prod @LaLoqueraProduccionesOficial (Visualizer)",
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi/JmA4g3CFUUo/maxresdefault.jpg",
     src: "assets/music/JmA4g3CFUUo.m4a"
+  },
+  {
+    title: "Al Son De La Neurona - Penya  -  (Video Oficia)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/x1JLel7OmTY/maxresdefault.webp",
+    src: "assets/music/x1JLel7OmTY.m4a"
+  },
+  {
+    title: "Penyair - Cuántos ⚡️ (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/-HJxAijznMo/maxresdefault.jpg",
+    src: "assets/music/-HJxAijznMo.m4a"
+  },
+  {
+    title: "Penyair - La cicatriz (Visualizer)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/9rqgrKpUmuA/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AG-B4AC0AWKAgwIABABGEsgZShFMA8=&rs=AOn4CLCVEB7uX7VHEuwRbByYK7kbM6w16g",
+    src: "assets/music/9rqgrKpUmuA.m4a"
+  },
+  {
+    title: "Penyair - En casa nadie lo espera x Dj Jlp (Visualizer)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/3BtkOApjHaA/maxresdefault.jpg",
+    src: "assets/music/3BtkOApjHaA.m4a"
+  },
+  {
+    title: "No Copy - Penyair (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/B8sAqa7dEq8/maxresdefault.jpg",
+    src: "assets/music/B8sAqa7dEq8.m4a"
+  },
+  {
+    title: "Penyair - Perro fino x @EddyMugre_Beats x @DJDmoe  (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/fVolstaflyo/maxresdefault.webp",
+    src: "assets/music/fVolstaflyo.m4a"
+  },
+  {
+    title: "Penyair - Mujeres (Video oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/PIQJl1y5WMg/maxresdefault.webp",
+    src: "assets/music/PIQJl1y5WMg.m4a"
+  },
+  {
+    title: "Maldito Siglo XXI - Penyair - (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/gcVNFjhaIdI/maxresdefault.webp",
+    src: "assets/music/gcVNFjhaIdI.m4a"
+  },
+  {
+    title: "Tú tienes el son - Penyair & Charles ( letra )",
+    artist: "Penyair Letras",
+    cover: "https://i.ytimg.com/vi/0c4j9hoMYWA/maxresdefault.jpg",
+    src: "assets/music/0c4j9hoMYWA.m4a"
+  },
+  {
+    title: "Penyair - Felicidad (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/DDok_Ut69iE/maxresdefault.jpg",
+    src: "assets/music/DDok_Ut69iE.m4a"
+  },
+  {
+    title: "Penyair - Bambú | A COLORS SHOW",
+    artist: "COLORS",
+    cover: "https://i.ytimg.com/vi_webp/-LtINl7lFss/maxresdefault.webp",
+    src: "assets/music/-LtINl7lFss.m4a"
+  },
+  {
+    title: "CHIMBA DE DÍA - @EstebanRojas06 x @PenyairOficial (Video Oficial)",
+    artist: "Esteban Rojas 💎",
+    cover: "https://i.ytimg.com/vi_webp/w7ycW8-FVKo/maxresdefault.webp",
+    src: "assets/music/w7ycW8-FVKo.m4a"
+  },
+  {
+    title: "Penyair - Tarde que temprano ft Joes Yawar Crew ⏰ (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/GIS450UJbMQ/maxresdefault.jpg",
+    src: "assets/music/GIS450UJbMQ.m4a"
+  },
+  {
+    title: "Penyair - Pon fin ll Antes del alba (visualizer)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/Kq-CIz4-FR8/maxresdefault.jpg",
+    src: "assets/music/Kq-CIz4-FR8.m4a"
+  },
+  {
+    title: "Sabor - Penyair (Cuarentemas)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/Iv_hbcKlH4E/maxresdefault.jpg",
+    src: "assets/music/Iv_hbcKlH4E.m4a"
+  },
+  {
+    title: "Realidad Mental - Ya Verás ft. @PenyairOficial Prod @EddyMugre_Beats  @AlkaBeatsCol (Visualizer)",
+    artist: "Realidad Mental",
+    cover: "https://i.ytimg.com/vi_webp/kiTKGKjjS2I/maxresdefault.webp",
+    src: "assets/music/kiTKGKjjS2I.m4a"
+  },
+  {
+    title: "Penyair, Sharif - Por si los días no vuelven x Gordo del funk (video oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/Zv4I8_Fg2G4/maxresdefault.webp",
+    src: "assets/music/Zv4I8_Fg2G4.m4a"
+  },
+  {
+    title: "Penyair - Compasión (Letras)",
+    artist: "Penyair Letras",
+    cover: "https://i.ytimg.com/vi/ctH6b8Zn51A/maxresdefault.jpg",
+    src: "assets/music/ctH6b8Zn51A.m4a"
+  },
+  {
+    title: "LosPetitFellas - Original Ft. Penyair",
+    artist: "LosPetitFellas",
+    cover: "https://i.ytimg.com/vi/w_P2krK9z4U/maxresdefault.jpg",
+    src: "assets/music/w_P2krK9z4U.m4a"
+  },
+  {
+    title: "Menos Plata Mas Amor - Penyair (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/QH8skkEg0m4/hqdefault.jpg",
+    src: "assets/music/QH8skkEg0m4.m4a"
+  },
+  {
+    title: "Paisaje de mi Herida - Kazu Ft @PenyairOficial (Video Oficial)",
+    artist: "Kazu",
+    cover: "https://i.ytimg.com/vi/OpJmg6eVGAs/hqdefault.jpg",
+    src: "assets/music/OpJmg6eVGAs.m4a"
+  },
+  {
+    title: "Como La Luna  - Selene ft Penyair (Prod. El Sonido Del Javier)",
+    artist: "Selene ",
+    cover: "https://i.ytimg.com/vi/JruiMsnZT-E/maxresdefault.jpg",
+    src: "assets/music/JruiMsnZT-E.m4a"
+  },
+  {
+    title: "MADRUGADAS - GONA x PENYAIR x SHOIBA",
+    artist: "Gonadl1",
+    cover: "https://i.ytimg.com/vi_webp/Xysz1kxL5qQ/maxresdefault.webp",
+    src: "assets/music/Xysz1kxL5qQ.m4a"
+  },
+  {
+    title: "Penyair - El final del cuento (Letra)",
+    artist: "Penyair Letras",
+    cover: "https://i.ytimg.com/vi/8HSTiZWJo9U/maxresdefault.jpg",
+    src: "assets/music/8HSTiZWJo9U.m4a"
+  },
+  {
+    title: "Penyair - Llegan se van (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/90UfJKzBBOA/maxresdefault.webp",
+    src: "assets/music/90UfJKzBBOA.m4a"
+  },
+  {
+    title: "PENYAIR | The Cypher Effect Mic Check Session #290",
+    artist: "The Cypher Effect En Español",
+    cover: "https://i.ytimg.com/vi_webp/sCtd-r3vvvc/maxresdefault.webp",
+    src: "assets/music/sCtd-r3vvvc.m4a"
+  },
+  {
+    title: "Penyair - Las calles son clases ft @McKnoOficial 🚕 ll Antes del alba (video oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/zMJ4VJXS3mQ/hqdefault.jpg",
+    src: "assets/music/zMJ4VJXS3mQ.m4a"
+  },
+  {
+    title: "Hablar con actos - Penya (Eddy Mugre, Dj Jota) AskoFilms",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/GGRiH-zBrcI/maxresdefault.webp",
+    src: "assets/music/GGRiH-zBrcI.m4a"
+  },
+  {
+    title: "Realidad Mental - Vivir El Tiempo ft. @PenyairOficial (Video Oficial)",
+    artist: "Realidad Mental",
+    cover: "https://i.ytimg.com/vi/WJnumOjQEn8/maxresdefault.jpg",
+    src: "assets/music/WJnumOjQEn8.m4a"
+  },
+  {
+    title: "Penyair - I Don´t Know (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/9IHmdI8eKIc/maxresdefault.jpg",
+    src: "assets/music/9IHmdI8eKIc.m4a"
+  },
+  {
+    title: "Penyair - Hasta las yemas ll Antes del alba (visualizer)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/ybxVczv73Ac/maxresdefault.jpg",
+    src: "assets/music/ybxVczv73Ac.m4a"
+  },
+  {
+    title: "Penyair - Esperar ft. @AfazNaturalOficial (Parte 2)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/7Q5Mud5YgU0/maxresdefault.jpg",
+    src: "assets/music/7Q5Mud5YgU0.m4a"
+  },
+  {
+    title: "Penyair - No sabia que sabia ft Mañas Ru-Fino prod. Juan Sinatra (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/RpfWsx45Rgo/maxresdefault.webp",
+    src: "assets/music/RpfWsx45Rgo.m4a"
+  },
+  {
+    title: "Penyair - Cura prod. @Alka_Produce  (Video oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/E3g9izI6Rww/maxresdefault.jpg",
+    src: "assets/music/E3g9izI6Rww.m4a"
+  },
+  {
+    title: "Penyair - Tio Armando x @Alka_Produce  (Video oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/lAoj2JTQtbQ/maxresdefault.jpg",
+    src: "assets/music/lAoj2JTQtbQ.m4a"
+  },
+  {
+    title: "2:22 - Penyair - Video Oficial (Solitario LP)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/C6Mvd9Y7m4A/maxresdefault.jpg",
+    src: "assets/music/C6Mvd9Y7m4A.m4a"
+  },
+  {
+    title: "Penyair - Eter ft. @ASTRO-LS  (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/3BcgyeNGCJ4/maxresdefault.webp",
+    src: "assets/music/3BcgyeNGCJ4.m4a"
+  },
+  {
+    title: "Penyair - Tierra Santa ft. @laberintoenlascalles x @djsenkua (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/BZw-GbuR4UI/maxresdefault.webp",
+    src: "assets/music/BZw-GbuR4UI.m4a"
+  },
+  {
+    title: "El final del cuento - Penyair  🔥Letra🔥 #letra #letralyrics #penyair",
+    artist: "Monsaent ",
+    cover: "https://i.ytimg.com/vi_webp/w_hMtFoFtU4/maxresdefault.webp",
+    src: "assets/music/w_hMtFoFtU4.m4a"
+  },
+  {
+    title: "Nada- Penyair (Letra)",
+    artist: "SP letters",
+    cover: "https://i.ytimg.com/vi/biWAJoE8m_s/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AHSBoAC3AOKAgwIABABGGUgWihaMA8=&rs=AOn4CLAmbY8ObBwTkc7IpDaAXI81X9UQnw",
+    src: "assets/music/biWAJoE8m_s.m4a"
+  },
+  {
+    title: "SI NO ESTAS-- Penyair   LETRA 🔥",
+    artist: "LETRAS 4K",
+    cover: "https://i.ytimg.com/vi/qAsy_UP0GoI/maxresdefault.jpg",
+    src: "assets/music/qAsy_UP0GoI.m4a"
+  },
+  {
+    title: "Penyair  - Sin Visajes",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/Aaa5_xY4Kko/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGGUgWShIMA8=&rs=AOn4CLCUHH2T5pRz_RxdEx-L5l4T4WxmRQ",
+    src: "assets/music/Aaa5_xY4Kko.m4a"
+  },
+  {
+    title: "No Critique A Los Demas - Penya (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi_webp/epQfTYf9Q2c/maxresdefault.webp",
+    src: "assets/music/epQfTYf9Q2c.m4a"
+  },
+  {
+    title: "Nada - Penyair (Lyrics)",
+    artist: "Music GO Official",
+    cover: "https://i.ytimg.com/vi/iogm2vrZhGQ/maxresdefault.jpg",
+    src: "assets/music/iogm2vrZhGQ.m4a"
+  },
+  {
+    title: "Penyair - Los dueños x G promode ll Antes del alba (video oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/CUZA9tM1x9c/maxresdefault.jpg",
+    src: "assets/music/CUZA9tM1x9c.m4a"
+  },
+  {
+    title: "El Muisca ft @PenyairOficial   - Intento Tras Intento(VIDEO OFICIAL)",
+    artist: "EL MUISCA ",
+    cover: "https://i.ytimg.com/vi_webp/bE8KYHJF3tI/maxresdefault.webp",
+    src: "assets/music/bE8KYHJF3tI.m4a"
+  },
+  {
+    title: "el Redcode Ft @PenyairOficial // PARA NO VOLVER JAMAS",
+    artist: "El RedCode OFICIAL",
+    cover: "https://i.ytimg.com/vi/SCa11_1Ezx4/maxresdefault.jpg",
+    src: "assets/music/SCa11_1Ezx4.m4a"
+  },
+  {
+    title: "Penyair Ft. Joes Ywc - Tema Explícito (Letra)",
+    artist: "Monsaent ",
+    cover: "https://i.ytimg.com/vi_webp/Nldwyb5lhpI/maxresdefault.webp",
+    src: "assets/music/Nldwyb5lhpI.m4a"
+  },
+  {
+    title: "Penyair - Las Ganas (Audio)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/PHA_N_LXjyc/maxresdefault.jpg",
+    src: "assets/music/PHA_N_LXjyc.m4a"
+  },
+  {
+    title: "Sus Mentiras - Penyair (Cypher)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/BMMt6ADT6W8/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGC4gXyhlMA8=&rs=AOn4CLDs3YZtxhilWPA_x2LFA2xuewHNBg",
+    src: "assets/music/BMMt6ADT6W8.m4a"
+  },
+  {
+    title: "Solitario Soldado ft. @PenyairOficial  - Por el D.C  (prod. @elsonidodeljavier (Vídeo oficial)",
+    artist: "Solitario Soldado",
+    cover: "https://i.ytimg.com/vi_webp/-RDWIsrVt0s/maxresdefault.webp",
+    src: "assets/music/-RDWIsrVt0s.m4a"
+  },
+  {
+    title: "Penyair - Aquí x @TurekHem (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/61hpBuw10l0/maxresdefault.jpg",
+    src: "assets/music/61hpBuw10l0.m4a"
+  },
+  {
+    title: "Como Yotas - Penyair letra",
+    artist: "Alfredo Lyrics",
+    cover: "https://i.ytimg.com/vi/CRXHmt6jW9s/maxresdefault.jpg",
+    src: "assets/music/CRXHmt6jW9s.m4a"
+  },
+  {
+    title: "Penyair - Le decían que no podía (Video Oficial)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/eXRfRwkYZEs/maxresdefault.jpg",
+    src: "assets/music/eXRfRwkYZEs.m4a"
+  },
+  {
+    title: "Tema Explicito - Penyair ft, Joes ywc (Letra's)... Rap - Colombia",
+    artist: "Letra'S",
+    cover: "https://i.ytimg.com/vi/E6ZRiV80s4c/maxresdefault.jpg",
+    src: "assets/music/E6ZRiV80s4c.m4a"
+  },
+  {
+    title: "Penyair - Mi rap ll Antes del alba (visualizer)",
+    artist: "Penyair Oficial",
+    cover: "https://i.ytimg.com/vi/UY11Lczb2MA/maxresdefault.jpg",
+    src: "assets/music/UY11Lczb2MA.m4a"
+  },
+  {
+    title: "3 de septiembre - Penyair",
+    artist: "Penyair Letras",
+    cover: "https://i.ytimg.com/vi/ozlZfVa7DtM/hqdefault.jpg",
+    src: "assets/music/ozlZfVa7DtM.m4a"
   },
 ];
 
