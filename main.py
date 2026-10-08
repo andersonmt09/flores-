@@ -64,5 +64,12 @@ def stream(video_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Servir la aplicación estática de forma nativa con FastAPI
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+@app.get("/")
+def serve_root():
+    return FileResponse("index.html")
+
+@app.get("/{full_path:path}")
+def serve_static(full_path: str):
+    if os.path.exists(full_path) and os.path.isfile(full_path):
+        return FileResponse(full_path)
+    return FileResponse("index.html")
