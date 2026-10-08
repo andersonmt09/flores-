@@ -1840,6 +1840,29 @@
         });
       }
 
+      // Fetch from iTunes API
+      async function fetchPenyairSongs() {
+        try {
+          const response = await fetch('https://itunes.apple.com/search?term=Penyair&entity=song&limit=15');
+          const data = await response.json();
+          if (data && data.results) {
+            data.results.forEach(track => {
+              // Get higher quality image
+              const highResCover = track.artworkUrl100 ? track.artworkUrl100.replace('100x100bb', '600x600bb') : 'assets/images/saber_amar_cover.jpg';
+              playlist.push({
+                title: track.trackName,
+                artist: track.artistName,
+                cover: highResCover,
+                src: track.previewUrl
+              });
+            });
+            renderPlaylist(playlistSearch ? playlistSearch.value : "");
+          }
+        } catch (error) {
+          console.error('Error fetching API:', error);
+        }
+      }
+
       if(playlistSearch) {
         playlistSearch.addEventListener('input', (e) => {
           renderPlaylist(e.target.value);
@@ -1864,7 +1887,8 @@
       if(prevBtn) prevBtn.addEventListener('click', prevSong);
       if(nextBtn) nextBtn.addEventListener('click', nextSong);
       if(progressContainer) progressContainer.addEventListener('click', setProgress);
-
+      
+      fetchPenyairSongs();
       loadSong(0);
 
       animate();
