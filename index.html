@@ -604,7 +604,7 @@
       .progress-bar::after { content: ""; position: absolute; right: -5px; top: -3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; }
       .time-info { display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); margin-top: 0.5rem; }
     
-      .full-screen-overlay {
+            .full-screen-overlay {
         position: fixed;
         inset: 0;
         z-index: 1000;
@@ -612,7 +612,8 @@
         flex-direction: column;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.5s ease, visibility 0.5s ease;
+        transition: opacity 0.5s ease, visibility 0.5s;
+        background-color: #071616;
       }
       .full-screen-overlay.active {
         opacity: 1;
