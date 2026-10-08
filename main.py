@@ -64,6 +64,11 @@ def stream(video_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/debug_source")
+def debug_source():
+    with open(__file__, "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f"<pre>{f.read()}</pre>")
+
 @app.get("/")
 def serve_root():
     with open("index.html", "r", encoding="utf-8") as f:
