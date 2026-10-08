@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, RedirectResponse
+from fastapi.responses import StreamingResponse, FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 import yt_dlp
 import requests
+import os
 
 app = FastAPI()
 
@@ -13,10 +15,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.get("/")
-def read_root():
-    return RedirectResponse(url="https://andersonmt09.github.io/flores-/")
 
 @app.get("/search")
 def search(q: str):
@@ -65,3 +63,20 @@ def stream(video_id: str):
             return StreamingResponse(iterfile(), media_type="audio/mpeg")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/debug_source")
+def debug_source():
+    with open(__file__, "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f"<pre>{f.read()}</pre>")
+
+@app.get("/")
+def serve_root():
+    with open("../index.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read(), headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache"})
+
+@app.get("/{full_path:path}")
+def serve_static(full_path: str):
+    target = os.path.join("..", full_path)
+    if os.path.exists(target) and os.path.isfile(target):
+        return FileResponse(target)
+    return FileResponse("../index.html")
