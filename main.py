@@ -68,7 +68,12 @@ def stream(video_id: str):
 if os.path.exists("assets"):
     app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
-# Ruta comodín para servir el frontend (index.html)
+# Ruta explícita para la raíz para evitar redirecciones 307 de FastAPI
+@app.get("/")
+def serve_root():
+    return FileResponse("index.html")
+
+# Ruta comodín para servir el frontend (assets u otros archivos)
 @app.get("/{full_path:path}")
 def serve_frontend(full_path: str):
     if full_path == "" or full_path == "index.html":
