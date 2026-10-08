@@ -424,7 +424,7 @@
         text-shadow: 0 2px 4px rgba(0,0,0,0.5);
       }
 
-      .player-layout {
+            .player-layout {
         position: relative;
         z-index: 2;
         width: 90%;
@@ -435,20 +435,29 @@
         justify-content: center;
         margin: 0 auto;
         height: 100vh;
+        padding-top: 4rem;
+        box-sizing: border-box;
       }
       
       @media (max-width: 768px) {
-        .player-layout {
-          flex-direction: column;
-          align-items: center;
-          height: 80vh;
-          overflow-y: auto;
-          gap: 1.5rem;
-        }
+              .player-layout {
+        position: relative;
+        z-index: 2;
+        width: 90%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        height: 100vh;
+        padding-top: 4rem;
+        box-sizing: border-box;
+      }
       }
 
       .player-container {
-        flex: 1;
+        
         width: 100%;
         max-width: 380px;
         padding: 2rem;
@@ -557,10 +566,10 @@
         align-items: center;
         justify-content: center;
         position: relative;
-        animation: spin 20s linear infinite paused;
+        animation: spin 20s linear infinite paused; -webkit-animation: spin 20s linear infinite paused;
       }
 
-      .album-art.playing { animation-play-state: running; }
+      .album-art.playing { animation-play-state: running; -webkit-animation-play-state: running; }
 
       .album-art::after {
         content: "";
@@ -1932,12 +1941,6 @@
     src: "assets/music/d8nRUJOSdkQ.m4a"
   },
   {
-    title: "Penyair - Mujer Sin Nombre ft. Muisca (Letra)",
-    artist: "Penyair Oficial",
-    cover: "https://i.ytimg.com/vi/751tzWp2X08/maxresdefault.jpg",
-    src: "assets/music/751tzWp2X08.m4a"
-  },
-  {
     title: "Penyair - Un Pelito y un Tamal (Video Oficial)",
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi_webp/A1eu6Spaz3g/maxresdefault.webp",
@@ -2002,12 +2005,6 @@
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi_webp/BbTgoluQyu4/maxresdefault.webp",
     src: "assets/music/BbTgoluQyu4.m4a"
-  },
-  {
-    title: "Perder",
-    artist: "Penyair Oficial",
-    cover: "https://i.ytimg.com/vi_webp/Ay9h07Z2vcI/maxresdefault.webp",
-    src: "assets/music/Ay9h07Z2vcI.m4a"
   },
   {
     title: "Penyair - Salmo  (Audio)",
@@ -2128,12 +2125,6 @@
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi_webp/Zv4I8_Fg2G4/maxresdefault.webp",
     src: "assets/music/Zv4I8_Fg2G4.m4a"
-  },
-  {
-    title: "Penyair - Compasión (Letras)",
-    artist: "Penyair Letras",
-    cover: "https://i.ytimg.com/vi/ctH6b8Zn51A/maxresdefault.jpg",
-    src: "assets/music/ctH6b8Zn51A.m4a"
   },
   {
     title: "LosPetitFellas - Original Ft. Penyair",
@@ -2262,12 +2253,6 @@
     src: "assets/music/w_hMtFoFtU4.m4a"
   },
   {
-    title: "Nada- Penyair (Letra)",
-    artist: "SP letters",
-    cover: "https://i.ytimg.com/vi/biWAJoE8m_s/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AHSBoAC3AOKAgwIABABGGUgWihaMA8=&rs=AOn4CLAmbY8ObBwTkc7IpDaAXI81X9UQnw",
-    src: "assets/music/biWAJoE8m_s.m4a"
-  },
-  {
     title: "SI NO ESTAS-- Penyair   LETRA 🔥",
     artist: "LETRAS 4K",
     cover: "https://i.ytimg.com/vi/qAsy_UP0GoI/maxresdefault.jpg",
@@ -2286,12 +2271,6 @@
     src: "assets/music/epQfTYf9Q2c.m4a"
   },
   {
-    title: "Nada - Penyair (Lyrics)",
-    artist: "Music GO Official",
-    cover: "https://i.ytimg.com/vi/iogm2vrZhGQ/maxresdefault.jpg",
-    src: "assets/music/iogm2vrZhGQ.m4a"
-  },
-  {
     title: "Penyair - Los dueños x G promode ll Antes del alba (video oficial)",
     artist: "Penyair Oficial",
     cover: "https://i.ytimg.com/vi/CUZA9tM1x9c/maxresdefault.jpg",
@@ -2302,18 +2281,6 @@
     artist: "EL MUISCA ",
     cover: "https://i.ytimg.com/vi_webp/bE8KYHJF3tI/maxresdefault.webp",
     src: "assets/music/bE8KYHJF3tI.m4a"
-  },
-  {
-    title: "el Redcode Ft @PenyairOficial // PARA NO VOLVER JAMAS",
-    artist: "El RedCode OFICIAL",
-    cover: "https://i.ytimg.com/vi/SCa11_1Ezx4/maxresdefault.jpg",
-    src: "assets/music/SCa11_1Ezx4.m4a"
-  },
-  {
-    title: "Penyair Ft. Joes Ywc - Tema Explícito (Letra)",
-    artist: "Monsaent ",
-    cover: "https://i.ytimg.com/vi_webp/Nldwyb5lhpI/maxresdefault.webp",
-    src: "assets/music/Nldwyb5lhpI.m4a"
   },
   {
     title: "Penyair - Las Ganas (Audio)",
