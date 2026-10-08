@@ -3142,15 +3142,26 @@ function createFlower(config) {
         }
 function loadSong(index) {
           if(loadingSpinner) loadingSpinner.classList.add("active");
-        currentSongIndex = index;
-        const song = playlist[currentSongIndex];
-        songTitle.textContent = song.title;
-        songArtist.textContent = song.artist;
-        audioPlayer.src = song.src;
-        albumArt.style.backgroundImage = 'url("' + song.cover + '")';
-        dynamicBg.style.backgroundImage = 'url("' + song.cover + '")';
-        renderPlaylist(playlistSearch ? playlistSearch.value : "");
-      }
+          currentSongIndex = index;
+          const song = playlist[currentSongIndex];
+          songTitle.textContent = song.title;
+          songArtist.textContent = song.artist;
+          audioPlayer.src = song.src;
+          albumArt.style.backgroundImage = 'url("' + song.cover + '")';
+          dynamicBg.style.backgroundImage = 'url("' + song.cover + '")';
+          updateActivePlaylistSong();
+        }
+
+        function updateActivePlaylistSong() {
+          const items = document.querySelectorAll('#playlistItems .playlist-item');
+          items.forEach(item => {
+            if (parseInt(item.dataset.index) === currentSongIndex) {
+              item.classList.add('active-song');
+            } else {
+              item.classList.remove('active-song');
+            }
+          });
+        }
 
       function togglePlay() {
         if (isPlaying) {
@@ -3230,10 +3241,15 @@ function loadSong(index) {
           if (song.title.toLowerCase().includes(filter.toLowerCase()) || song.artist.toLowerCase().includes(filter.toLowerCase())) {
             const li = document.createElement('li');
             li.className = 'playlist-item ' + (index === currentSongIndex ? 'active-song' : '');
+              li.dataset.index = index;
             li.innerHTML = '<div class="playlist-item-img" style="background-image: url(\'' + song.cover + '\')"></div><div class="playlist-item-info"><p class="playlist-item-title">' + song.title + '</p><p class="playlist-item-artist">' + song.artist + '</p></div>';
             li.addEventListener('click', () => {
-                loadSong(index);
-                audioPlayer.play();
+                if (index !== currentSongIndex || audioPlayer.paused) {
+                  if (index !== currentSongIndex) {
+                    loadSong(index);
+                  }
+                  audioPlayer.play();
+                }
                 document.getElementById('playlistOverlay').classList.remove('active');
                 document.getElementById('musicOverlay').classList.add('active');
               });
@@ -3288,6 +3304,7 @@ function loadSong(index) {
       if(progressContainer) progressContainer.addEventListener('click', setProgress);
       
       
+      renderPlaylist("");
       loadSong(0);
 
       animate();
