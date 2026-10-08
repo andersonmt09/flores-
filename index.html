@@ -507,16 +507,7 @@
         flex: 1;
       }
 
-            .playlist-item {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 1.5rem 1rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 0.8rem;
+            .playlist-item { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0.5rem 0.8rem; display: flex; flex-direction: row; align-items: center; text-align: left; gap: 1rem;
         cursor: pointer;
         transition: background 0.2s, transform 0.2s;
       }
@@ -530,38 +521,17 @@
         border: 1px solid rgba(255, 212, 90, 0.3);
       }
 
-            .playlist-item-img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
+            .playlist-item-img { width: 45px; height: 45px; border-radius: 8px; flex-shrink: 0;
         background-size: cover;
         background-position: center;
         border: 2px solid rgba(255,255,255,0.1);
       }
 
-      .playlist-item-info {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .playlist-item-info { display: flex; flex-direction: column; align-items: flex-start; flex: 1; overflow: hidden; }
 
-            .playlist-item-title {
-        font-size: 1rem;
-        color: var(--cream);
-        margin: 0;
-        font-family: Iowan Old Style, serif;
-        text-align: center;
-        line-height: 1.2;
-      }
+            .playlist-item-title { font-size: 0.95rem; color: var(--cream); margin: 0; font-family: 'Inter', sans-serif; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
 
-                  .playlist-item-artist {
-        font-size: 0.85rem;
-        color: rgba(255,255,255,0.6);
-        margin: 0;
-        text-align: center;
-        width: 100%;
-        display: block;
-      }
+                  .playlist-item-artist { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin: 0; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
             .album-art {
         width: 100%;
@@ -781,7 +751,7 @@
       <div class="playlist-full-container">
         <h1 style="color: var(--gold); text-align: center; font-family: 'Iowan Old Style', serif; font-size: clamp(2rem, 5vw, 2.5rem); margin: 0 auto 2rem; width: 100%;">Catálogo de Penyair</h1>
         <input type="text" class="playlist-search" id="playlistSearch" placeholder="Buscar canción..." style="max-width: 600px; margin: 0 auto 2rem; display: block; width: 90%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1rem; border-radius: 20px; color: white;">
-        <ul class="playlist-items" id="playlistItems" style="max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; padding: 0 1rem; list-style: none;">
+        <ul class="playlist-items" id="playlistItems" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.5rem; padding: 0 1rem; list-style: none;">
         </ul>
       </div>
     </div>
@@ -824,6 +794,9 @@
           </div>
 
           <div class="controls">
+            <button class="btn-control" id="shuffleBtn" aria-label="Aleatorio" style="opacity: 0.5;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+            </button>
             <button class="btn-control" id="prevBtn" aria-label="Anterior">
               <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
                 <polygon points="19 20 9 12 19 4 19 20"></polygon>
@@ -3087,6 +3060,27 @@ function createFlower(config) {
 
       let currentSongIndex = 0;
       let isPlaying = false;
+        let isShuffle = false;
+        let isLoop = false;
+        
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const loopBtn = document.getElementById('loopBtn');
+        
+        if (shuffleBtn) {
+          shuffleBtn.addEventListener('click', () => {
+            isShuffle = !isShuffle;
+            shuffleBtn.style.opacity = isShuffle ? '1' : '0.5';
+            shuffleBtn.style.color = isShuffle ? 'var(--gold)' : 'var(--cream)';
+          });
+        }
+        
+        if (loopBtn) {
+          loopBtn.addEventListener('click', () => {
+            isLoop = !isLoop;
+            loopBtn.style.opacity = isLoop ? '1' : '0.5';
+            loopBtn.style.color = isLoop ? 'var(--gold)' : 'var(--cream)';
+          });
+        }
 
       const audioPlayer = document.getElementById('audioPlayer');
       const playBtn = document.getElementById('playBtn');
@@ -3168,8 +3162,21 @@ function loadSong(index) {
         if (isPlaying) audioPlayer.play();
       }
 
-      function nextSong() {
-        const idx = (currentSongIndex + 1) % playlist.length;
+            function nextSong() {
+        if (isLoop) {
+          audioPlayer.currentTime = 0;
+          audioPlayer.play();
+          return;
+        }
+        let idx;
+        if (isShuffle) {
+          idx = Math.floor(Math.random() * playlist.length);
+          if (idx === currentSongIndex && playlist.length > 1) {
+            idx = (idx + 1) % playlist.length;
+          }
+        } else {
+          idx = (currentSongIndex + 1) % playlist.length;
+        }
         loadSong(idx);
         if (isPlaying) audioPlayer.play();
       }
