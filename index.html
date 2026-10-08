@@ -1200,79 +1200,217 @@
         head.add(seeds);
       }
 
-      function createFlower(config) {
-        const group = new THREE.Group();
-        group.position.set(config.x, 0, config.z);
+      
+// ---------- MATERIALES DE TULIPANES ----------
+const tulipStemMaterial = new THREE.MeshStandardMaterial({ color: 0x6fa84a, roughness: 0.65 });
+const tulipLeafMaterial = new THREE.MeshStandardMaterial({
+  color: 0x5d9b6a, roughness: 0.55, side: THREE.DoubleSide, vertexColors: true
+});
+const tulipPetalMaterials = [0xd9142b, 0xf06292, 0xffc107, 0xff7a1a, 0x8e3fb5, 0xf4efe6, 0xe8446d].map(
+  (color) =>
+    new THREE.MeshStandardMaterial({
+      color, roughness: 0.42, metalness: 0.0, side: THREE.DoubleSide, vertexColors: true
+    })
+);
+const tulipCenterMaterial = new THREE.MeshStandardMaterial({ color: 0x3a2a4a, roughness: 0.6 });
+const tulipFilamentMaterial = new THREE.MeshStandardMaterial({ color: 0xe9e2b0, roughness: 0.7 });
+const tulipAntherMaterial = new THREE.MeshStandardMaterial({ color: 0x2b1b3a, roughness: 0.5 });
+const tulipPistilMaterial = new THREE.MeshStandardMaterial({ color: 0xb5c95a, roughness: 0.6 });
 
-        const curve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(0, 0, 0),
-          new THREE.Vector3(config.bendX * 0.18, config.height * 0.32, config.bendZ * 0.18),
-          new THREE.Vector3(config.bendX * 0.6, config.height * 0.68, config.bendZ * 0.6),
-          new THREE.Vector3(config.bendX, config.height, config.bendZ)
-        ]);
+function createTulipPetalGeometry(outer) {
+  const segU = 22, segV = 10;
+  const H = outer ? 1.0 : 0.93;
+  const halfW = outer ? 0.31 : 0.29;
+  const cup = outer ? 1.45 : 1.65;
+  const flick = outer ? 0.16 : 0.04;
+ 
+  const positions = [], colors = [], indices = [];
+ 
+  for (let i = 0; i <= segU; i++) {
+    const u = i / segU;
+    const w = Math.max(Math.pow(Math.sin(Math.PI * Math.pow(u, 0.8)), 0.6), 0.14 * (1 - u));
+    const R = 0.06 + 0.27 * Math.sin(Math.PI * Math.pow(u, 0.88)) + flick * Math.pow(u, 6);
+ 
+    for (let j = 0; j <= segV; j++) {
+      const v = (j / segV) * 2 - 1;
+      const y = v * w * halfW;
+      const x = R - cup * y * y;
+      const z = u * H;
+      positions.push(x, y, z);
+ 
+      const base = 0.7 + 0.3 * Math.min(1, u / 0.35);
+      const edge = 1 + 0.07 * Math.pow(Math.abs(v), 2);
+      const streak = 0.95 + 0.05 * Math.abs(v);
+      const c = Math.min(1, base * edge * streak);
+      colors.push(c, c * 0.98, c * 0.98);
+    }
+  }
+  const row = segV + 1;
+  for (let i = 0; i < segU; i++) {
+    for (let j = 0; j < segV; j++) {
+      const a = i * row + j, b = a + 1, c = a + row, d = c + 1;
+      indices.push(a, c, b, b, c, d);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  g.setIndex(indices);
+  g.computeVertexNormals();
+  return g;
+}
 
-        const stem = new THREE.Mesh(
-          new THREE.TubeGeometry(curve, 24, 0.047 * config.scale, 8, false),
-          stemMaterial
-        );
-        group.add(stem);
+function createTulipLeafGeometry() {
+  const segU = 24, segV = 8;
+  const positions = [], colors = [], indices = [];
+  let yy = 0, zz = 0.03;
+  const du = 1 / segU;
+ 
+  for (let i = 0; i <= segU; i++) {
+    const u = i / segU;
+    if (i > 0) {
+      const theta = 0.12 + 1.15 * Math.pow(u, 1.6);
+      yy += Math.cos(theta) * du;
+      zz += Math.sin(theta) * du;
+    }
+    const w = 0.15 * Math.pow(Math.sin(Math.PI * Math.pow(u, 0.5)), 0.9) * (1 - 0.25 * u);
+ 
+    for (let j = 0; j <= segV; j++) {
+      const v = (j / segV) * 2 - 1;
+      const x = v * w;
+      const fold = -0.9 * Math.abs(x) * (1 - u * 0.5);
+      const wave = 0.012 * Math.sin(u * 14 + v * 3);
+      positions.push(x, yy, zz + fold + wave);
+ 
+      const shade = 0.72 + 0.28 * u + 0.06 * (1 - Math.abs(v));
+      colors.push(shade * 0.95, shade, shade * 0.95);
+    }
+  }
+  const row = segV + 1;
+  for (let i = 0; i < segU; i++) {
+    for (let j = 0; j < segV; j++) {
+      const a = i * row + j, b = a + 1, c = a + row, d = c + 1;
+      indices.push(a, b, c, b, d, c);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  g.setIndex(indices);
+  g.computeVertexNormals();
+  return g;
+}
+ 
+const outerPetalGeometry = createTulipPetalGeometry(true);
+const innerPetalGeometry = createTulipPetalGeometry(false);
+const tulipLeafGeometry = createTulipLeafGeometry();
+ 
+const tulipFilamentGeometry = new THREE.CylinderGeometry(0.008, 0.01, 0.4, 6);
+tulipFilamentGeometry.rotateX(Math.PI / 2);
+tulipFilamentGeometry.translate(0, 0, 0.2);
+const tulipAntherGeometry = new THREE.BoxGeometry(0.03, 0.02, 0.09);
+const pistilStemGeometry = new THREE.CylinderGeometry(0.02, 0.026, 0.38, 8);
+pistilStemGeometry.rotateX(Math.PI / 2);
+pistilStemGeometry.translate(0, 0, 0.19);
+const pistilTopGeometry = new THREE.SphereGeometry(0.045, 10, 8);
+const calyxGeometry = new THREE.SphereGeometry(0.075, 12, 10);
 
-        [0.24, 0.5, 0.72].forEach((point, index) => {
-          if (index === 2 && config.scale < 0.6) return;
-          const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
-          leaf.position.copy(curve.getPoint(point));
-          leaf.rotation.order = "YXZ";
-          leaf.rotation.y = config.seed * 3.6 + index * 2.48;
-          leaf.rotation.x = -Math.PI / 2 + 0.46 + index * 0.1;
-          leaf.scale.setScalar(config.scale * (0.74 - index * 0.11));
-          group.add(leaf);
-        });
+function addTepals(head, material, geometry, angleOffset, openAngle, rnd) {
+  for (let i = 0; i < 3; i++) {
+    const holder = new THREE.Group();
+    holder.rotation.z = angleOffset + (i / 3) * Math.PI * 2;
+    const petal = new THREE.Mesh(geometry, material);
+    petal.rotation.y = openAngle + (rnd(i * 5 + angleOffset * 10) - 0.5) * 0.08;
+    petal.rotation.x = (rnd(i * 3 + 40) - 0.5) * 0.06;
+    const s = 0.96 + rnd(i * 9 + 5) * 0.08;
+    petal.scale.set(s, s, 0.96 + rnd(i * 4 + 2) * 0.08);
+    holder.add(petal);
+    head.add(holder);
+  }
+}
 
-        const head = new THREE.Group();
-        head.position.copy(curve.getPoint(1));
-        head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
-        const material = petalMaterials[config.materialIndex % petalMaterials.length];
+function addStamens(head, rnd) {
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 + rnd(i + 60) * 0.3;
+    const holder = new THREE.Group();
+    holder.rotation.z = a;
+    const filament = new THREE.Mesh(tulipFilamentGeometry, tulipFilamentMaterial);
+    filament.position.x = 0.075;
+    filament.rotation.y = 0.07 + rnd(i + 70) * 0.05;
+    holder.add(filament);
+    const anther = new THREE.Mesh(tulipAntherGeometry, tulipAntherMaterial);
+    anther.position.set(0.075 + Math.sin(filament.rotation.y) * 0.4, 0, 0.4);
+    holder.add(anther);
+    head.add(holder);
+  }
+  const pistil = new THREE.Group();
+  const pStem = new THREE.Mesh(pistilStemGeometry, tulipPistilMaterial);
+  const pTop = new THREE.Mesh(pistilTopGeometry, tulipPistilMaterial);
+  pTop.scale.set(1, 1, 0.8);
+  pTop.position.z = 0.38;
+  pistil.add(pStem, pTop);
+  head.add(pistil);
+}
 
-        addPetalLayer(head, material, config.petals, config.scale, 0, 0.1, 0.02);
-        addPetalLayer(
-          head,
-          material,
-          Math.max(7, config.petals - 3),
-          config.scale * 0.69,
-          Math.PI / config.petals,
-          0.33,
-          0.1
-        );
-        addPetalLayer(
-          head,
-          material,
-          Math.max(5, config.petals - 6),
-          config.scale * 0.4,
-          (Math.PI / config.petals) * 0.5,
-          0.62,
-          0.17
-        );
+function createFlower(config) {
+  const group = new THREE.Group();
+  group.position.set(config.x, 0, config.z);
+ 
+  const rnd = (n) => {
+    const s = Math.sin(n * 127.1 + config.seed * 311.7) * 43758.5453;
+    return s - Math.floor(s);
+  };
+ 
+  const curve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(config.bendX * 0.18, config.height * 0.32, config.bendZ * 0.18),
+    new THREE.Vector3(config.bendX * 0.6, config.height * 0.68, config.bendZ * 0.6),
+    new THREE.Vector3(config.bendX, config.height, config.bendZ)
+  ]);
+  const stem = new THREE.Mesh(
+    new THREE.TubeGeometry(curve, 32, 0.04 * config.scale, 8, false),
+    tulipStemMaterial
+  );
+  group.add(stem);
+ 
+  const leafCount = config.scale < 0.6 ? 2 : 3;
+  for (let i = 0; i < leafCount; i++) {
+    const leaf = new THREE.Mesh(tulipLeafGeometry, tulipLeafMaterial);
+    leaf.position.set(0, 0.02 + i * 0.05 * config.height, 0);
+    leaf.rotation.y = config.seed * 6.28 + i * (Math.PI * 2 / leafCount) + (rnd(i + 1) - 0.5) * 0.5;
+    leaf.rotation.x = (rnd(i + 7) - 0.5) * 0.15;
+    const len = config.height * (0.62 - i * 0.1) * (0.9 + rnd(i + 3) * 0.2);
+    leaf.scale.setScalar(len);
+    group.add(leaf);
+  }
+ 
+  const head = new THREE.Group();
+  head.position.copy(curve.getPoint(1));
+  head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
+  head.scale.setScalar(config.scale * 0.95);
+ 
+  const material = tulipPetalMaterials[config.materialIndex % tulipPetalMaterials.length];
+  const open = config.open !== undefined ? config.open : 0.25 + rnd(11) * 0.35;
+ 
+  const calyx = new THREE.Mesh(calyxGeometry, tulipStemMaterial);
+  calyx.scale.set(1, 1, 0.8);
+  calyx.position.z = -0.01;
+  head.add(calyx);
+ 
+  addTepals(head, material, outerPetalGeometry, 0 + rnd(21) * 0.2, 0.05 + open * 0.28, rnd);
+  addTepals(head, material, innerPetalGeometry, Math.PI / 3 + rnd(22) * 0.2, 0.01 + open * 0.16, rnd);
+ 
+  const inner = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 10), tulipCenterMaterial);
+  inner.scale.set(1, 1, 0.55);
+  inner.position.z = 0.03;
+  head.add(inner);
+ 
+  if (config.detail !== false) addStamens(head, rnd);
+ 
+  group.add(head);
+  return { group, head, phase: config.seed * Math.PI * 2, spin: config.spin };
+}
 
-        const center = new THREE.Mesh(
-          new THREE.SphereGeometry(0.5 * config.scale, 24, 16),
-          centerMaterial
-        );
-        center.scale.set(1, 1, 0.44);
-        center.position.z = 0.02;
-        head.add(center);
-
-        const centerTop = new THREE.Mesh(
-          new THREE.SphereGeometry(0.34 * config.scale, 20, 14),
-          centerTopMaterial
-        );
-        centerTop.scale.set(1, 1, 0.4);
-        centerTop.position.z = 0.14 * config.scale;
-        head.add(centerTop);
-        if (config.detail !== false) addSeeds(head, config.scale);
-        group.add(head);
-
-        return { group, head, phase: config.seed * Math.PI * 2, spin: config.spin };
-      }
 
       function createSpiderLily(config) {
         const group = new THREE.Group();
