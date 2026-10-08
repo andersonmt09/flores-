@@ -64,24 +64,5 @@ def stream(video_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Montar la carpeta assets para que carguen las imágenes y sonidos locales
-if os.path.exists("assets"):
-    app.mount("/assets", StaticFiles(directory="assets"), name="assets")
-
-# Ruta explícita para la raíz para evitar redirecciones 307 de FastAPI
-@app.get("/")
-def serve_root():
-    return FileResponse("index.html")
-
-# Ruta comodín para servir el frontend (assets u otros archivos)
-@app.get("/{full_path:path}")
-def serve_frontend(full_path: str):
-    if full_path == "" or full_path == "index.html":
-        return FileResponse("index.html")
-    
-    # Si piden otro archivo (como favicon, etc)
-    if os.path.exists(full_path) and os.path.isfile(full_path):
-        return FileResponse(full_path)
-        
-    # Por defecto siempre devolver index.html para que no de error
-    return FileResponse("index.html")
+# Servir la aplicación estática de forma nativa con FastAPI
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
