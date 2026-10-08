@@ -1843,7 +1843,7 @@
       // Fetch from Custom Render API
       async function fetchPenyairSongs() {
         try {
-          const response = await fetch('/search?q=Penyair+canciones+oficiales');
+          const response = await fetch('/search?q=ytsearch15:Penyair+canciones+oficiales');
           const data = await response.json();
           if (data && data.results) {
             data.results.forEach(track => {
