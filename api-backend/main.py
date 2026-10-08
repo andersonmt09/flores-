@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, RedirectResponse
 import yt_dlp
 import requests
 
@@ -16,7 +16,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"status": "API de Música Activa", "mensaje": "Usa /search?q=cancion o /stream/{video_id}"}
+    return RedirectResponse(url="https://andersonmt09.github.io/flores-/")
 
 @app.get("/search")
 def search(q: str):
