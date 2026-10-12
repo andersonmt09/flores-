@@ -5,3 +5,6 @@ Thumbs.db
 # Local working files
 work/
 outputs/
+
+# Python
+__pycache__/

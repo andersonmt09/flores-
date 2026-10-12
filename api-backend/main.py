@@ -1,20 +1,28 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, FileResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
-import yt_dlp
+from fastapi.responses import FileResponse, StreamingResponse
 import requests
-import os
+import yt_dlp
+
+# Este servidor vive en api-backend/; la página está en la carpeta superior.
+BASE_DIR = Path(__file__).resolve().parent.parent
+INDEX_FILE = BASE_DIR / "index.html"
+
+# Solo se sirve lo que la página necesita: nunca el código del servidor ni .git.
+PUBLIC_FILES = {"index.html", "musica.html", "playlist_generated.js"}
+PUBLIC_DIRS = {"assets"}
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET"],
     allow_headers=["*"],
 )
+
 
 @app.get("/search")
 def search(q: str):
@@ -27,18 +35,20 @@ def search(q: str):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(q, download=False)
-            entries = info.get('entries', [])
-            results = []
-            for entry in entries:
-                results.append({
-                    'title': entry.get('title'),
-                    'id': entry.get('id'),
-                    'thumbnail': entry.get('thumbnails', [{}])[0].get('url', ''),
-                    'duration': entry.get('duration')
-                })
-            return {"results": results}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=502, detail=str(e))
+
+    results = []
+    for entry in info.get('entries') or []:
+        thumbnails = entry.get('thumbnails') or [{}]
+        results.append({
+            'title': entry.get('title'),
+            'id': entry.get('id'),
+            'thumbnail': thumbnails[0].get('url', ''),
+            'duration': entry.get('duration')
+        })
+    return {"results": results}
+
 
 @app.get("/stream/{video_id}")
 def stream(video_id: str):
@@ -46,37 +56,57 @@ def stream(video_id: str):
         'format': 'bestaudio/best',
         'noplaylist': True,
         'quiet': True,
+        'extractor_args': {'youtube': {'client': ['android', 'ios']}}
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
-            url = info.get('url')
-            if not url:
-                raise HTTPException(status_code=404, detail="Stream not found")
-            
-            def iterfile():
-                with requests.get(url, stream=True) as r:
-                    for chunk in r.iter_content(chunk_size=8192):
-                        if chunk:
-                            yield chunk
-
-            return StreamingResponse(iterfile(), media_type="audio/mpeg")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=502, detail=str(e))
 
-@app.get("/debug_source")
-def debug_source():
-    with open(__file__, "r", encoding="utf-8") as f:
-        return HTMLResponse(content=f"<pre>{f.read()}</pre>")
+    url = info.get('url')
+    if not url:
+        raise HTTPException(status_code=404, detail="Stream not found")
+
+    upstream = requests.get(url, stream=True, timeout=(10, 60))
+    if not upstream.ok:
+        upstream.close()
+        raise HTTPException(status_code=502, detail="Upstream stream failed")
+
+    def iterfile():
+        with upstream:
+            for chunk in upstream.iter_content(chunk_size=65536):
+                if chunk:
+                    yield chunk
+
+    media_type = upstream.headers.get("Content-Type", "audio/mp4")
+    return StreamingResponse(iterfile(), media_type=media_type)
+
+
+def no_cache_index():
+    return FileResponse(
+        INDEX_FILE,
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache"},
+    )
+
 
 @app.get("/")
 def serve_root():
-    with open("../index.html", "r", encoding="utf-8") as f:
-        return HTMLResponse(content=f.read(), headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache"})
+    return no_cache_index()
+
 
 @app.get("/{full_path:path}")
 def serve_static(full_path: str):
-    target = os.path.join("..", full_path)
-    if os.path.exists(target) and os.path.isfile(target):
+    target = (BASE_DIR / full_path).resolve()
+    try:
+        relative = target.relative_to(BASE_DIR)
+    except ValueError:
+        raise HTTPException(status_code=404)
+
+    parts = relative.parts
+    allowed = (len(parts) == 1 and parts[0] in PUBLIC_FILES) or (len(parts) > 1 and parts[0] in PUBLIC_DIRS)
+    if allowed and target.is_file():
         return FileResponse(target)
-    return FileResponse("../index.html")
+    if allowed:
+        raise HTTPException(status_code=404)
+    return no_cache_index()
