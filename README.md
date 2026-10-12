@@ -15,7 +15,7 @@ Abre `index.html` en un navegador moderno con conexión a Internet. La escena ca
 ## Detalles
 
 - Jardín nocturno grande: macizo central de tulipanes, seis parterres de tulipanes y lirios araña con seto, dos anillos de paseo, avenidas en cruz, campos de tulipanes en franjas de colores y praderas de lirios araña.
-- Faroles victorianos encendidos a lo largo de los senderos, luna llena con el mapa real de su superficie, bosque de siluetas alrededor, estrellas que titilan, Vía Láctea y constelaciones reales (Orión, Osa Mayor, Casiopea, Cisne, Cruz del Sur, Escorpión y Lira).
+- Faroles victorianos encendidos a lo largo de los senderos, luna llena con el mapa real de su superficie, bosque de siluetas alrededor, cielo real de una noche de enero en Colombia: 6.300 estrellas del catálogo de Yale en su posición, magnitud y color reales, y la Vía Láctea en su lugar; luna gibosa con relieve. Polillas y luciérnagas revolotean entre flores y faroles.
 - Luciérnagas, césped y flores que se mecen con el viento.
 - Reproductor: 127 canciones de Penyair, cada una con su audio. Los títulos se leen de la API oEmbed de YouTube (`/api/oembed/{id}` en el servidor, con respaldo directo desde el navegador) y se guardan en el teléfono. Recuerda la última canción, barra arrastrable, búsqueda sin tildes, mantener presionado ⏮/⏭ para retroceder o adelantar, y acceso rápido desde el jardín.
 - Rendimiento: el cielo, el dibujo del suelo y la luz de los faroles se precalculan una sola vez; las flores lejanas usan versiones simplificadas y las del centro se dibujan en pocas piezas. En celulares no hay sombras ni luces en tiempo real, y la resolución se ajusta sola según los FPS para que no se trabe en ningún teléfono.
