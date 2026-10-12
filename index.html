@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#071616" />
+    <meta name="theme-color" content="#030714" />
     <meta
       name="description"
       content="Una experiencia floral tridimensional de luz, movimiento y color."
@@ -33,9 +33,7 @@
       }
 
       body {
-        background:
-          radial-gradient(circle at 50% 34%, #285c55 0%, #123635 37%, #071616 74%),
-          #071616;
+        background: #030714;
         color: var(--cream);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         -webkit-tap-highlight-color: transparent;
@@ -337,10 +335,11 @@
         z-index: 50;
         display: grid;
         place-items: center;
-        background: radial-gradient(circle at 50% 42%, #2d6c56 0%, #123735 40%, #071616 100%), #071616;
+        overflow: hidden;
+        background: radial-gradient(ellipse 120% 80% at 50% 110%, #1b2d55 0%, #0b1736 45%, #030714 100%), #030714;
         opacity: 1;
         visibility: visible;
-        transition: opacity 800ms ease, visibility 800ms ease;
+        transition: opacity 1100ms ease, visibility 1100ms ease;
       }
 
       .splash-screen.hidden {
@@ -348,29 +347,147 @@
         visibility: hidden;
       }
 
+      /* cielo estrellado del inicio */
+      .splash-stars,
+      .splash-stars::after {
+        position: absolute;
+        inset: -10%;
+        background-image:
+          radial-gradient(1.2px 1.2px at 12% 18%, #fff, transparent 60%),
+          radial-gradient(1px 1px at 27% 62%, #dfe8ff, transparent 60%),
+          radial-gradient(1.6px 1.6px at 41% 24%, #fff6e8, transparent 60%),
+          radial-gradient(1px 1px at 58% 78%, #fff, transparent 60%),
+          radial-gradient(1.3px 1.3px at 66% 35%, #e6eeff, transparent 60%),
+          radial-gradient(1px 1px at 79% 12%, #fff, transparent 60%),
+          radial-gradient(1.5px 1.5px at 88% 56%, #fff3df, transparent 60%),
+          radial-gradient(1px 1px at 7% 84%, #fff, transparent 60%),
+          radial-gradient(1.1px 1.1px at 35% 90%, #dfe8ff, transparent 60%),
+          radial-gradient(1px 1px at 93% 88%, #fff, transparent 60%);
+        background-size: 360px 360px;
+        content: "";
+        animation: twinkle 4s ease-in-out infinite alternate;
+      }
+      .splash-stars::after {
+        inset: 0;
+        background-size: 230px 230px;
+        background-position: 70px 40px;
+        animation-delay: -2s;
+        opacity: 0.7;
+      }
+      @keyframes twinkle {
+        from { opacity: 0.55; }
+        to { opacity: 1; }
+      }
+
+      .splash-moon {
+        position: absolute;
+        top: 14%;
+        right: 16%;
+        width: clamp(58px, 11vw, 96px);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 35% 38%, rgba(140, 138, 132, 0.28) 0 12%, transparent 13%),
+          radial-gradient(circle at 62% 58%, rgba(140, 138, 132, 0.22) 0 16%, transparent 17%),
+          radial-gradient(circle at 48% 72%, rgba(140, 138, 132, 0.18) 0 8%, transparent 9%),
+          radial-gradient(circle at 38% 35%, #fffdf6, #e8e3d6 70%, #cbc5b6);
+        box-shadow: 0 0 40px 10px rgba(190, 210, 255, 0.28), 0 0 120px 40px rgba(120, 150, 230, 0.16);
+        animation: moonRise 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      @keyframes moonRise {
+        from { transform: translateY(30px); opacity: 0; }
+      }
+
       .splash__card {
+        position: relative;
         text-align: center;
+        padding: 0 1.5rem;
+        animation: rise 1.4s cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+      }
+
+      .splash__card h1 {
+        max-width: none;
+        margin: 0;
+        color: #fff7df;
+        font-size: clamp(2.6rem, 9vw, 5rem);
+        font-weight: 400;
+        letter-spacing: 0.18em;
+        line-height: 1;
+        text-shadow: 0 0 30px rgba(255, 212, 140, 0.35);
+      }
+
+      .splash-subtitle {
+        margin: 1rem 0 0;
+        color: rgba(255, 247, 223, 0.72);
+        font-family: Iowan Old Style, Baskerville, Georgia, serif;
+        font-size: clamp(0.95rem, 2.6vw, 1.15rem);
+        font-style: italic;
+        letter-spacing: 0.06em;
       }
 
       .splash-bar-container {
-        width: 220px;
-        height: 4px;
-        background: rgba(255, 247, 223, 0.1);
+        width: min(220px, 60vw);
+        height: 2px;
+        background: rgba(255, 247, 223, 0.12);
         border-radius: 2px;
-        margin: 1.5rem auto 0;
+        margin: 1.8rem auto 0;
         overflow: hidden;
       }
 
       .pretty-bar {
         width: 0;
         height: 100%;
-        background: linear-gradient(90deg, #ffd45a 0%, #ff9a9e 50%, #fecfef 100%);
+        background: linear-gradient(90deg, #ffd45a 0%, #ff9a9e 55%, #c9d6ff 100%);
         border-radius: 2px;
-        animation: loadBar 2s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.5s;
+        box-shadow: 0 0 10px rgba(255, 212, 90, 0.6);
+        animation: loadBar 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.4s;
       }
 
       @keyframes loadBar {
         to { width: 100%; }
+      }
+
+      /* control para caminar (pantallas táctiles) */
+      .joystick {
+        display: none;
+        position: relative;
+        width: 104px;
+        height: 104px;
+        flex: 0 0 auto;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 247, 223, 0.06), rgba(9, 20, 40, 0.35));
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        pointer-events: auto;
+        touch-action: none;
+      }
+      .joystick.active { border-color: rgba(255, 212, 90, 0.6); }
+      .joystick-knob {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 44px;
+        height: 44px;
+        margin: -22px 0 0 -22px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 40% 35%, rgba(255, 247, 223, 0.55), rgba(255, 212, 90, 0.25));
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+        transition: transform 80ms linear;
+      }
+      @media (pointer: coarse) {
+        .joystick { display: block; }
+      }
+      .hint-touch { display: none; }
+      @media (pointer: coarse) {
+        .hint-touch { display: inline; }
+        .hint-desktop { display: none; }
+      }
+      .footer-left {
+        display: flex;
+        align-items: end;
+        gap: 0.8rem;
+        min-width: 0;
       }
 
       @media (max-width: 540px) {
@@ -636,7 +753,8 @@
       .song-artist { font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); margin: 0 0 1.5rem; }
 
       .controls { display: flex; align-items: center; justify-content: center; gap: 1rem; }
-      .btn-control { background: transparent; border: none; color: var(--cream); cursor: pointer; padding: 0; transition: transform 0.2s, color 0.2s; display: grid; place-items: center; }
+      .btn-control { background: transparent; border: none; color: var(--cream); cursor: pointer; padding: 0; min-width: 44px; min-height: 44px; transition: transform 0.2s, color 0.2s; display: grid; place-items: center; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+      .btn-control:active, .btn-control.holding { transform: scale(0.92); color: var(--gold); }
       .btn-control:hover { color: var(--gold); transform: scale(1.1); }
       .btn-play { width: 3.5rem; height: 3.5rem; border-radius: 50%; background: rgba(255, 255, 255, 0.15); color: #fff; }
       .btn-play:hover { background: rgba(255, 255, 255, 0.25); }
@@ -745,14 +863,25 @@
       </header>
 
       <footer class="footer">
-        <div class="interaction" id="gestureHint">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-            <path d="M4 12.3c1.9-2.2 4.6-3.3 8-3.3s6.1 1.1 8 3.3c-1.9 2.2-4.6 3.3-8 3.3s-6.1-1.1-8-3.3Z"/>
-            <path d="M12 9v6M9 12h6"/>
-          </svg>
-          <span>Arrastra para explorar · pellizca para acercar</span>
+        <div class="footer-left">
+          <div class="joystick" id="joystick" aria-label="Caminar por el jardín" role="application">
+            <div class="joystick-knob" id="joystickKnob"></div>
+          </div>
+          <div class="interaction" id="gestureHint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="M4 12.3c1.9-2.2 4.6-3.3 8-3.3s6.1 1.1 8 3.3c-1.9 2.2-4.6 3.3-8 3.3s-6.1-1.1-8-3.3Z"/>
+              <path d="M12 9v6M9 12h6"/>
+            </svg>
+            <span class="hint-desktop">Arrastra para mirar · W A S D o flechas para caminar</span>
+            <span class="hint-touch">Arrastra para mirar · usa el círculo para caminar</span>
+          </div>
         </div>
         <div class="controls">
+          <button class="round-button" id="homeButton" type="button" aria-label="Volver a la entrada" title="Volver a la entrada">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 11.5 12 5l8 6.5"/><path d="M6.5 10v9h11v-9"/><path d="M10 19v-5h4v5"/>
+            </svg>
+          </button>
           <button class="now-playing" id="nowPlayingBtn" type="button" aria-label="Abrir reproductor">
             <span class="now-playing-cover" id="nowPlayingCover"></span>
             <span class="now-playing-title" id="nowPlayingTitle"></span>
@@ -767,8 +896,11 @@
     </div>
 
     <div class="splash-screen" id="splashScreen" role="status" aria-live="polite">
+      <div class="splash-stars" aria-hidden="true"></div>
+      <div class="splash-moon" aria-hidden="true"></div>
       <div class="splash__card">
         <h1>PARA TI</h1>
+        <p class="splash-subtitle">un jardín bajo la luna</p>
         <div class="splash-bar-container">
           <div class="pretty-bar"></div>
         </div>
@@ -890,11 +1022,15 @@
       const splashScreen = document.getElementById("splashScreen");
       const topMenuToggle = document.getElementById("topMenuToggle");
       const topMenuPanel = document.getElementById("topMenuPanel");
+      const joystick = document.getElementById("joystick");
+      const joystickKnob = document.getElementById("joystickKnob");
+      const homeButton = document.getElementById("homeButton");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const compactViewport = window.matchMedia("(max-width: 640px)").matches;
-      const lowPower = compactViewport || (navigator.hardwareConcurrency || 8) <= 4;
-      // Escala de cantidades: el móvil recibe un jardín igual de lleno pero más ligero.
-      const Q = lowPower ? 0.5 : 1;
+      const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+      const lowPower = compactViewport || coarsePointer || (navigator.hardwareConcurrency || 8) <= 4;
+      // Escala de cantidades: el móvil recibe el mismo jardín pero más ligero.
+      const Q = lowPower ? 0.45 : 1;
 
       if (topMenuToggle && topMenuPanel) {
         topMenuToggle.addEventListener("click", () => {
@@ -902,20 +1038,21 @@
         });
       }
 
-      setTimeout(() => {
+      // La pantalla de inicio se va cuando el jardín ya está construido
+      function hideSplash() {
         if (splashScreen) splashScreen.classList.add("hidden");
-      }, 2600);
+      }
 
       // ---------- RENDER ----------
       const renderer = new THREE.WebGLRenderer({
-        antialias: true,
+        antialias: !lowPower,
         powerPreference: "high-performance"
       });
-      const maxPixelRatio = lowPower ? 1.5 : 2;
+      const maxPixelRatio = lowPower ? 1.5 : 1.75;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
+      renderer.toneMappingExposure = 1.25;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -923,15 +1060,16 @@
       document.documentElement.classList.add("webgl-ready");
 
       const scene = new THREE.Scene();
-      const horizonColor = new THREE.Color("#f7d2a2");
-      scene.fog = new THREE.Fog(new THREE.Color("#efc9a0"), 26, 190);
+      const fogColor = new THREE.Color("#0d1b38");
+      scene.fog = new THREE.Fog(fogColor, 22, 95);
+      scene.background = fogColor;
 
-      const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 400);
-      camera.position.set(1.4, 2.9, 11.6);
+      const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 600);
+      camera.position.set(0.6, 3.1, 15.5);
 
-      // Sol bajo de atardecer, detrás del jardín: contraluz cálido en los pétalos.
-      const sunLightDir = new THREE.Vector3(-0.42, 0.46, -1).normalize();
-      const sunSkyDir = new THREE.Vector3(-0.42, 0.075, -1).normalize();
+      // Luna baja delante de la entrada: se ve desde la vista inicial
+      const moonSkyDir = new THREE.Vector3(-0.3, 0.3, -1).normalize();
+      const moonLightDir = new THREE.Vector3(-0.35, 0.75, -1).normalize();
 
       // ---------- RUIDO (JS) ----------
       function hash2(x, z) {
@@ -956,8 +1094,8 @@
       }
       function groundHeight(x, z) {
         const r = Math.hypot(x, z);
-        const rise = THREE.MathUtils.smoothstep(r, 15, 48);
-        return rise * (fbm(x * 0.035 + 7, z * 0.035 - 3) * 7.5 - 1.2);
+        const rise = THREE.MathUtils.smoothstep(r, 64, 110);
+        return rise * (fbm(x * 0.03 + 7, z * 0.03 - 3) * 12 - 1.5);
       }
 
       function seededRandom(seed) {
@@ -971,8 +1109,9 @@
       const random = seededRandom(20260921);
 
       // ---------- DISEÑO DEL JARDÍN ----------
-      // Jardín circular: macizo central de tulipanes, sendero de grava en anillo,
-      // seis parterres por especie separados por pasillos de césped, y un seto bajo.
+      // Centro: macizo de tulipanes, sendero en anillo y seis parterres con seto.
+      // Alrededor: un gran jardín con avenidas en cruz, dos anillos de paseo,
+      // campos de tulipanes en franjas de colores y praderas de lirios araña.
       const GARDEN = {
         centerBed: 3.2,
         pathInner: 3.45,
@@ -981,7 +1120,13 @@
         bedOuter: 8.7,
         hedge: 10.3,
         sectorCount: 6,
-        walkHalf: 0.55
+        walkHalf: 0.55,
+        ring1: [12.2, 13.6],
+        ring2: [34.4, 35.8],
+        avenueHalf: 1.1,
+        tulipField: [15.5, 33.2],
+        lilyField: [37.5, 58],
+        edge: 62
       };
       const SECTOR = (Math.PI * 2) / GARDEN.sectorCount;
 
@@ -992,15 +1137,24 @@
         let a = theta % SECTOR;
         if (a < 0) a += SECTOR;
         const index = Math.round((theta - a) / SECTOR + 6) % 6;
-        // distancia (en arco) al borde del parterre
         const local = a - SECTOR / 2;
         const edge = (SECTOR / 2 - Math.abs(local)) * r;
         return { r, theta, index, edge };
       }
-      function onPath(x, z) {
+      function onAvenue(x, z, margin = 0) {
         const r = Math.hypot(x, z);
-        if (r > GARDEN.pathInner - 0.12 && r < GARDEN.pathOuter + 0.12) return true;
-        return Math.abs(x) < 0.62 && r > GARDEN.pathOuter - 0.2 && r < GARDEN.hedge + 1.6;
+        const half = GARDEN.avenueHalf + margin;
+        const zAxis = Math.abs(x) < half && r > GARDEN.pathOuter - 0.2 && r < GARDEN.edge + 1;
+        const xAxis = Math.abs(z) < half && r > GARDEN.ring1[0] && r < GARDEN.edge + 1;
+        return zAxis || xAxis;
+      }
+      function onPath(x, z, margin = 0.12) {
+        const r = Math.hypot(x, z);
+        if (r > GARDEN.pathInner - margin && r < GARDEN.pathOuter + margin) return true;
+        if (r > GARDEN.ring1[0] - margin && r < GARDEN.ring1[1] + margin) return true;
+        if (r > GARDEN.ring2[0] - margin && r < GARDEN.ring2[1] + margin) return true;
+        if (r < GARDEN.hedge + 1) return Math.abs(x) < 0.62 && r > GARDEN.pathOuter - 0.2;
+        return onAvenue(x, z, margin);
       }
       function inBed(x, z, margin = 0) {
         const s = sectorInfo(x, z);
@@ -1010,8 +1164,19 @@
         }
         return null;
       }
+      // Franjas de tierra de los campos de tulipanes (en los cuatro cuadrantes)
+      const STRIPE = 2.3;
+      const STRIPE_SOIL = 1.45;
+      function tulipStripe(x, z, margin = 0) {
+        const r = Math.hypot(x, z);
+        if (r < GARDEN.tulipField[0] + margin || r > GARDEN.tulipField[1] - margin) return -1;
+        if (Math.abs(x) < GARDEN.avenueHalf + 1.4 + margin || Math.abs(z) < GARDEN.avenueHalf + 1.4 + margin) return -1;
+        const v = (Math.abs(z) % STRIPE);
+        if (v < margin || v > STRIPE_SOIL - margin) return -1;
+        return Math.floor(Math.abs(z) / STRIPE);
+      }
 
-      // ---------- CIELO ----------
+      // ---------- CIELO NOCTURNO ----------
       const NOISE_GLSL = `
         float gHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float gNoise(vec2 p) {
@@ -1029,15 +1194,14 @@
       `;
 
       const skyUniforms = {
-        uSunDir: { value: sunSkyDir },
-        uTop: { value: new THREE.Color("#3d6fb6") },
-        uMid: { value: new THREE.Color("#f3a77f") },
-        uHorizon: { value: horizonColor.clone() },
-        uSunColor: { value: new THREE.Color("#ffb46b") },
+        uMoonDir: { value: moonSkyDir },
+        uTop: { value: new THREE.Color("#030714") },
+        uMid: { value: new THREE.Color("#0b1736") },
+        uHorizon: { value: fogColor.clone() },
         uTime: { value: 0 }
       };
       const sky = new THREE.Mesh(
-        new THREE.SphereGeometry(300, 48, 24),
+        new THREE.SphereGeometry(400, 48, 24),
         new THREE.ShaderMaterial({
           uniforms: skyUniforms,
           side: THREE.BackSide,
@@ -1051,28 +1215,33 @@
             }
           `,
           fragmentShader: `
-            uniform vec3 uSunDir; uniform vec3 uTop; uniform vec3 uMid; uniform vec3 uHorizon; uniform vec3 uSunColor;
+            uniform vec3 uMoonDir; uniform vec3 uTop; uniform vec3 uMid; uniform vec3 uHorizon;
             uniform float uTime;
             varying vec3 vDir;
             ${NOISE_GLSL}
             void main() {
               vec3 dir = normalize(vDir);
               float h = dir.y;
-              vec3 mauve = vec3(0.86, 0.5, 0.52);
-              vec3 col = mix(uHorizon, uMid, smoothstep(0.0, 0.14, h));
-              col = mix(col, mauve, smoothstep(0.12, 0.36, h));
-              col = mix(col, uTop, smoothstep(0.3, 0.85, h));
-              col = mix(col, uHorizon, smoothstep(0.0, -0.15, h));
-              float sd = max(dot(dir, uSunDir), 0.0);
-              col += uSunColor * (pow(sd, 4.0) * 0.4 + pow(sd, 32.0) * 0.6 + pow(sd, 400.0) * 1.4);
-              col += vec3(1.0, 0.93, 0.78) * smoothstep(0.99935, 0.99965, sd) * 5.0;
-              // nubes altas y finas
-              vec2 cuv = dir.xz / (h + 0.12);
-              float n = gFbm(cuv * 0.9 + vec2(uTime * 0.006, uTime * 0.002));
-              float band = smoothstep(0.015, 0.14, h) * (1.0 - smoothstep(0.35, 0.8, h));
-              float cloud = smoothstep(0.52, 0.82, n) * band;
-              vec3 cloudCol = mix(vec3(0.85, 0.5, 0.48), vec3(1.0, 0.78, 0.52), pow(sd, 3.0));
-              col = mix(col, cloudCol, cloud * 0.65);
+              vec3 col = mix(uHorizon, uMid, smoothstep(-0.02, 0.22, h));
+              col = mix(col, uTop, smoothstep(0.2, 0.9, h));
+              // resplandor de la luna sobre el cielo
+              float md = max(dot(dir, uMoonDir), 0.0);
+              col += vec3(0.35, 0.45, 0.75) * (pow(md, 6.0) * 0.18 + pow(md, 60.0) * 0.35);
+              // Vía Láctea: banda difusa inclinada atravesando el cielo
+              vec3 axis = normalize(vec3(0.55, 0.35, 0.76));
+              float band = 1.0 - abs(dot(dir, axis));
+              float milky = pow(band, 14.0);
+              vec2 muv = vec2(atan(dir.z, dir.x) * 3.0, dir.y * 6.0);
+              float dust = gFbm(muv * 1.4) ;
+              float lanes = smoothstep(0.35, 0.75, gFbm(muv * 3.1 + 5.0));
+              milky *= (0.45 + dust * 0.9) * (1.0 - lanes * 0.55);
+              col += vec3(0.42, 0.45, 0.62) * milky * 0.32 * smoothstep(0.02, 0.3, h);
+              // nubes nocturnas muy tenues, iluminadas por la luna
+              vec2 cuv = dir.xz / (h + 0.15);
+              float n = gFbm(cuv * 0.7 + vec2(uTime * 0.004, 0.0));
+              float cloud = smoothstep(0.58, 0.85, n) * smoothstep(0.02, 0.2, h) * (1.0 - smoothstep(0.4, 0.8, h));
+              col = mix(col, vec3(0.07, 0.09, 0.17) + vec3(0.2, 0.22, 0.3) * pow(md, 4.0), cloud * 0.45);
+              col = mix(col, uHorizon, smoothstep(0.0, -0.1, h));
               gl_FragColor = vec4(col, 1.0);
               #include <tonemapping_fragment>
               #include <colorspace_fragment>
@@ -1080,42 +1249,315 @@
           `
         })
       );
-      scene.add(sky);
+      sky.renderOrder = -10;
+      // el cielo entero (estrellas, luna) viaja con la cámara
+      const skyGroup = new THREE.Group();
+      scene.add(skyGroup);
+      skyGroup.add(sky);
+
+      // Estrellas: brillo y color según su magnitud, con titileo suave
+      const starUniforms = { uTime: { value: 0 }, uPixelRatio: { value: renderer.getPixelRatio() } };
+      const starMaterial = new THREE.ShaderMaterial({
+        uniforms: starUniforms,
+        transparent: true,
+        depthWrite: false,
+        fog: false,
+        blending: THREE.AdditiveBlending,
+        vertexShader: `
+          attribute float size; attribute vec3 tint; attribute float seed;
+          uniform float uTime; uniform float uPixelRatio;
+          varying vec3 vColor;
+          void main() {
+            float tw = 0.75 + 0.25 * sin(uTime * (1.5 + seed * 3.0) + seed * 50.0);
+            vColor = tint * tw;
+            vec4 mv = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = size * uPixelRatio;
+            gl_Position = projectionMatrix * mv;
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vColor;
+          void main() {
+            float d = length(gl_PointCoord - 0.5);
+            float core = exp(-d * d * 60.0);
+            float halo = exp(-d * d * 12.0) * 0.25;
+            gl_FragColor = vec4(vColor * (core + halo), 1.0);
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+          }
+        `
+      });
+      const SKY_R = 330;
+      function skyDirection(azimuthDeg, altitudeDeg) {
+        // azimut 0 = hacia la luna (-z), positivo hacia la derecha (+x)
+        const az = THREE.MathUtils.degToRad(azimuthDeg);
+        const alt = THREE.MathUtils.degToRad(altitudeDeg);
+        return new THREE.Vector3(Math.sin(az) * Math.cos(alt), Math.sin(alt), -Math.cos(az) * Math.cos(alt));
+      }
+      function starColor(t) {
+        // de azulado a dorado, como las temperaturas reales
+        const c = new THREE.Color();
+        if (t < 0.25) c.setRGB(0.75, 0.82, 1.0);
+        else if (t < 0.75) c.setRGB(1.0, 0.97, 0.92);
+        else c.setRGB(1.0, 0.82, 0.62);
+        return c;
+      }
+      {
+        const count = lowPower ? 1800 : 3600;
+        const positions = [], sizes = [], tints = [], seeds = [];
+        const v = new THREE.Vector3();
+        for (let i = 0; i < count; i += 1) {
+          // uniformes en la esfera, solo sobre el horizonte
+          const y = random() * 0.98 + 0.02;
+          const a = random() * Math.PI * 2;
+          const rr = Math.sqrt(1 - y * y);
+          v.set(Math.cos(a) * rr, y, Math.sin(a) * rr).multiplyScalar(SKY_R);
+          positions.push(v.x, v.y, v.z);
+          const mag = Math.pow(random(), 7);
+          sizes.push(1.2 + mag * 5.5);
+          const c = starColor(random()).multiplyScalar(0.35 + mag * 1.6);
+          tints.push(c.r, c.g, c.b);
+          seeds.push(random());
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        g.setAttribute("size", new THREE.Float32BufferAttribute(sizes, 1));
+        g.setAttribute("tint", new THREE.Float32BufferAttribute(tints, 3));
+        g.setAttribute("seed", new THREE.Float32BufferAttribute(seeds, 1));
+        const stars = new THREE.Points(g, starMaterial);
+        stars.renderOrder = -9;
+        skyGroup.add(stars);
+      }
+
+      // Constelaciones reales (ascensión recta en horas, declinación en grados),
+      // colocadas alrededor del cielo conservando su forma.
+      const CONSTELLATIONS = [
+        {
+          name: "Orión", az: -48, alt: 24, scale: 1.05,
+          stars: [[5.919, 7.41, 0.5], [5.418, 6.35, 1.6], [5.679, -1.94, 1.7], [5.604, -1.2, 1.7], [5.533, -0.3, 2.2], [5.796, -9.67, 2.1], [5.242, -8.2, 0.1], [5.585, 9.93, 3.4]],
+          lines: [[7, 0], [7, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6]]
+        },
+        {
+          name: "Osa Mayor", az: 30, alt: 26, scale: 1.0,
+          stars: [[11.062, 61.75, 1.8], [11.031, 56.38, 2.3], [11.897, 53.69, 2.4], [12.257, 57.03, 3.3], [12.9, 55.96, 1.8], [13.399, 54.93, 2.2], [13.792, 49.31, 1.9]],
+          lines: [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [4, 5], [5, 6]]
+        },
+        {
+          name: "Casiopea", az: 105, alt: 34, scale: 1.2,
+          stars: [[0.153, 59.15, 2.3], [0.675, 56.54, 2.2], [0.945, 60.72, 2.4], [1.43, 60.24, 2.7], [1.907, 63.67, 3.4]],
+          lines: [[0, 1], [1, 2], [2, 3], [3, 4]]
+        },
+        {
+          name: "Cisne", az: 160, alt: 40, scale: 1.0,
+          stars: [[20.69, 45.28, 1.3], [20.37, 40.26, 2.2], [20.77, 33.97, 2.5], [19.75, 45.13, 2.9], [19.512, 27.96, 3.1]],
+          lines: [[0, 1], [1, 4], [2, 1], [1, 3]]
+        },
+        {
+          name: "Cruz del Sur", az: -105, alt: 20, scale: 1.4,
+          stars: [[12.443, -63.1, 0.8], [12.795, -59.69, 1.3], [12.519, -57.11, 1.6], [12.252, -58.75, 2.8]],
+          lines: [[0, 2], [1, 3]]
+        },
+        {
+          name: "Escorpión", az: -150, alt: 30, scale: 0.95,
+          stars: [[16.091, -19.81, 2.6], [16.006, -22.62, 2.3], [15.981, -26.11, 2.9], [16.49, -26.43, 1.0], [16.598, -28.22, 2.8], [16.836, -34.29, 2.3], [16.864, -38.05, 3.0], [16.91, -42.36, 3.6], [17.202, -43.24, 3.3], [17.622, -43.0, 1.9], [17.793, -40.13, 3.0], [17.708, -39.03, 2.4], [17.56, -37.1, 1.6]],
+          lines: [[0, 1], [1, 2], [1, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 12]]
+        },
+        {
+          name: "Lira", az: 72, alt: 52, scale: 1.6,
+          stars: [[18.616, 38.78, 0.0], [18.746, 37.6, 4.3], [18.908, 36.9, 4.3], [18.982, 32.69, 3.2], [18.835, 33.36, 3.5]],
+          lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 1]]
+        }
+      ];
+      {
+        const linePositions = [];
+        const pts = [], sizes = [], tints = [], seeds = [];
+        for (const c of CONSTELLATIONS) {
+          const ra0 = c.stars.reduce((s, st) => s + st[0], 0) / c.stars.length;
+          const dec0 = c.stars.reduce((s, st) => s + st[1], 0) / c.stars.length;
+          const center = skyDirection(c.az, c.alt);
+          // base tangente: derecha y arriba en el cielo
+          const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), center).normalize().negate();
+          const up = new THREE.Vector3().crossVectors(center, right).normalize().negate();
+          if (up.y < 0) up.negate();
+          const world = c.stars.map(([ra, dec, mag]) => {
+            let dra = ra - ra0;
+            if (dra > 12) dra -= 24;
+            if (dra < -12) dra += 24;
+            // el este queda a la izquierda al mirar el cielo
+            const dx = -dra * 15 * Math.cos(THREE.MathUtils.degToRad(dec0)) * c.scale;
+            const dy = (dec - dec0) * c.scale;
+            const p = center.clone()
+              .addScaledVector(right, Math.tan(THREE.MathUtils.degToRad(dx)))
+              .addScaledVector(up, Math.tan(THREE.MathUtils.degToRad(dy)))
+              .normalize()
+              .multiplyScalar(SKY_R - 2);
+            pts.push(p.x, p.y, p.z);
+            const bright = Math.max(0.25, 1.0 - mag / 4.5);
+            sizes.push(3.5 + bright * 7);
+            const col = starColor(mag < 1 ? 0.1 : 0.5).multiplyScalar(0.8 + bright * 1.6);
+            tints.push(col.r, col.g, col.b);
+            seeds.push(random());
+            return p;
+          });
+          for (const [a, b] of c.lines) {
+            linePositions.push(world[a].x, world[a].y, world[a].z, world[b].x, world[b].y, world[b].z);
+          }
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+        g.setAttribute("size", new THREE.Float32BufferAttribute(sizes, 1));
+        g.setAttribute("tint", new THREE.Float32BufferAttribute(tints, 3));
+        g.setAttribute("seed", new THREE.Float32BufferAttribute(seeds, 1));
+        const bright = new THREE.Points(g, starMaterial);
+        bright.renderOrder = -8;
+        skyGroup.add(bright);
+        const lg = new THREE.BufferGeometry();
+        lg.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+        const lines = new THREE.LineSegments(
+          lg,
+          new THREE.LineBasicMaterial({ color: 0xa9c4ff, transparent: true, opacity: 0.5, depthWrite: false, fog: false, blending: THREE.AdditiveBlending })
+        );
+        lines.renderOrder = -8;
+        skyGroup.add(lines);
+      }
+
+      // Luna llena con mares, cráteres y halo
+      function createMoonTexture() {
+        const S = 512;
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = S;
+        const ctx = canvas.getContext("2d");
+        const rand = seededRandom(777);
+        const R = S * 0.36;
+        const cx = S / 2, cy = S / 2;
+        // halo exterior
+        const halo = ctx.createRadialGradient(cx, cy, R * 0.9, cx, cy, S / 2);
+        halo.addColorStop(0, "rgba(190, 210, 255, 0.35)");
+        halo.addColorStop(0.35, "rgba(150, 175, 240, 0.1)");
+        halo.addColorStop(1, "rgba(120, 150, 230, 0)");
+        ctx.fillStyle = halo;
+        ctx.fillRect(0, 0, S, S);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.clip();
+        const base = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.25, R * 0.1, cx, cy, R);
+        base.addColorStop(0, "#fbf8ef");
+        base.addColorStop(0.7, "#e9e4d6");
+        base.addColorStop(1, "#c9c3b4");
+        ctx.fillStyle = base;
+        ctx.fillRect(0, 0, S, S);
+        // mares (zonas oscuras) inspirados en la cara visible
+        const maria = [[-0.28, -0.3, 0.32], [0.12, -0.36, 0.22], [0.3, -0.05, 0.2], [-0.05, -0.02, 0.24], [-0.38, 0.12, 0.2], [0.05, 0.3, 0.16], [0.35, 0.28, 0.12]];
+        for (const [mx, my, mr] of maria) {
+          for (let k = 0; k < 14; k += 1) {
+            const g = ctx.createRadialGradient(
+              cx + (mx + (rand() - 0.5) * mr * 0.8) * R, cy + (my + (rand() - 0.5) * mr * 0.8) * R, 0,
+              cx + mx * R, cy + my * R, mr * R * (0.7 + rand() * 0.5)
+            );
+            g.addColorStop(0, "rgba(130, 128, 124, 0.1)");
+            g.addColorStop(1, "rgba(120, 118, 115, 0)");
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, S, S);
+          }
+        }
+        // cráteres
+        for (let i = 0; i < 140; i += 1) {
+          const a = rand() * Math.PI * 2;
+          const d = Math.sqrt(rand()) * R * 0.95;
+          const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d;
+          const r = 1 + Math.pow(rand(), 3) * 14;
+          ctx.fillStyle = `rgba(110, 108, 104, ${0.05 + rand() * 0.07})`;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "rgba(255, 255, 250, 0.18)";
+          ctx.beginPath();
+          ctx.arc(x - r * 0.25, y - r * 0.25, r * 0.6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Tycho con sus rayos
+        ctx.strokeStyle = "rgba(255,255,250,0.12)";
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 18; i += 1) {
+          const a = rand() * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(cx - R * 0.08, cy + R * 0.62);
+          ctx.lineTo(cx - R * 0.08 + Math.cos(a) * R * 0.6, cy + R * 0.62 + Math.sin(a) * R * 0.6);
+          ctx.stroke();
+        }
+        // oscurecimiento del borde
+        const limb = ctx.createRadialGradient(cx, cy, R * 0.6, cx, cy, R);
+        limb.addColorStop(0, "rgba(0,0,0,0)");
+        limb.addColorStop(1, "rgba(20,25,45,0.35)");
+        ctx.fillStyle = limb;
+        ctx.fillRect(0, 0, S, S);
+        ctx.restore();
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        return tex;
+      }
+      const moon = new THREE.Sprite(
+        new THREE.SpriteMaterial({ map: createMoonTexture(), fog: false, depthWrite: false, transparent: true, color: new THREE.Color(2.4, 2.4, 2.5) })
+      );
+      moon.scale.setScalar(52);
+      moon.renderOrder = -7;
+      moon.position.copy(moonSkyDir).multiplyScalar(300);
+      skyGroup.add(moon);
 
       // ---------- LUCES ----------
-      scene.add(new THREE.HemisphereLight(0xc4d6f2, 0x5b5a2c, 0.95));
+      scene.add(new THREE.HemisphereLight(0x5f7ec4, 0x1a2a1a, 0.95));
+      const moonLight = new THREE.DirectionalLight(0xb9cdff, 1.35);
+      moonLight.castShadow = true;
+      moonLight.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
+      moonLight.shadow.camera.left = -16;
+      moonLight.shadow.camera.right = 16;
+      moonLight.shadow.camera.top = 16;
+      moonLight.shadow.camera.bottom = -16;
+      moonLight.shadow.camera.near = 5;
+      moonLight.shadow.camera.far = 80;
+      moonLight.shadow.bias = -0.0004;
+      moonLight.shadow.normalBias = 0.03;
+      moonLight.shadow.radius = 4;
+      scene.add(moonLight, moonLight.target);
+      // relleno suave para que las flores no se vean opacas
+      const fillLight = new THREE.DirectionalLight(0x9fb4ff, 0.35);
+      fillLight.position.set(6, 8, 14);
+      scene.add(fillLight);
 
-      const sunLight = new THREE.DirectionalLight(0xffc690, 3.4);
-      sunLight.position.copy(sunLightDir).multiplyScalar(30);
-      sunLight.castShadow = true;
-      sunLight.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
-      sunLight.shadow.camera.left = -13;
-      sunLight.shadow.camera.right = 13;
-      sunLight.shadow.camera.top = 13;
-      sunLight.shadow.camera.bottom = -13;
-      sunLight.shadow.camera.near = 5;
-      sunLight.shadow.camera.far = 60;
-      sunLight.shadow.bias = -0.0004;
-      sunLight.shadow.normalBias = 0.025;
-      sunLight.shadow.radius = 3;
-      scene.add(sunLight);
-
-      // Luz de rebote suave desde el lado de la cámara para que nada quede negro.
-      const bounceLight = new THREE.DirectionalLight(0xffe2c4, 0.8);
-      bounceLight.position.set(4, 6, 12);
-      scene.add(bounceLight);
-
-      // ---------- VIENTO COMPARTIDO ----------
+      // ---------- MATERIALES: VIENTO Y LUZ DE FAROLES ----------
       const windUniforms = { uTime: { value: 0 } };
-      function addWind(material, amplitude, height) {
+      const MAX_LAMPS = 96;
+      const lampUniforms = {
+        uLamps: { value: Array.from({ length: MAX_LAMPS }, () => new THREE.Vector4(0, -100, 0, 0)) },
+        uLampCount: { value: 0 }
+      };
+      const LAMP_GLSL = `
+        uniform vec4 uLamps[${MAX_LAMPS}];
+        uniform int uLampCount;
+        vec3 lampGlow(vec3 p) {
+          vec3 sum = vec3(0.0);
+          for (int i = 0; i < ${MAX_LAMPS}; i++) {
+            if (i >= uLampCount) break;
+            vec3 d = p - uLamps[i].xyz;
+            float dist2 = dot(d, d);
+            sum += vec3(1.0, 0.62, 0.3) * (uLamps[i].w / (1.0 + dist2 * 0.9)) * smoothstep(42.0, 6.0, dist2);
+          }
+          return sum;
+        }
+      `;
+      // Inyecta viento (balanceo en el vértice) y/o luz cálida de los faroles cercanos.
+      function enhance(material, { wind = null, lamps = true } = {}) {
         material.onBeforeCompile = (shader) => {
           shader.uniforms.uTime = windUniforms.uTime;
-          shader.uniforms.uAmp = { value: amplitude };
-          shader.uniforms.uHeight = { value: height };
+          shader.uniforms.uLamps = lampUniforms.uLamps;
+          shader.uniforms.uLampCount = lampUniforms.uLampCount;
+          shader.uniforms.uAmp = { value: wind ? wind.amp : 0 };
+          shader.uniforms.uHeight = { value: wind ? wind.height : 1 };
           shader.vertexShader = shader.vertexShader
             .replace(
               "#include <common>",
-              "#include <common>\nuniform float uTime; uniform float uAmp; uniform float uHeight;"
+              "#include <common>\nuniform float uTime; uniform float uAmp; uniform float uHeight; varying vec3 vLampW;"
             )
             .replace(
               "#include <begin_vertex>",
@@ -1123,7 +1565,7 @@
               #ifdef USE_INSTANCING
                 vec3 ip = instanceMatrix[3].xyz;
               #else
-                vec3 ip = vec3(0.0);
+                vec3 ip = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
               #endif
               float hN = clamp(position.y / uHeight, 0.0, 1.5);
               float gust = sin(uTime * 0.55 + ip.x * 0.16 + ip.z * 0.09) * 0.5 + 0.5;
@@ -1133,13 +1575,73 @@
               transformed.x += bend;
               transformed.z += bend * 0.45;
               transformed.y -= abs(bend) * 0.25 * hN;`
+            )
+            .replace(
+              "#include <project_vertex>",
+              `#include <project_vertex>
+              #ifdef USE_INSTANCING
+                vLampW = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;
+              #else
+                vLampW = (modelMatrix * vec4(transformed, 1.0)).xyz;
+              #endif`
+            );
+          shader.fragmentShader = shader.fragmentShader
+            .replace("#include <common>", `#include <common>\nvarying vec3 vLampW;\n${LAMP_GLSL}`)
+            .replace(
+              "#include <emissivemap_fragment>",
+              lamps
+                ? "#include <emissivemap_fragment>\ntotalEmissiveRadiance += diffuseColor.rgb * lampGlow(vLampW);"
+                : "#include <emissivemap_fragment>"
             );
         };
+        material.customProgramCacheKey = () => `enhance-${wind ? 1 : 0}-${lamps ? 1 : 0}`;
+        return material;
+      }
+      const addWind = (material, amp, height) => enhance(material, { wind: { amp, height } });
+
+      // Divide instancias por zonas para que el navegador solo dibuje lo que se ve.
+      const chunkedMeshes = [];
+      function chunkedInstances(geometry, material, items, { chunk = 14, castShadow = false } = {}) {
+        const buckets = new Map();
+        for (const item of items) {
+          const key = Math.floor(item.x / chunk) + "," + Math.floor(item.z / chunk);
+          if (!buckets.has(key)) buckets.set(key, []);
+          buckets.get(key).push(item);
+        }
+        const m = new THREE.Matrix4();
+        const q = new THREE.Quaternion();
+        const e = new THREE.Euler();
+        const color = new THREE.Color();
+        const p = new THREE.Vector3();
+        const sc = new THREE.Vector3();
+        for (const list of buckets.values()) {
+          const mesh = new THREE.InstancedMesh(geometry, material, list.length);
+          let cx = 0, cz = 0;
+          list.forEach((item, i) => {
+            e.set(item.tiltX || 0, item.yaw || 0, item.tiltZ || 0, "YXZ");
+            q.setFromEuler(e);
+            p.set(item.x, item.y || 0, item.z);
+            sc.set(item.s, item.sy || item.s, item.s);
+            m.compose(p, q, sc);
+            mesh.setMatrixAt(i, m);
+            if (item.color) color.copy(item.color);
+            else color.setScalar(item.shade || 1);
+            mesh.setColorAt(i, color);
+            cx += item.x;
+            cz += item.z;
+          });
+          mesh.computeBoundingSphere();
+          mesh.castShadow = castShadow;
+          mesh.receiveShadow = true;
+          mesh.userData.center = new THREE.Vector3(cx / list.length, 0, cz / list.length);
+          scene.add(mesh);
+          chunkedMeshes.push(mesh);
+        }
       }
 
       // ---------- SUELO PROCEDURAL ----------
-      const groundSize = 260;
-      const groundSegments = lowPower ? 140 : 220;
+      const groundSize = 300;
+      const groundSegments = lowPower ? 150 : 240;
       const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, groundSegments, groundSegments);
       groundGeometry.rotateX(-Math.PI / 2);
       {
@@ -1149,13 +1651,16 @@
         }
         groundGeometry.computeVertexNormals();
       }
+      const f2 = (v) => v.toFixed(2);
       const groundMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, metalness: 0 });
       groundMaterial.onBeforeCompile = (shader) => {
+        shader.uniforms.uLamps = lampUniforms.uLamps;
+        shader.uniforms.uLampCount = lampUniforms.uLampCount;
         shader.vertexShader = shader.vertexShader
           .replace("#include <common>", "#include <common>\nvarying vec3 vGW;")
           .replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nvGW = (modelMatrix * vec4(transformed, 1.0)).xyz;");
         shader.fragmentShader = shader.fragmentShader
-          .replace("#include <common>", `#include <common>\nvarying vec3 vGW;\n${NOISE_GLSL}\nfloat gRough = 1.0;`)
+          .replace("#include <common>", `#include <common>\nvarying vec3 vGW;\n${NOISE_GLSL}\n${LAMP_GLSL}\nfloat gRough = 1.0;`)
           .replace(
             "#include <color_fragment>",
             `#include <color_fragment>
@@ -1170,22 +1675,30 @@
 
               // césped
               vec3 grassA = pow(vec3(0.24, 0.33, 0.11), vec3(2.2));
-              vec3 grassB = pow(vec3(0.38, 0.45, 0.17), vec3(2.2));
-              vec3 dry = pow(vec3(0.55, 0.5, 0.27), vec3(2.2));
+              vec3 grassB = pow(vec3(0.36, 0.44, 0.17), vec3(2.2));
+              vec3 dry = pow(vec3(0.45, 0.45, 0.25), vec3(2.2));
               vec3 col = mix(grassA, grassB, nMid);
-              col = mix(col, dry, smoothstep(0.6, 0.82, nBig) * 0.45 + smoothstep(20.0, 70.0, r) * 0.2);
+              col = mix(col, dry, smoothstep(0.62, 0.84, nBig) * 0.35);
               col *= 0.82 + nFine * 0.28;
               float rough = 0.95;
 
-              // tierra / mantillo de los parterres
+              // tierra de los parterres centrales
               float sectorA = 6.2831853 / 6.0;
               float a = mod(th - sectorA * 0.5, sectorA);
               float edgeArc = (sectorA * 0.5 - abs(a - sectorA * 0.5)) * r;
-              float bed = (1.0 - smoothstep(${GARDEN.centerBed.toFixed(2)} - 0.05, ${GARDEN.centerBed.toFixed(2)} + 0.12, r + edgeN));
-              float outerBed = smoothstep(${GARDEN.bedInner.toFixed(2)} - 0.1, ${GARDEN.bedInner.toFixed(2)} + 0.05, r + edgeN)
-                * (1.0 - smoothstep(${GARDEN.bedOuter.toFixed(2)} - 0.05, ${GARDEN.bedOuter.toFixed(2)} + 0.12, r + edgeN))
-                * smoothstep(${GARDEN.walkHalf.toFixed(2)} - 0.08, ${GARDEN.walkHalf.toFixed(2)} + 0.06, edgeArc + edgeN);
+              float bed = (1.0 - smoothstep(${f2(GARDEN.centerBed)} - 0.05, ${f2(GARDEN.centerBed)} + 0.12, r + edgeN));
+              float outerBed = smoothstep(${f2(GARDEN.bedInner)} - 0.1, ${f2(GARDEN.bedInner)} + 0.05, r + edgeN)
+                * (1.0 - smoothstep(${f2(GARDEN.bedOuter)} - 0.05, ${f2(GARDEN.bedOuter)} + 0.12, r + edgeN))
+                * smoothstep(${f2(GARDEN.walkHalf)} - 0.08, ${f2(GARDEN.walkHalf)} + 0.06, edgeArc + edgeN);
               bed = max(bed, outerBed);
+              // franjas de los campos de tulipanes
+              float fieldZone = smoothstep(${f2(GARDEN.tulipField[0])} - 0.2, ${f2(GARDEN.tulipField[0])} + 0.2, r)
+                * (1.0 - smoothstep(${f2(GARDEN.tulipField[1])} - 0.2, ${f2(GARDEN.tulipField[1])} + 0.2, r))
+                * smoothstep(${f2(GARDEN.avenueHalf + 1.25)}, ${f2(GARDEN.avenueHalf + 1.45)}, abs(p.x))
+                * smoothstep(${f2(GARDEN.avenueHalf + 1.25)}, ${f2(GARDEN.avenueHalf + 1.45)}, abs(p.y));
+              float sv = mod(abs(p.y), ${f2(STRIPE)});
+              float stripe = smoothstep(-0.05, 0.08, sv + edgeN * 0.3) * (1.0 - smoothstep(${f2(STRIPE_SOIL)} - 0.08, ${f2(STRIPE_SOIL)} + 0.05, sv + edgeN * 0.3));
+              bed = max(bed, fieldZone * stripe);
               vec3 soilA = pow(vec3(0.17, 0.11, 0.07), vec3(2.2));
               vec3 soilB = pow(vec3(0.3, 0.2, 0.13), vec3(2.2));
               vec3 soil = mix(soilA, soilB, gNoise(p * 9.0) * 0.6 + nFine * 0.4);
@@ -1193,13 +1706,22 @@
               col = mix(col, soil, bed);
               rough = mix(rough, 1.0, bed);
 
-              // sendero de grava: anillo + entradas norte/sur
-              float ring = smoothstep(${GARDEN.pathInner.toFixed(2)} - 0.04, ${GARDEN.pathInner.toFixed(2)} + 0.06, r + edgeN * 0.25)
-                * (1.0 - smoothstep(${GARDEN.pathOuter.toFixed(2)} - 0.06, ${GARDEN.pathOuter.toFixed(2)} + 0.04, r + edgeN * 0.25));
+              // senderos de grava: anillo central, entradas, dos anillos de paseo y avenidas en cruz
+              float ring = smoothstep(${f2(GARDEN.pathInner)} - 0.04, ${f2(GARDEN.pathInner)} + 0.06, r + edgeN * 0.25)
+                * (1.0 - smoothstep(${f2(GARDEN.pathOuter)} - 0.06, ${f2(GARDEN.pathOuter)} + 0.04, r + edgeN * 0.25));
               float spoke = (1.0 - smoothstep(0.46, 0.56, abs(p.x) + edgeN * 0.2))
-                * smoothstep(${GARDEN.pathOuter.toFixed(2)} - 0.3, ${GARDEN.pathOuter.toFixed(2)}, r)
-                * (1.0 - smoothstep(${(GARDEN.hedge + 1.2).toFixed(2)}, ${(GARDEN.hedge + 2.2).toFixed(2)}, r));
-              float path = max(ring, spoke);
+                * smoothstep(${f2(GARDEN.pathOuter)} - 0.3, ${f2(GARDEN.pathOuter)}, r)
+                * (1.0 - smoothstep(${f2(GARDEN.hedge + 0.8)}, ${f2(GARDEN.hedge + 1.4)}, r));
+              float ring1 = smoothstep(${f2(GARDEN.ring1[0])} - 0.06, ${f2(GARDEN.ring1[0])} + 0.06, r + edgeN * 0.25)
+                * (1.0 - smoothstep(${f2(GARDEN.ring1[1])} - 0.06, ${f2(GARDEN.ring1[1])} + 0.06, r + edgeN * 0.25));
+              float ring2 = smoothstep(${f2(GARDEN.ring2[0])} - 0.06, ${f2(GARDEN.ring2[0])} + 0.06, r + edgeN * 0.25)
+                * (1.0 - smoothstep(${f2(GARDEN.ring2[1])} - 0.06, ${f2(GARDEN.ring2[1])} + 0.06, r + edgeN * 0.25));
+              float aveZ = (1.0 - smoothstep(${f2(GARDEN.avenueHalf - 0.06)}, ${f2(GARDEN.avenueHalf + 0.06)}, abs(p.x) + edgeN * 0.2))
+                * smoothstep(${f2(GARDEN.hedge + 0.8)}, ${f2(GARDEN.hedge + 1.4)}, r);
+              float aveX = (1.0 - smoothstep(${f2(GARDEN.avenueHalf - 0.06)}, ${f2(GARDEN.avenueHalf + 0.06)}, abs(p.y) + edgeN * 0.2))
+                * smoothstep(${f2(GARDEN.ring1[0])}, ${f2(GARDEN.ring1[0] + 0.3)}, r);
+              float avenues = (aveZ + aveX) * (1.0 - smoothstep(${f2(GARDEN.edge)}, ${f2(GARDEN.edge + 3)}, r));
+              float path = clamp(max(max(ring, spoke), max(max(ring1, ring2), avenues)), 0.0, 1.0);
               float pebble = gNoise(p * 55.0);
               float pebble2 = gNoise(p * 23.0 + 4.0);
               vec3 gravel = mix(pow(vec3(0.5, 0.46, 0.4), vec3(2.2)), pow(vec3(0.74, 0.69, 0.6), vec3(2.2)), pebble);
@@ -1212,7 +1734,11 @@
               gRough = rough;
             }`
           )
-          .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = gRough;");
+          .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = gRough;")
+          .replace(
+            "#include <emissivemap_fragment>",
+            "#include <emissivemap_fragment>\ntotalEmissiveRadiance += diffuseColor.rgb * lampGlow(vGW) * 1.3;"
+          );
       };
       const ground = new THREE.Mesh(groundGeometry, groundMaterial);
       ground.receiveShadow = true;
@@ -1316,16 +1842,17 @@
             new THREE.SpriteMaterial({
               map: createTreeTexture(k.kind, 101 + i * 37),
               alphaTest: 0.35,
-              fog: true
+              fog: true,
+              color: 0x3a4660
             })
         );
-        const treeCount = Math.round(170 * (lowPower ? 0.6 : 1));
-        const sunAngle = Math.atan2(sunSkyDir.z, sunSkyDir.x);
+        const treeCount = Math.round(260 * (lowPower ? 0.5 : 1));
+        const sunAngle = Math.atan2(moonSkyDir.z, moonSkyDir.x);
         for (let i = 0; i < treeCount; i += 1) {
           const a = random() * Math.PI * 2;
-          // claro detrás del sol para dejar ver el atardecer
+          // claro bajo la luna para que siempre se vea
           const behindSun = Math.max(0, Math.cos(a - sunAngle));
-          const r = 32 + Math.pow(random(), 0.8) * 60 + behindSun * behindSun * 30;
+          const r = 68 + Math.pow(random(), 0.8) * 45 + behindSun * behindSun * 40;
           const x = Math.cos(a) * r;
           const z = Math.sin(a) * r;
           const k = Math.floor(random() * kinds.length);
@@ -1410,7 +1937,7 @@
       // ---------- CÉSPED (briznas instanciadas que se mecen) ----------
       function createGrassClumpGeometry() {
         const positions = [], normals = [], colors = [], indices = [];
-        const blades = 7;
+        const blades = 6;
         const segs = 3;
         let base = 0;
         const rand = seededRandom(77);
@@ -1455,45 +1982,30 @@
         return g;
       }
       {
-        const grassMaterial = new THREE.MeshStandardMaterial({
+        const grassMaterial = enhance(new THREE.MeshStandardMaterial({
           vertexColors: true,
           roughness: 0.82,
           side: THREE.DoubleSide
-        });
-        addWind(grassMaterial, 0.05, 0.28);
-        const clumpCount = Math.round(26000 * Q);
-        const grass = new THREE.InstancedMesh(createGrassClumpGeometry(), grassMaterial, clumpCount);
-        const m = new THREE.Matrix4();
-        const q = new THREE.Quaternion();
-        const color = new THREE.Color();
-        let placed = 0;
+        }), { wind: { amp: 0.05, height: 0.28 } });
+        const clumpCount = Math.round(60000 * Q);
+        const items = [];
         let guard = 0;
-        while (placed < clumpCount && guard < clumpCount * 8) {
+        while (items.length < clumpCount && guard < clumpCount * 6) {
           guard += 1;
-          // más densidad cerca del centro, el campo se extiende hasta lejos
-          const r = Math.pow(random(), 0.85) * 32;
+          const r = Math.pow(random(), 0.7) * (GARDEN.edge + 6);
           const a = random() * Math.PI * 2;
           const x = Math.cos(a) * r;
           const z = Math.sin(a) * r;
           if (onPath(x, z)) continue;
           const bed = inBed(x, z, -0.15);
           if (bed !== null && random() > 0.04) continue;
-          const nearHedge = Math.abs(r - GARDEN.hedge) < 0.45;
-          if (nearHedge && random() > 0.3) continue;
-          const meadow = THREE.MathUtils.smoothstep(r, 10.5, 16);
-          const s = (0.8 + random() * 0.5) * (1 + meadow * 0.55);
-          q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), random() * Math.PI * 2);
-          m.compose(new THREE.Vector3(x, groundHeight(x, z), z), q, new THREE.Vector3(s, s * (0.85 + random() * 0.4), s));
-          grass.setMatrixAt(placed, m);
-          const v = 0.78 + random() * 0.35;
-          const dryness = fbm(x * 0.22, z * 0.22);
-          color.setRGB(v * (1 + Math.max(0, dryness - 0.6) * 0.5), v, v * 0.92);
-          grass.setColorAt(placed, color);
-          placed += 1;
+          if (tulipStripe(x, z, -0.1) >= 0 && random() > 0.05) continue;
+          if (Math.abs(r - GARDEN.hedge) < 0.45 && random() > 0.3) continue;
+          const s = 0.8 + random() * 0.6;
+          const v = 0.75 + random() * 0.35;
+          items.push({ x, z, y: groundHeight(x, z), s, sy: s * (0.85 + random() * 0.4), yaw: random() * Math.PI * 2, shade: v });
         }
-        grass.count = placed;
-        grass.receiveShadow = true;
-        scene.add(grass);
+        chunkedInstances(createGrassClumpGeometry(), grassMaterial, items, { chunk: 12 });
       }
 
       // ---------- TULIPANES ----------
@@ -1513,8 +2025,7 @@
         night: 0x3e1238
       };
 
-      function createTulipPetalGeometry(outer) {
-        const segU = 14, segV = 7;
+      function createTulipPetalGeometry(outer, segU = 14, segV = 7) {
         const H = outer ? 1.0 : 0.93;
         const halfW = outer ? 0.31 : 0.29;
         const cup = outer ? 1.45 : 1.65;
@@ -1552,8 +2063,7 @@
         return g;
       }
 
-      function createTulipLeafGeometry() {
-        const segU = 14, segV = 4;
+      function createTulipLeafGeometry(segU = 14, segV = 4) {
         const positions = [], colors = [], indices = [];
         let yy = 0, zz = 0.03;
         const du = 1 / segU;
@@ -1592,6 +2102,10 @@
       const outerPetalGeometry = createTulipPetalGeometry(true);
       const innerPetalGeometry = createTulipPetalGeometry(false);
       const tulipLeafGeometry = createTulipLeafGeometry();
+      // versiones ligeras para los campos grandes
+      const lowOuterPetal = createTulipPetalGeometry(true, 7, 4);
+      const lowInnerPetal = createTulipPetalGeometry(false, 6, 3);
+      const lowLeaf = createTulipLeafGeometry(8, 2);
       const tulipFilamentGeometry = new THREE.CylinderGeometry(0.008, 0.01, 0.4, 5);
       tulipFilamentGeometry.rotateX(Math.PI / 2);
       tulipFilamentGeometry.translate(0, 0, 0.2);
@@ -1622,6 +2136,7 @@
         sheenColor: new THREE.Color(0xffffff),
         side: THREE.DoubleSide
       });
+      enhance(flowerMaterial);
 
       function bakePlant(group) {
         group.updateMatrixWorld(true);
@@ -1709,11 +2224,12 @@
           new THREE.Vector3(config.bendX * 0.6, config.height * 0.68, config.bendZ * 0.6),
           new THREE.Vector3(config.bendX, config.height, config.bendZ)
         ]);
-        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 14, 0.045 * config.scale, 6, false), tulipStemPaint));
+        const lp = !!config.lowPoly;
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, lp ? 5 : 14, 0.045 * config.scale, lp ? 4 : 6, false), tulipStemPaint));
 
         const leafCount = 2 + (rnd(1) > 0.5 ? 1 : 0);
         for (let i = 0; i < leafCount; i++) {
-          const leaf = new THREE.Mesh(tulipLeafGeometry, tulipLeafPaint);
+          const leaf = new THREE.Mesh(lp ? lowLeaf : tulipLeafGeometry, tulipLeafPaint);
           leaf.position.set(0, 0.01 + i * 0.04 * config.height, 0);
           leaf.rotation.y = config.seed * 6.28 + i * ((Math.PI * 2) / leafCount) + (rnd(i + 1) - 0.5) * 0.5;
           leaf.rotation.x = (rnd(i + 7) - 0.5) * 0.15;
@@ -1732,8 +2248,8 @@
         calyx.scale.set(1, 1, 0.8);
         calyx.position.z = -0.01;
         head.add(calyx);
-        addTepals(head, petalPaint, outerPetalGeometry, rnd(21) * 0.2, 0.05 + open * 0.28, rnd);
-        addTepals(head, petalPaint, innerPetalGeometry, Math.PI / 3 + rnd(22) * 0.2, 0.01 + open * 0.16, rnd);
+        addTepals(head, petalPaint, lp ? lowOuterPetal : outerPetalGeometry, rnd(21) * 0.2, 0.05 + open * 0.28, rnd);
+        addTepals(head, petalPaint, lp ? lowInnerPetal : innerPetalGeometry, Math.PI / 3 + rnd(22) * 0.2, 0.01 + open * 0.16, rnd);
         const inner = new THREE.Mesh(tulipInnerGeometry, tulipCenterPaint);
         inner.scale.set(1, 1, 0.55);
         inner.position.z = 0.03;
@@ -1743,15 +2259,16 @@
         return bakePlant(group);
       }
 
+
       // ---------- LIRIOS ARAÑA (Lycoris) ----------
-      function createSpiderPetalGeometry() {
+      function createSpiderPetalGeometry(curveSegments = 8) {
         const shape = new THREE.Shape();
         shape.moveTo(0, 0);
         shape.bezierCurveTo(0.1, 0.12, 0.15, 0.58, 0.08, 1.08);
         shape.bezierCurveTo(0.045, 1.38, 0.02, 1.55, 0, 1.64);
         shape.bezierCurveTo(-0.02, 1.55, -0.045, 1.38, -0.08, 1.08);
         shape.bezierCurveTo(-0.15, 0.58, -0.1, 0.12, 0, 0);
-        const geometry = new THREE.ShapeGeometry(shape, 8);
+        const geometry = new THREE.ShapeGeometry(shape, curveSegments);
         const position = geometry.attributes.position;
         const colors = [];
         for (let i = 0; i < position.count; i += 1) {
@@ -1771,6 +2288,7 @@
         return geometry;
       }
       const spiderPetalGeometry = createSpiderPetalGeometry();
+      const lowSpiderPetal = createSpiderPetalGeometry(3);
       const spiderStamenCurve = new THREE.CatmullRomCurve3([
         new THREE.Vector3(0, 0, 0),
         new THREE.Vector3(0, 0.34, 0.1),
@@ -1779,6 +2297,7 @@
         new THREE.Vector3(0, 0.88, 1.06)
       ]);
       const spiderStamenGeometry = new THREE.TubeGeometry(spiderStamenCurve, 10, 0.011, 4, false);
+      const lowStamen = new THREE.TubeGeometry(spiderStamenCurve, 5, 0.013, 3, false);
       const spiderAntherGeometry = new THREE.SphereGeometry(0.035, 6, 4);
       const spiderCenterGeometry = new THREE.SphereGeometry(0.085, 8, 6);
       const LYCORIS_COLORS = [0xd0182b, 0xe02a2d, 0xb8121f];
@@ -1796,7 +2315,8 @@
           new THREE.Vector3(config.bendX * 0.6, config.height * 0.7, config.bendZ * 0.6),
           new THREE.Vector3(config.bendX, config.height, config.bendZ)
         ]);
-        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 12, 0.03 * config.scale, 6, false), spiderStemPaint));
+        const lp = !!config.lowPoly;
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, lp ? 5 : 12, 0.03 * config.scale, lp ? 4 : 6, false), spiderStemPaint));
         const head = new THREE.Group();
         head.position.copy(curve.getPoint(1));
         head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
@@ -1804,7 +2324,7 @@
         const petalPaint = paint(config.color);
         // Umbela: 5–6 florecillas que miran hacia afuera, cada una con 6 tépalos
         // estrechos que se curvan hacia atrás y estambres largos que sobresalen.
-        const florets = 5 + (config.seed > 0.5 ? 1 : 0);
+        const florets = lp ? 4 : 5 + (config.seed > 0.5 ? 1 : 0);
         head.add(new THREE.Mesh(spiderCenterGeometry, spiderCenterPaint));
         for (let f = 0; f < florets; f += 1) {
           const floret = new THREE.Group();
@@ -1816,16 +2336,17 @@
           for (let i = 0; i < 6; i += 1) {
             const holder = new THREE.Group();
             holder.rotation.z = (i / 6) * Math.PI * 2 + f;
-            const petal = new THREE.Mesh(spiderPetalGeometry, petalPaint);
+            const petal = new THREE.Mesh(lp ? lowSpiderPetal : spiderPetalGeometry, petalPaint);
             petal.rotation.x = 0.55 + ((i * 7 + f) % 3) * 0.08;
             petal.scale.set(0.9, 0.95, 1);
             holder.add(petal);
             inner.add(holder);
           }
-          for (let i = 0; i < 6; i += 1) {
+          const stamens = lp ? 3 : 6;
+          for (let i = 0; i < stamens; i += 1) {
             const holder = new THREE.Group();
-            holder.rotation.z = Math.PI / 6 + (i / 6) * Math.PI * 2;
-            const stamen = new THREE.Mesh(spiderStamenGeometry, spiderStamenPaint);
+            holder.rotation.z = Math.PI / 6 + (i / stamens) * Math.PI * 2;
+            const stamen = new THREE.Mesh(lp ? lowStamen : spiderStamenGeometry, spiderStamenPaint);
             stamen.rotation.x = -0.35;
             stamen.scale.setScalar(1.55);
             holder.add(stamen);
@@ -1840,6 +2361,7 @@
         group.add(head);
         return bakePlant(group);
       }
+
 
       // ---------- PLANTAS INSTANCIADAS ----------
       function plantInstances(geometry, material, items, opts = {}) {
@@ -1998,8 +2520,7 @@
       }
 
       const grassClumpGeometry = createGrassClumpGeometry();
-      const coverMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, side: THREE.DoubleSide });
-      addWind(coverMaterial, 0.05, 0.45);
+      const coverMaterial = enhance(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, side: THREE.DoubleSide }), { wind: { amp: 0.05, height: 0.45 } });
 
       lycorisBed(0);
       tulipBed(1, ["yellow", "apricot", "orange", "scarlet"]);
@@ -2020,83 +2541,236 @@
         plantInstances(grassClumpGeometry, coverMaterial, cover);
       }
 
-      // ---------- POLEN Y POLVO EN EL AIRE ----------
-      const particleUniforms = {
-        uTime: { value: 0 },
-        uPixelRatio: { value: renderer.getPixelRatio() },
-        uSunDir: { value: sunSkyDir }
-      };
+
+      // ---------- CAMPOS GRANDES (instanciados) ----------
+      // Variantes horneadas de cada flor; cada campo usa miles de copias.
+      const fieldFlowerMaterial = enhance(flowerMaterial.clone(), { wind: { amp: 0.05, height: 1.3 } });
+      fieldFlowerMaterial.side = THREE.DoubleSide;
+      function tulipVariant(colorHex, seed) {
+        const rnd = seededRandom(Math.floor(seed * 100000) + 7);
+        return createTulip({
+          x: 0, z: 0,
+          height: 1.0,
+          scale: 0.36,
+          tilt: 0.05 + rnd() * 0.15,
+          bendX: (rnd() - 0.5) * 0.2,
+          bendZ: (rnd() - 0.5) * 0.2,
+          spin: rnd() * Math.PI * 2,
+          color: colorHex,
+          seed,
+          detail: false,
+          lowPoly: true,
+          open: 0.15 + rnd() * 0.3
+        }).children[0].geometry;
+      }
+      function lilyVariant(colorHex, seed) {
+        const rnd = seededRandom(Math.floor(seed * 100000) + 11);
+        return createSpiderLily({
+          x: 0, z: 0,
+          height: 1.0,
+          scale: 0.3,
+          tilt: 0.12 + rnd() * 0.2,
+          bendX: (rnd() - 0.5) * 0.25,
+          bendZ: (rnd() - 0.5) * 0.25,
+          spin: rnd() * Math.PI * 2,
+          color: colorHex,
+          seed,
+          lowPoly: true
+        }).children[0].geometry;
+      }
+
+      // Franjas de colores de los campos de tulipanes (estilo Keukenhof)
+      const STRIPE_PALETTE = ["red", "yellow", "pink", "white", "orange", "purple", "scarlet", "blush", "apricot", "lilac", "cream", "night"];
       {
-        const count = Math.round(900 * Q);
-        const positions = new Float32Array(count * 3);
-        const seeds = new Float32Array(count * 3);
-        for (let i = 0; i < count; i += 1) {
-          const r = Math.sqrt(random()) * 16;
-          const a = random() * Math.PI * 2;
-          positions[i * 3] = Math.cos(a) * r;
-          positions[i * 3 + 1] = 0.2 + Math.pow(random(), 1.6) * 6;
-          positions[i * 3 + 2] = Math.sin(a) * r;
-          seeds[i * 3] = random();
-          seeds[i * 3 + 1] = random();
-          seeds[i * 3 + 2] = random();
+        const variants = {};
+        for (const name of STRIPE_PALETTE) {
+          variants[name] = [0, 1, 2].map((k) => tulipVariant(TULIP_COLORS[name], 0.13 + k * 0.29 + name.length * 0.01));
         }
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute("seed", new THREE.BufferAttribute(seeds, 3));
-        const material = new THREE.ShaderMaterial({
-          uniforms: particleUniforms,
-          transparent: true,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          vertexShader: `
-            attribute vec3 seed;
-            uniform float uTime; uniform float uPixelRatio; uniform vec3 uSunDir;
-            varying float vBright;
-            void main() {
-              vec3 p = position;
-              float t = uTime;
-              // deriva lenta, como motas de polen llevadas por una brisa
-              p.x += sin(t * (0.07 + seed.x * 0.08) + seed.y * 6.28) * 1.1 + t * 0.05 * (seed.z - 0.3);
-              p.z += cos(t * (0.06 + seed.y * 0.07) + seed.z * 6.28) * 1.1;
-              p.y += sin(t * (0.11 + seed.z * 0.1) + seed.x * 6.28) * 0.35;
-              p.x = mod(p.x + 18.0, 36.0) - 18.0;
-              vec4 world = modelMatrix * vec4(p, 1.0);
-              vec4 mv = viewMatrix * world;
-              vec3 view = normalize(world.xyz - cameraPosition);
-              float forward = pow(max(dot(view, uSunDir), 0.0), 3.0);
-              float twinkle = 0.65 + 0.35 * sin(t * (1.2 + seed.y * 2.5) + seed.x * 40.0);
-              vBright = (0.14 + forward * 1.4) * twinkle;
-              float size = 0.022 + seed.z * 0.03;
-              gl_PointSize = size * uPixelRatio * (520.0 / -mv.z);
-              gl_Position = projectionMatrix * mv;
+        const items = {};
+        const stepX = lowPower ? 0.5 : 0.36;
+        const rows = lowPower ? 2 : 3;
+        const maxR = lowPower ? 28 : GARDEN.tulipField[1];
+        for (let zi = 0; zi * STRIPE < maxR; zi += 1) {
+          for (const sign of [-1, 1]) {
+            const stripeZ = zi * STRIPE;
+            // las franjas de cada cuadrante tienen su propio orden de colores
+            for (const sx of [-1, 1]) {
+              const quadrant = (sign > 0 ? 0 : 2) + (sx > 0 ? 0 : 1);
+              const name = STRIPE_PALETTE[(zi + quadrant * 3) % STRIPE_PALETTE.length];
+              for (let row = 0; row < rows; row += 1) {
+                const zLocal = 0.22 + (row + 0.5) * ((STRIPE_SOIL - 0.44) / rows);
+                const z = sign * (stripeZ + zLocal);
+                for (let x = GARDEN.avenueHalf + 1.6; x < maxR; x += stepX) {
+                  const jx = sx * (x + (random() - 0.5) * stepX * 0.5);
+                  const jz = z + (random() - 0.5) * 0.12;
+                  if (tulipStripe(jx, jz, 0.1) < 0 || Math.hypot(jx, jz) > maxR) continue;
+                  const v = Math.floor(random() * 3);
+                  const key = name + v;
+                  if (!items[key]) items[key] = { geometry: variants[name][v], list: [] };
+                  items[key].list.push({
+                    x: jx,
+                    z: jz,
+                    s: 0.9 + random() * 0.25,
+                    sy: 0.85 + random() * 0.35,
+                    yaw: random() * Math.PI * 2,
+                    tiltX: (random() - 0.5) * 0.08,
+                    tiltZ: (random() - 0.5) * 0.08,
+                    shade: 0.88 + random() * 0.18
+                  });
+                }
+              }
             }
-          `,
-          fragmentShader: `
-            varying float vBright;
-            void main() {
-              float d = length(gl_PointCoord - 0.5);
-              float a = smoothstep(0.5, 0.0, d);
-              a *= a;
-              vec3 col = vec3(1.0, 0.86, 0.6) * vBright;
-              gl_FragColor = vec4(col, a);
-              #include <tonemapping_fragment>
-              #include <colorspace_fragment>
-            }
-          `
+          }
+        }
+        for (const entry of Object.values(items)) chunkedInstances(entry.geometry, fieldFlowerMaterial, entry.list, { chunk: 12 });
+      }
+
+      // Praderas de lirios araña: manchas naturales entre el césped
+      {
+        const variants = LYCORIS_COLORS.flatMap((c, i) => [lilyVariant(c, 0.2 + i * 0.17), lilyVariant(c, 0.61 + i * 0.11)]);
+        const lists = variants.map(() => []);
+        const target = Math.round(2600 * Q);
+        let placed = 0;
+        let guard = 0;
+        const [r0, r1] = GARDEN.lilyField;
+        while (placed < target && guard < target * 30) {
+          guard += 1;
+          const r = Math.sqrt(r0 * r0 + random() * (r1 * r1 - r0 * r0));
+          const a = random() * Math.PI * 2;
+          const x = Math.cos(a) * r;
+          const z = Math.sin(a) * r;
+          if (onPath(x, z, 0.6)) continue;
+          const patch = fbm(x * 0.09 + 3, z * 0.09 - 5);
+          if (patch < 0.47 || random() > (patch - 0.4) * 2.2) continue;
+          const k = Math.floor(random() * variants.length);
+          lists[k].push({
+            x, z,
+            s: 0.95 + random() * 0.3,
+            sy: 0.85 + random() * 0.35,
+            yaw: random() * Math.PI * 2,
+            tiltX: (random() - 0.5) * 0.12,
+            tiltZ: (random() - 0.5) * 0.12,
+            shade: 0.85 + random() * 0.2
+          });
+          placed += 1;
+        }
+        variants.forEach((g, k) => chunkedInstances(g, fieldFlowerMaterial, lists[k], { chunk: 14 }));
+      }
+
+      // ---------- FAROLES ----------
+      const lampPositions = [];
+      {
+        const add = (x, z) => lampPositions.push(new THREE.Vector3(x, 0, z));
+        // alrededor del sendero central, entre los parterres
+        for (let i = 0; i < 6; i += 1) {
+          const a = SECTOR / 2 + i * SECTOR + SECTOR / 2;
+          if (Math.abs(Math.cos(a)) < 0.2) continue;
+          add(Math.cos(a) * (GARDEN.pathOuter + 0.25), Math.sin(a) * (GARDEN.pathOuter + 0.25));
+        }
+        // a los lados de las entradas del seto
+        for (const zs of [-1, 1]) for (const xs of [-1, 1]) add(xs * 1.0, zs * (GARDEN.hedge + 0.6));
+        // anillos de paseo
+        for (const [ring, count] of [[GARDEN.ring1[1] + 0.35, 12], [GARDEN.ring2[1] + 0.35, 24]]) {
+          for (let i = 0; i < count; i += 1) {
+            const a = (i + 0.5) * ((Math.PI * 2) / count);
+            add(Math.cos(a) * ring, Math.sin(a) * ring);
+          }
+        }
+        // avenidas en cruz, alternando lados
+        for (let d = 17; d < GARDEN.edge; d += 7) {
+          if (Math.abs(d - (GARDEN.ring2[0] + GARDEN.ring2[1]) / 2) < 3) continue;
+          const side = Math.round(d / 7) % 2 ? 1 : -1;
+          const off = GARDEN.avenueHalf + 0.35;
+          add(side * off, d); add(-side * off, -d);
+          add(d, side * off); add(-d, -side * off);
+        }
+      }
+      lampUniforms.uLampCount.value = Math.min(MAX_LAMPS, lampPositions.length);
+      const LAMP_HEIGHT = 2.35;
+      lampPositions.slice(0, MAX_LAMPS).forEach((p, i) => {
+        lampUniforms.uLamps.value[i].set(p.x, LAMP_HEIGHT, p.z, 1.35);
+      });
+      {
+        // farol clásico: base, poste, linterna de vidrio y tejadillo
+        const metal = [];
+        const base = new THREE.CylinderGeometry(0.12, 0.16, 0.25, 8);
+        base.translate(0, 0.125, 0);
+        const pole = new THREE.CylinderGeometry(0.035, 0.05, LAMP_HEIGHT - 0.2, 8);
+        pole.translate(0, (LAMP_HEIGHT - 0.2) / 2 + 0.2, 0);
+        const ring = new THREE.TorusGeometry(0.08, 0.02, 6, 12);
+        ring.rotateX(Math.PI / 2);
+        ring.translate(0, LAMP_HEIGHT - 0.22, 0);
+        const cap = new THREE.ConeGeometry(0.2, 0.18, 4);
+        cap.rotateY(Math.PI / 4);
+        cap.translate(0, LAMP_HEIGHT + 0.27, 0);
+        const finial = new THREE.SphereGeometry(0.035, 8, 6);
+        finial.translate(0, LAMP_HEIGHT + 0.39, 0);
+        for (const g of [base, pole, ring, cap, finial]) {
+          g.deleteAttribute("uv");
+          metal.push(g.index ? g.toNonIndexed() : g);
+        }
+        const metalGeometry = mergeGeometries(metal, false);
+        const glassGeometry = new THREE.CylinderGeometry(0.15, 0.1, 0.36, 4, 1);
+        glassGeometry.rotateY(Math.PI / 4);
+        glassGeometry.translate(0, LAMP_HEIGHT, 0);
+        const metalMaterial = new THREE.MeshStandardMaterial({ color: 0x1c1f24, roughness: 0.45, metalness: 0.7 });
+        const glassMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.35, 0.55), fog: true });
+        const items = lampPositions.map((p) => ({ x: p.x, z: p.z, s: 1, yaw: Math.atan2(p.x, p.z) }));
+        chunkedInstances(metalGeometry, metalMaterial, items, { chunk: 20, castShadow: true });
+        chunkedInstances(glassGeometry, glassMaterial, items, { chunk: 20 });
+
+        // halo de luz alrededor de cada linterna
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 128;
+        const ctx = canvas.getContext("2d");
+        const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+        g.addColorStop(0, "rgba(255, 220, 160, 0.9)");
+        g.addColorStop(0.2, "rgba(255, 180, 100, 0.35)");
+        g.addColorStop(1, "rgba(255, 150, 60, 0)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 128, 128);
+        const glowTexture = new THREE.CanvasTexture(canvas);
+        glowTexture.colorSpace = THREE.SRGBColorSpace;
+        const glowMaterial = new THREE.SpriteMaterial({ map: glowTexture, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true });
+        for (const p of lampPositions) {
+          const s = new THREE.Sprite(glowMaterial);
+          s.position.set(p.x, LAMP_HEIGHT, p.z);
+          s.scale.setScalar(1.7);
+          scene.add(s);
+        }
+      }
+      // Luces reales solo en los faroles más cercanos (las demás se simulan en el suelo)
+      const lampLights = [];
+      for (let i = 0; i < (lowPower ? 3 : 6); i += 1) {
+        const light = new THREE.PointLight(0xffb46a, 7, 10, 1.8);
+        light.position.set(0, -50, 0);
+        scene.add(light);
+        lampLights.push(light);
+      }
+      function updateLampLights(center) {
+        const sorted = lampPositions
+          .map((p) => ({ p, d: (p.x - center.x) ** 2 + (p.z - center.z) ** 2 }))
+          .sort((a, b) => a.d - b.d);
+        lampLights.forEach((light, i) => {
+          const entry = sorted[i];
+          if (entry) light.position.set(entry.p.x, LAMP_HEIGHT - 0.05, entry.p.z);
         });
-        scene.add(new THREE.Points(geometry, material));
       }
 
       // ---------- LUCIÉRNAGAS ----------
+      const particleUniforms = {
+        uTime: { value: 0 },
+        uPixelRatio: { value: renderer.getPixelRatio() }
+      };
       {
-        const count = Math.round(70 * Q);
+        const count = Math.round(700 * Q);
         const positions = new Float32Array(count * 3);
         const seeds = new Float32Array(count * 4);
         for (let i = 0; i < count; i += 1) {
-          const r = 2 + Math.sqrt(random()) * 13;
+          const r = 2 + Math.sqrt(random()) * 58;
           const a = random() * Math.PI * 2;
           positions[i * 3] = Math.cos(a) * r;
-          positions[i * 3 + 1] = 0.3 + random() * 1.6;
+          positions[i * 3 + 1] = 0.25 + Math.pow(random(), 1.5) * 2.4;
           positions[i * 3 + 2] = Math.sin(a) * r;
           seeds[i * 4] = random();
           seeds[i * 4 + 1] = random();
@@ -2123,11 +2797,11 @@
               p.z += cos(t * s1 * 0.85 + seed.z * 6.28) * 0.9 + cos(t * s1 * 1.9 + seed.w * 7.0) * 0.25;
               p.y += sin(t * s1 * 1.4 + seed.w * 6.28) * 0.35;
               // destello real: encendido corto, luego varios segundos apagado
-              float cycle = fract(t / (2.4 + seed.w * 3.2) + seed.x);
-              float flash = smoothstep(0.0, 0.06, cycle) * (1.0 - smoothstep(0.08, 0.3, cycle));
-              vFlash = flash * 0.95 + 0.04;
+              float cycle = fract(t / (2.2 + seed.w * 3.0) + seed.x);
+              float flash = smoothstep(0.0, 0.06, cycle) * (1.0 - smoothstep(0.08, 0.32, cycle));
+              vFlash = flash + 0.06;
               vec4 mv = modelViewMatrix * vec4(p, 1.0);
-              gl_PointSize = 0.42 * uPixelRatio * (300.0 / -mv.z);
+              gl_PointSize = 0.5 * uPixelRatio * (300.0 / -mv.z);
               gl_Position = projectionMatrix * mv;
             }
           `,
@@ -2136,9 +2810,9 @@
             void main() {
               float d = length(gl_PointCoord - 0.5);
               float core = exp(-d * d * 260.0);
-              float halo = exp(-d * d * 22.0) * 0.35;
+              float halo = exp(-d * d * 18.0) * 0.4;
               float a = (core + halo) * vFlash;
-              vec3 col = vec3(0.82, 1.0, 0.42) * (core * 2.6 + halo);
+              vec3 col = vec3(0.8, 1.0, 0.4) * (core * 3.0 + halo);
               gl_FragColor = vec4(col * vFlash, clamp(a, 0.0, 1.0));
               #include <tonemapping_fragment>
               #include <colorspace_fragment>
@@ -2148,197 +2822,154 @@
         scene.add(new THREE.Points(geometry, material));
       }
 
-      // ---------- MARIPOSAS ----------
-      function createWingTexture(style) {
-        const canvas = document.createElement("canvas");
-        canvas.width = canvas.height = 256;
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, 256, 256);
-        const drawWing = (fill, cx, cy, rx, ry, rot) => {
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate(rot);
-          ctx.beginPath();
-          ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-          ctx.fillStyle = fill;
-          ctx.fill();
-          ctx.restore();
-        };
-        // ala anterior (arriba) y posterior (abajo); el borde x=0 es la bisagra
-        const fore = { cx: 110, cy: 92, rx: 112, ry: 70, rot: -0.35 };
-        const hind = { cx: 92, cy: 178, rx: 84, ry: 62, rot: 0.3 };
-        if (style.border) {
-          drawWing(style.border, fore.cx, fore.cy, fore.rx, fore.ry, fore.rot);
-          drawWing(style.border, hind.cx, hind.cy, hind.rx, hind.ry, hind.rot);
-        }
-        const inset = style.border ? 12 : 0;
-        drawWing(style.fill, fore.cx - 6, fore.cy + 2, fore.rx - inset, fore.ry - inset, fore.rot);
-        drawWing(style.fill2 || style.fill, hind.cx - 6, hind.cy - 2, hind.rx - inset, hind.ry - inset, hind.rot);
-        if (style.veins) {
-          ctx.strokeStyle = style.veins;
-          ctx.lineWidth = 3.2;
-          for (let i = 0; i < 7; i += 1) {
-            const a = -0.9 + i * 0.32;
-            ctx.beginPath();
-            ctx.moveTo(4, 128);
-            ctx.quadraticCurveTo(80 * Math.cos(a) + 20, 128 + 60 * Math.sin(a), 200 * Math.cos(a), 128 + 140 * Math.sin(a));
-            ctx.stroke();
-          }
-        }
-        if (style.dots) {
-          ctx.fillStyle = style.dots;
-          for (let i = 0; i < 16; i += 1) {
-            const a = -1.2 + i * 0.16;
-            ctx.beginPath();
-            ctx.arc(110 + Math.cos(a) * 112, 128 + Math.sin(a) * 110, 3.2, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-        if (style.spot) {
-          ctx.fillStyle = style.spot;
-          ctx.beginPath();
-          ctx.arc(150, 70, 13, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        // recorta todo lo que quede fuera de las alas
-        ctx.globalCompositeOperation = "destination-in";
-        drawWing("#000", fore.cx, fore.cy, fore.rx, fore.ry, fore.rot);
-        drawWing("#000", hind.cx, hind.cy, hind.rx, hind.ry, hind.rot);
-        const tex = new THREE.CanvasTexture(canvas);
-        tex.colorSpace = THREE.SRGBColorSpace;
-        tex.anisotropy = 4;
-        return tex;
-      }
-      const butterflyStyles = [
-        { fill: "#e9771c", fill2: "#f08a2a", border: "#1b1310", veins: "#1b1310", dots: "#fff7ea" }, // monarca
-        { fill: "#f4f0e2", border: "#3a3530", spot: "#3a3530" }, // blanquita de la col
-        { fill: "#f2dc6b", fill2: "#efd35a", veins: "rgba(120, 100, 40, 0.5)", spot: "#e98a2a" }, // limonera
-        { fill: "#e9771c", fill2: "#f08a2a", border: "#1b1310", veins: "#1b1310", dots: "#fff7ea" }
-      ];
-      const wingGeometry = new THREE.PlaneGeometry(1, 1);
-      wingGeometry.rotateX(Math.PI / 2);
-      wingGeometry.translate(0.5, 0, 0);
-      const bodyGeometry = new THREE.CapsuleGeometry(0.07, 0.75, 3, 6);
-      bodyGeometry.rotateX(Math.PI / 2);
-      const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x1d1611, roughness: 0.7 });
-      const butterflies = [];
-      const butterflyCount = lowPower ? 4 : 7;
-      for (let i = 0; i < butterflyCount; i += 1) {
-        const style = butterflyStyles[i % butterflyStyles.length];
-        const material = new THREE.MeshStandardMaterial({
-          map: createWingTexture(style),
-          alphaTest: 0.5,
-          side: THREE.DoubleSide,
-          roughness: 0.65
-        });
-        const group = new THREE.Group();
-        const right = new THREE.Mesh(wingGeometry, material);
-        const left = new THREE.Mesh(wingGeometry, material);
-        left.scale.x = -1;
-        right.castShadow = left.castShadow = true;
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-        group.add(right, left, body);
-        const size = 0.13 + random() * 0.06;
-        group.scale.setScalar(size / 0.13 * 0.15);
-        scene.add(group);
-        butterflies.push({
-          group,
-          left,
-          right,
-          cx: (random() - 0.5) * 9,
-          cz: (random() - 0.5) * 9,
-          ax: 2.5 + random() * 3.5,
-          az: 2.5 + random() * 3.5,
-          fx: 0.08 + random() * 0.06,
-          fz: 0.07 + random() * 0.06,
-          px: random() * 6.28,
-          pz: random() * 6.28,
-          baseY: 1.0 + random() * 1.2,
-          flap: 10 + random() * 5,
-          phase: random() * 100
-        });
-      }
-      const butterflyNext = new THREE.Vector3();
-      function butterflyPosition(b, t, out) {
-        out.set(
-          b.cx + Math.sin(t * b.fx + b.px) * b.ax + Math.sin(t * b.fx * 3.1 + b.pz) * 0.6,
-          b.baseY + Math.sin(t * 0.7 + b.phase) * 0.35 + Math.sin(t * 2.3 + b.phase) * 0.08,
-          b.cz + Math.sin(t * b.fz + b.pz) * b.az + Math.cos(t * b.fz * 2.7 + b.px) * 0.6
-        );
-        return out;
-      }
-
       // ---------- POSTPROCESO ----------
       let composer = null;
-      let bloomPass = null;
       if (!lowPower) {
         composer = new EffectComposer(renderer);
         composer.addPass(new RenderPass(scene, camera));
-        bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.32, 0.55, 0.88);
-        composer.addPass(bloomPass);
+        composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.55, 0.6, 0.82));
         composer.addPass(new OutputPass());
       }
 
-      // ---------- CONTROLES ----------
+      // ---------- CONTROLES: MIRAR Y CAMINAR ----------
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
-      controls.dampingFactor = 0.06;
+      controls.dampingFactor = 0.07;
       controls.enablePan = false;
-      controls.rotateSpeed = 0.7;
+      controls.rotateSpeed = 0.6;
       controls.zoomSpeed = 0.8;
-      controls.minDistance = 3.2;
-      controls.maxDistance = 21;
-      controls.minPolarAngle = 0.25;
-      controls.maxPolarAngle = Math.PI * 0.47;
-      controls.target.set(0, 0.9, 0);
-      controls.autoRotateSpeed = 0.35;
+      controls.minDistance = 2.5;
+      controls.maxDistance = 24;
+      controls.minPolarAngle = 0.3;
+      // se puede inclinar la vista hacia arriba para mirar el cielo
+      controls.maxPolarAngle = Math.PI * 0.56;
+      controls.target.set(0, 1.9, 0);
+      controls.autoRotateSpeed = 0.3;
       controls.update();
+      const START_TARGET = controls.target.clone();
+      const START_CAMERA = camera.position.clone();
 
       let isPaused = reduceMotion;
       let idleTimer = null;
 
       function setMotionState(paused) {
         isPaused = paused;
-        controls.autoRotate = !paused;
+        controls.autoRotate = false;
         motionToggle.setAttribute("aria-label", paused ? "Reanudar movimiento" : "Pausar movimiento");
         motionToggle.title = paused ? "Reanudar movimiento" : "Pausar movimiento";
         pauseIcon.innerHTML = paused
           ? '<path d="m8 5 11 7-11 7V5Z"/>'
           : '<path d="M8 5v14M16 5v14"/>';
       }
-
       setMotionState(isPaused);
 
-      motionToggle.addEventListener("click", () => {
-        if (idleTimer) clearTimeout(idleTimer);
-        setMotionState(!isPaused);
-      });
+      motionToggle.addEventListener("click", () => setMotionState(!isPaused));
 
-      controls.addEventListener("start", () => {
-        if (idleTimer) clearTimeout(idleTimer);
-        controls.autoRotate = false;
+      function hideHint() {
         gestureHint.style.opacity = "0";
         gestureHint.style.transform = "translateY(8px)";
-      });
+      }
+      controls.addEventListener("start", hideHint);
+      setTimeout(hideHint, 12000);
 
-      controls.addEventListener("end", () => {
-        if (isPaused) return;
-        idleTimer = window.setTimeout(() => {
-          if (!isPaused) controls.autoRotate = true;
-        }, 3300);
+      // Teclado: WASD o flechas para caminar, Shift para ir más rápido
+      const keys = new Set();
+      window.addEventListener("keydown", (e) => {
+        if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+        if (document.querySelector(".full-screen-overlay.active")) return;
+        const k = e.key.toLowerCase();
+        if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "shift"].includes(k)) {
+          keys.add(k);
+          if (k.startsWith("arrow")) e.preventDefault();
+          hideHint();
+        }
       });
+      window.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
+      window.addEventListener("blur", () => keys.clear());
+
+      // Control táctil: joystick para caminar
+      const stick = { x: 0, y: 0, active: false, id: null };
+      if (joystick && joystickKnob) {
+        const radius = 42;
+        const moveKnob = (e) => {
+          const rect = joystick.getBoundingClientRect();
+          let dx = e.clientX - (rect.left + rect.width / 2);
+          let dy = e.clientY - (rect.top + rect.height / 2);
+          const len = Math.hypot(dx, dy);
+          if (len > radius) { dx *= radius / len; dy *= radius / len; }
+          stick.x = dx / radius;
+          stick.y = -dy / radius;
+          joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+        };
+        joystick.addEventListener("pointerdown", (e) => {
+          stick.active = true;
+          stick.id = e.pointerId;
+          joystick.setPointerCapture(e.pointerId);
+          joystick.classList.add("active");
+          moveKnob(e);
+          hideHint();
+        });
+        joystick.addEventListener("pointermove", (e) => { if (stick.active && e.pointerId === stick.id) moveKnob(e); });
+        const release = () => {
+          stick.active = false;
+          stick.x = stick.y = 0;
+          joystickKnob.style.transform = "translate(0px, 0px)";
+          joystick.classList.remove("active");
+        };
+        joystick.addEventListener("pointerup", release);
+        joystick.addEventListener("pointercancel", release);
+      }
+
+      // Volver a la entrada del jardín con un vuelo suave
+      let flyHome = null;
+      if (homeButton) {
+        homeButton.addEventListener("click", () => {
+          flyHome = { t: 0, fromT: controls.target.clone(), fromC: camera.position.clone() };
+        });
+      }
+
+      const forward = new THREE.Vector3();
+      const right = new THREE.Vector3();
+      const step = new THREE.Vector3();
+      function walk(delta) {
+        let mx = stick.x, my = stick.y;
+        if (keys.has("w") || keys.has("arrowup")) my += 1;
+        if (keys.has("s") || keys.has("arrowdown")) my -= 1;
+        if (keys.has("a") || keys.has("arrowleft")) mx -= 1;
+        if (keys.has("d") || keys.has("arrowright")) mx += 1;
+        const len = Math.hypot(mx, my);
+        if (len < 0.05) return false;
+        if (len > 1) { mx /= len; my /= len; }
+        camera.getWorldDirection(forward);
+        forward.y = 0;
+        forward.normalize();
+        right.crossVectors(forward, camera.up).normalize();
+        const speed = keys.has("shift") ? 9 : 4.2;
+        step.copy(forward).multiplyScalar(my * speed * delta).addScaledVector(right, mx * speed * delta);
+        const next = controls.target.clone().add(step);
+        const r = Math.hypot(next.x, next.z);
+        if (r > GARDEN.edge) {
+          // no salir del jardín: se desliza por el borde
+          next.x *= GARDEN.edge / r;
+          next.z *= GARDEN.edge / r;
+          step.subVectors(next, controls.target);
+        }
+        controls.target.add(step);
+        camera.position.add(step);
+        return true;
+      }
 
       function resize() {
         const width = window.innerWidth;
         const height = window.innerHeight;
         const aspect = width / height;
         camera.aspect = aspect;
-        camera.fov = aspect < 1 ? Math.min(78, 42 * Math.pow(1 / aspect, 0.5)) : 42;
+        camera.fov = aspect < 1 ? Math.min(80, 50 * Math.pow(1 / aspect, 0.45)) : 50;
         camera.updateProjectionMatrix();
-        controls.target.set(0, aspect < 1 ? 1.05 : 0.9, 0);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
         renderer.setSize(width, height);
         particleUniforms.uPixelRatio.value = renderer.getPixelRatio();
+        starUniforms.uPixelRatio.value = renderer.getPixelRatio();
         if (composer) {
           composer.setPixelRatio(renderer.getPixelRatio());
           composer.setSize(width, height);
@@ -2352,6 +2983,9 @@
       const clock = new THREE.Clock();
       let elapsed = 0;
       let bloomClock = 0;
+      let lampTimer = 0;
+      let cullTimer = 0;
+      const lastLampCenter = new THREE.Vector3(1e9, 0, 0);
 
       function animate() {
         requestAnimationFrame(animate);
@@ -2368,10 +3002,19 @@
         windUniforms.uTime.value = elapsed;
         particleUniforms.uTime.value = elapsed;
         skyUniforms.uTime.value = elapsed;
+        starUniforms.uTime.value = elapsed;
+
+        walk(delta);
+        if (flyHome) {
+          flyHome.t = Math.min(1, flyHome.t + delta * 0.6);
+          const e = flyHome.t * flyHome.t * (3 - 2 * flyHome.t);
+          controls.target.lerpVectors(flyHome.fromT, START_TARGET, e);
+          camera.position.lerpVectors(flyHome.fromC, START_CAMERA, e);
+          if (flyHome.t >= 1) flyHome = null;
+        }
 
         const wind = Math.sin(elapsed * 0.18) * 0.5 + 0.5;
         const windAmplitude = (0.018 + 0.016 * wind) * (isPaused ? 0 : 1);
-
         for (const plant of plants) {
           const phase = plant.phase + plant.group.position.x * 0.35;
           plant.group.rotation.z = Math.sin(elapsed * 1.1 + phase) * windAmplitude * plant.sway;
@@ -2386,737 +3029,801 @@
           }
         }
 
-        for (const b of butterflies) {
-          const t = elapsed + b.phase;
-          butterflyPosition(b, t, b.group.position);
-          butterflyPosition(b, t + 0.15, butterflyNext);
-          b.group.lookAt(butterflyNext);
-          const flap = Math.sin(t * b.flap) * 0.85 + 0.25;
-          b.right.rotation.z = flap;
-          b.left.rotation.z = -flap;
+        controls.update();
+        // la cámara nunca baja del suelo
+        const minY = groundHeight(camera.position.x, camera.position.z) + 0.45;
+        if (camera.position.y < minY) camera.position.y = minY;
+
+        // el cielo acompaña a la cámara, como en la realidad
+        skyGroup.position.copy(camera.position);
+
+        // sombras de la luna y faroles alrededor de donde estás
+        moonLight.target.position.copy(controls.target).setY(0);
+        moonLight.position.copy(moonLight.target.position).addScaledVector(moonLightDir, 45);
+        lampTimer -= delta;
+        if (lampTimer <= 0 || lastLampCenter.distanceToSquared(controls.target) > 4) {
+          lampTimer = 0.4;
+          lastLampCenter.copy(controls.target);
+          updateLampLights(controls.target);
+        }
+        // solo se dibuja lo que está cerca: la niebla oculta lo lejano
+        cullTimer -= delta;
+        if (cullTimer <= 0) {
+          cullTimer = 0.25;
+          for (const mesh of chunkedMeshes) {
+            mesh.visible = mesh.userData.center.distanceToSquared(camera.position) < 85 * 85;
+          }
         }
 
-        controls.update();
         if (composer) composer.render();
         else renderer.render(scene, camera);
       }
+      requestAnimationFrame(() => setTimeout(hideSplash, 900));
 
       // Music Player Logic
       const playlist = [
-  {
-    title: "Saber Amar",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/69F3NYS9W-Q/hqdefault.jpg",
-    src: "assets/music/69F3NYS9W-Q.m4a"
-  },
-  {
-    title: "3 De Septiembre",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/ozlZfVa7DtM/hqdefault.jpg",
-    src: "assets/music/ozlZfVa7DtM.m4a"
-  },
-  {
-    title: "369 (ft. Reboll333)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/CgtULIbzQmM/hqdefault.jpg",
-    src: "assets/music/CgtULIbzQmM.m4a"
-  },
-  {
-    title: "Al Son De La Neurona",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/x1JLel7OmTY/hqdefault.jpg",
-    src: "assets/music/x1JLel7OmTY.m4a"
-  },
-  {
-    title: "Almas Benditas (ft. Achepe)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/qeJKadkYX40/hqdefault.jpg",
-    src: "assets/music/qeJKadkYX40.m4a"
-  },
-  {
-    title: "Aquí",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/61hpBuw10l0/hqdefault.jpg",
-    src: "assets/music/61hpBuw10l0.m4a"
-  },
-  {
-    title: "Aunque (ft. Joes Yawar Cru)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/NdRA1EymW7s/hqdefault.jpg",
-    src: "assets/music/NdRA1EymW7s.m4a"
-  },
-  {
-    title: "Ayer (ft. Black Jhons One)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/DY2n2TtrEeQ/hqdefault.jpg",
-    src: "assets/music/DY2n2TtrEeQ.m4a"
-  },
-  {
-    title: "Bambú",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-LtINl7lFss/hqdefault.jpg",
-    src: "assets/music/-LtINl7lFss.m4a"
-  },
-  {
-    title: "Cada Uno a Lo Suyo (ft. El Chojin & Almanegra)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BH7fwwL2WXE/hqdefault.jpg",
-    src: "assets/music/BH7fwwL2WXE.m4a"
-  },
-  {
-    title: "Calle Escondida (ft. Error 999 & Mismo Perro)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/APV0rbNX1LM/hqdefault.jpg",
-    src: "assets/music/APV0rbNX1LM.m4a"
-  },
-  {
-    title: "Capítulo 7",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/1_NpskHPn0w/hqdefault.jpg",
-    src: "assets/music/1_NpskHPn0w.m4a"
-  },
-  {
-    title: "Cenizas",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/V0VpYYoSN9Q/hqdefault.jpg",
-    src: "assets/music/V0VpYYoSN9Q.m4a"
-  },
-  {
-    title: "Chimba De Día",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/w7ycW8-FVKo/hqdefault.jpg",
-    src: "assets/music/w7ycW8-FVKo.m4a"
-  },
-  {
-    title: "Codigoz (ft. Guellaz & deejay Santacruz)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/9RBbP4h9Nkw/hqdefault.jpg",
-    src: "assets/music/9RBbP4h9Nkw.m4a"
-  },
-  {
-    title: "Comentarios (ft. Eddy Mugre)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/SfOg_p8wJlc/hqdefault.jpg",
-    src: "assets/music/SfOg_p8wJlc.m4a"
-  },
-  {
-    title: "Como La Luna ft. Selene",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/JruiMsnZT-E/hqdefault.jpg",
-    src: "assets/music/JruiMsnZT-E.m4a"
-  },
-  {
-    title: "Como Yotas",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/9erDmE2i2ws/hqdefault.jpg",
-    src: "assets/music/9erDmE2i2ws.m4a"
-  },
-  {
-    title: "Compasión",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/d8nRUJOSdkQ/hqdefault.jpg",
-    src: "assets/music/d8nRUJOSdkQ.m4a"
-  },
-  {
-    title: "Condena (ft. Achepe, Sipo One & T-Killa)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/kI3564k-AmQ/hqdefault.jpg",
-    src: "assets/music/kI3564k-AmQ.m4a"
-  },
-  {
-    title: "Cuando Sea Mañana (ft. Hi-Kymon)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/KS-TxFd6uLs/hqdefault.jpg",
-    src: "assets/music/KS-TxFd6uLs.m4a"
-  },
-  {
-    title: "Cuando Ya Esté Muerto - Antes Del Alba",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
-    src: "assets/music/CFbTHc0OaEQ.m4a"
-  },
-  {
-    title: "Cura",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/E3g9izI6Rww/hqdefault.jpg",
-    src: "assets/music/E3g9izI6Rww.m4a"
-  },
-  {
-    title: "Cuántos",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-HJxAijznMo/hqdefault.jpg",
-    src: "assets/music/-HJxAijznMo.m4a"
-  },
-  {
-    title: "Desde Abajo",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/M3rW8X5otwc/hqdefault.jpg",
-    src: "assets/music/M3rW8X5otwc.m4a"
-  },
-  {
-    title: "Efímero",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/lMFRq6rzPME/hqdefault.jpg",
-    src: "assets/music/lMFRq6rzPME.m4a"
-  },
-  {
-    title: "El Costal",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/R4HqzKnLffI/hqdefault.jpg",
-    src: "assets/music/R4HqzKnLffI.m4a"
-  },
-  {
-    title: "El Diablo",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/PEVztafebuk/hqdefault.jpg",
-    src: "assets/music/PEVztafebuk.m4a"
-  },
-  {
-    title: "El Día Que El Mundo Cambie",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BNCZ_fK-BuY/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGD8gZShSMA8=&rs=AOn4CLAPM6-zD_06hLwUXGSD9YoVT8NOnA",
-    src: "assets/music/BNCZ_fK-BuY.m4a"
-  },
-  {
-    title: "El Final Del Cuento",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/8HSTiZWJo9U/hqdefault.jpg",
-    src: "assets/music/8HSTiZWJo9U.m4a"
-  },
-  {
-    title: "El Final Del Cuento (Sesión)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/w_hMtFoFtU4/hqdefault.jpg",
-    src: "assets/music/w_hMtFoFtU4.m4a"
-  },
-  {
-    title: "El Final Del Cuento - Antes Del Alba",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
-  },
-  {
-    title: "El Que Duro Se Para",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/JmA4g3CFUUo/hqdefault.jpg",
-    src: "assets/music/JmA4g3CFUUo.m4a"
-  },
-  {
-    title: "El Redcode",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/UI40eF5MbbI/hqdefault.jpg",
-    src: "assets/music/UI40eF5MbbI.m4a"
-  },
-  {
-    title: "En Casa Nadie Lo Espera",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/3BtkOApjHaA/hqdefault.jpg",
-    src: "assets/music/3BtkOApjHaA.m4a"
-  },
-  {
-    title: "Entre humo y letras",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/NSc4oDPJiEw/hqdefault.jpg",
-    src: "assets/music/NSc4oDPJiEw.m4a"
-  },
-  {
-    title: "Esperar",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/7Q5Mud5YgU0/hqdefault.jpg",
-    src: "assets/music/7Q5Mud5YgU0.m4a"
-  },
-  {
-    title: "Fantasmas (ft. Lianna)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/X48zbOA3I8I/hqdefault.jpg",
-    src: "assets/music/X48zbOA3I8I.m4a"
-  },
-  {
-    title: "Felicidad",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/DDok_Ut69iE/hqdefault.jpg",
-    src: "assets/music/DDok_Ut69iE.m4a"
-  },
-  {
-    title: "Guayacanes y Hortensias (ft. Oblivion's Mighty Trash & Cheche Cole)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/3W0sJrXRFYI/hqdefault.jpg",
-    src: "assets/music/3W0sJrXRFYI.m4a"
-  },
-  {
-    title: "Hablar Con Actos",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/GGRiH-zBrcI/hqdefault.jpg",
-    src: "assets/music/GGRiH-zBrcI.m4a"
-  },
-  {
-    title: "Hasta Las Yemas - Antes Del Alba",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/ybxVczv73Ac/hqdefault.jpg",
-    src: "assets/music/ybxVczv73Ac.m4a"
-  },
-  {
-    title: "I Don't Know",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/9IHmdI8eKIc/hqdefault.jpg",
-    src: "assets/music/9IHmdI8eKIc.m4a"
-  },
-  {
-    title: "Igual",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-cG1v34b62c/hqdefault.jpg",
-    src: "assets/music/-cG1v34b62c.m4a"
-  },
-  {
-    title: "Infierno",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/VPquW0K-goQ/hqdefault.jpg",
-    src: "assets/music/VPquW0K-goQ.m4a"
-  },
-  {
-    title: "Inquebrantable",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-sVab-CQ7kE/hqdefault.jpg",
-    src: "assets/music/-sVab-CQ7kE.m4a"
-  },
-  {
-    title: "Intuición",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/751tzWp2X08/hqdefault.jpg",
-    src: "assets/music/751tzWp2X08.m4a"
-  },
-  {
-    title: "Karma",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/XPrirTJ1_A4/hqdefault.jpg",
-    src: "assets/music/XPrirTJ1_A4.m4a"
-  },
-  {
-    title: "La 70 (ft. Deuxer, Dexta Small & DaStreetGenie)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/nBw0-Xu2nxQ/hqdefault.jpg",
-    src: "assets/music/nBw0-Xu2nxQ.m4a"
-  },
-  {
-    title: "La Cicatriz",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/9rqgrKpUmuA/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AG-B4AC0AWKAgwIABABGEsgZShFMA8=&rs=AOn4CLCVEB7uX7VHEuwRbByYK7kbM6w16g",
-    src: "assets/music/9rqgrKpUmuA.m4a"
-  },
-  {
-    title: "La culpa",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/3axEOIr1OmU/hqdefault.jpg",
-    src: "assets/music/3axEOIr1OmU.m4a"
-  },
-  {
-    title: "La Intuición",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Flp8MX2Zem0/hqdefault.jpg",
-    src: "assets/music/Flp8MX2Zem0.m4a"
-  },
-  {
-    title: "La Luz",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Ls1cOqGf7oI/hqdefault.jpg",
-    src: "assets/music/Ls1cOqGf7oI.m4a"
-  },
-  {
-    title: "La Misma Cara",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/ak9GNPBxK94/hqdefault.jpg",
-    src: "assets/music/ak9GNPBxK94.m4a"
-  },
-  {
-    title: "La Moral (ft. Pielroja & Alka Produce)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/6l8m-nj8eZM/hqdefault.jpg",
-    src: "assets/music/6l8m-nj8eZM.m4a"
-  },
-  {
-    title: "La Música",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Um-T2wsssag/hqdefault.jpg",
-    src: "assets/music/Um-T2wsssag.m4a"
-  },
-  {
-    title: "La Papa Y La Leña",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/7u2zY4WVwD4/hqdefault.jpg",
-    src: "assets/music/7u2zY4WVwD4.m4a"
-  },
-  {
-    title: "Las Calles Son Clases",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/zMJ4VJXS3mQ/hqdefault.jpg",
-    src: "assets/music/zMJ4VJXS3mQ.m4a"
-  },
-  {
-    title: "Las Ganas",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/PHA_N_LXjyc/hqdefault.jpg",
-    src: "assets/music/PHA_N_LXjyc.m4a"
-  },
-  {
-    title: "Le Decían Que No Podía",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/eXRfRwkYZEs/hqdefault.jpg",
-    src: "assets/music/eXRfRwkYZEs.m4a"
-  },
-  {
-    title: "Lejos De Falsos",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/x77asaCh5V8/hqdefault.jpg",
-    src: "assets/music/x77asaCh5V8.m4a"
-  },
-  {
-    title: "Llegan Se Van",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/90UfJKzBBOA/hqdefault.jpg",
-    src: "assets/music/90UfJKzBBOA.m4a"
-  },
-  {
-    title: "Lobos (ft. Diavlitx)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/toaKAHcAa1o/hqdefault.jpg",
-    src: "assets/music/toaKAHcAa1o.m4a"
-  },
-  {
-    title: "Los Dueños",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/CUZA9tM1x9c/hqdefault.jpg",
-    src: "assets/music/CUZA9tM1x9c.m4a"
-  },
-  {
-    title: "Los Petit Fellas",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/w_P2krK9z4U/hqdefault.jpg",
-    src: "assets/music/w_P2krK9z4U.m4a"
-  },
-  {
-    title: "Madrugadas ft. Gona",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Xysz1kxL5qQ/hqdefault.jpg",
-    src: "assets/music/Xysz1kxL5qQ.m4a"
-  },
-  {
-    title: "Maldito Siglo Xxi",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/gcVNFjhaIdI/hqdefault.jpg",
-    src: "assets/music/gcVNFjhaIdI.m4a"
-  },
-  {
-    title: "María / Aroma de Jardín (ft. Charles Ans & BCN)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/gCRfJuJGdcw/hqdefault.jpg",
-    src: "assets/music/gCRfJuJGdcw.m4a"
-  },
-  {
-    title: "Menos Plata Más Amor",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/QH8skkEg0m4/hqdefault.jpg",
-    src: "assets/music/QH8skkEg0m4.m4a"
-  },
-  {
-    title: "Mi Loma Natal",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/n8S4xAAQ27w/hqdefault.jpg",
-    src: "assets/music/n8S4xAAQ27w.m4a"
-  },
-  {
-    title: "Mi Rap - Antes Del Alba",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/UY11Lczb2MA/hqdefault.jpg",
-    src: "assets/music/UY11Lczb2MA.m4a"
-  },
-  {
-    title: "Mujer Sin Nombre",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/yOX7cfNhdzQ/hqdefault.jpg",
-    src: "assets/music/yOX7cfNhdzQ.m4a"
-  },
-  {
-    title: "Mujeres",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/PIQJl1y5WMg/hqdefault.jpg",
-    src: "assets/music/PIQJl1y5WMg.m4a"
-  },
-  {
-    title: "Máscaras",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/HIxEaIBSiTI/hqdefault.jpg",
-    src: "assets/music/HIxEaIBSiTI.m4a"
-  },
-  {
-    title: "Nada",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
-  },
-  {
-    title: "No Copy",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/B8sAqa7dEq8/hqdefault.jpg",
-    src: "assets/music/B8sAqa7dEq8.m4a"
-  },
-  {
-    title: "No Critique A Los Demás",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/epQfTYf9Q2c/hqdefault.jpg",
-    src: "assets/music/epQfTYf9Q2c.m4a"
-  },
-  {
-    title: "No Sabía Que Sabía",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/RpfWsx45Rgo/hqdefault.jpg",
-    src: "assets/music/RpfWsx45Rgo.m4a"
-  },
-  {
-    title: "No Somos Iguales",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/lfCDiBAqH6s/hqdefault.jpg",
-    src: "assets/music/lfCDiBAqH6s.m4a"
-  },
-  {
-    title: "Osama",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BWvIHzlaH8o/hqdefault.jpg",
-    src: "assets/music/BWvIHzlaH8o.m4a"
-  },
-  {
-    title: "Oscuridad",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/gNPJMEoP6KI/hqdefault.jpg",
-    src: "assets/music/gNPJMEoP6KI.m4a"
-  },
-  {
-    title: "Otoño",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/IzSdLJxsfmc/hqdefault.jpg",
-    src: "assets/music/IzSdLJxsfmc.m4a"
-  },
-  {
-    title: "Otra noche",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/UUUoEUUfp8s/hqdefault.jpg",
-    src: "assets/music/UUUoEUUfp8s.m4a"
-  },
-  {
-    title: "Paisaje De Mi Herida ft. Kazu",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/OpJmg6eVGAs/hqdefault.jpg",
-    src: "assets/music/OpJmg6eVGAs.m4a"
-  },
-  {
-    title: "Parcera",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/yEZjtgpqWhg/hqdefault.jpg",
-    src: "assets/music/yEZjtgpqWhg.m4a"
-  },
-  {
-    title: "Perder",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/oCI-LvnibUg/hqdefault.jpg",
-    src: "assets/music/oCI-LvnibUg.m4a"
-  },
-  {
-    title: "Perro Fino",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/fVolstaflyo/hqdefault.jpg",
-    src: "assets/music/fVolstaflyo.m4a"
-  },
-  {
-    title: "Pon Fin - Antes Del Alba",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Kq-CIz4-FR8/hqdefault.jpg",
-    src: "assets/music/Kq-CIz4-FR8.m4a"
-  },
-  {
-    title: "Por Si Los Días No Vuelven ft. Sharif",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Zv4I8_Fg2G4/hqdefault.jpg",
-    src: "assets/music/Zv4I8_Fg2G4.m4a"
-  },
-  {
-    title: "Que den la vuelta (ft. Jam Block Jr & Hi-Kymon)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/9yBUd8iS5uc/hqdefault.jpg",
-    src: "assets/music/9yBUd8iS5uc.m4a"
-  },
-  {
-    title: "Que Nada Te Aplaste",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/hqdefault.jpg",
-    src: "assets/music/-WPPMOE2jeE.m4a"
-  },
-  {
-    title: "Quimera",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/3N9Q8XIqhUo/hqdefault.jpg",
-    src: "assets/music/3N9Q8XIqhUo.m4a"
-  },
-  {
-    title: "Qué Más Da (ft. Melodico & La Loquera)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/WdGZ4LOn0lQ/hqdefault.jpg",
-    src: "assets/music/WdGZ4LOn0lQ.m4a"
-  },
-  {
-    title: "Rapero Porque Quiero",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BbTgoluQyu4/hqdefault.jpg",
-    src: "assets/music/BbTgoluQyu4.m4a"
-  },
-  {
-    title: "Ratas y Ladys (ft. Eddy Mugre)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/7TpeooPW_0Q/hqdefault.jpg",
-    src: "assets/music/7TpeooPW_0Q.m4a"
-  },
-  {
-    title: "Realidad Mental - Lo Que Más Importa",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/VnznSUg2rT4/hqdefault.jpg",
-    src: "assets/music/VnznSUg2rT4.m4a"
-  },
-  {
-    title: "Realidad Mental - Vivir El Tiempo",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/WJnumOjQEn8/hqdefault.jpg",
-    src: "assets/music/WJnumOjQEn8.m4a"
-  },
-  {
-    title: "Realidad Mental - Ya Verás",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/kiTKGKjjS2I/hqdefault.jpg",
-    src: "assets/music/kiTKGKjjS2I.m4a"
-  },
-  {
-    title: "Sabor",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Iv_hbcKlH4E/hqdefault.jpg",
-    src: "assets/music/Iv_hbcKlH4E.m4a"
-  },
-  {
-    title: "Salmo",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/DdylyF4gWPc/hqdefault.jpg",
-    src: "assets/music/DdylyF4gWPc.m4a"
-  },
-  {
-    title: "Ser feliz es gratis",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/KHQuqfbcII0/hqdefault.jpg",
-    src: "assets/music/KHQuqfbcII0.m4a"
-  },
-  {
-    title: "Si No Estas",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/qAsy_UP0GoI/hqdefault.jpg",
-    src: "assets/music/qAsy_UP0GoI.m4a"
-  },
-  {
-    title: "Sigo aquí (ft. Ali A.K.A Mind)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/giOWXLeBMbg/hqdefault.jpg",
-    src: "assets/music/giOWXLeBMbg.m4a"
-  },
-  {
-    title: "Sin Excusas (ft. Santa RM & Alka Produce)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BYBYorRK_h8/hqdefault.jpg",
-    src: "assets/music/BYBYorRK_h8.m4a"
-  },
-  {
-    title: "Sin Visajes",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Aaa5_xY4Kko/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGGUgWShIMA8=&rs=AOn4CLCUHH2T5pRz_RxdEx-L5l4T4WxmRQ",
-    src: "assets/music/Aaa5_xY4Kko.m4a"
-  },
-  {
-    title: "Solitario Soldado",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-RDWIsrVt0s/hqdefault.jpg",
-    src: "assets/music/-RDWIsrVt0s.m4a"
-  },
-  {
-    title: "Solo Es Una",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/XVvXuK4hZ_c/hqdefault.jpg",
-    src: "assets/music/XVvXuK4hZ_c.m4a"
-  },
-  {
-    title: "Sus Mentiras",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BMMt6ADT6W8/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGC4gXyhlMA8=&rs=AOn4CLDs3YZtxhilWPA_x2LFA2xuewHNBg",
-    src: "assets/music/BMMt6ADT6W8.m4a"
-  },
-  {
-    title: "Tarde Que Temprano",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/GIS450UJbMQ/hqdefault.jpg",
-    src: "assets/music/GIS450UJbMQ.m4a"
-  },
-  {
-    title: "Tema Explícito ft. Joes Ywc",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
-    src: "assets/music/vFQ_0jRTUt0.m4a"
-  },
-  {
-    title: "Tierra Santa",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BZw-GbuR4UI/hqdefault.jpg",
-    src: "assets/music/BZw-GbuR4UI.m4a"
-  },
-  {
-    title: "Tío Armando",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/lAoj2JTQtbQ/hqdefault.jpg",
-    src: "assets/music/lAoj2JTQtbQ.m4a"
-  },
-  {
-    title: "Tú Tienes El Son",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/_2fNpGHig6s/hqdefault.jpg",
-    src: "assets/music/_2fNpGHig6s.m4a"
-  },
-  {
-    title: "Tú Tienes El Son ft. Charles",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/0c4j9hoMYWA/hqdefault.jpg",
-    src: "assets/music/0c4j9hoMYWA.m4a"
-  },
-  {
-    title: "Un Pelito Y Un Tamal",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/A1eu6Spaz3g/hqdefault.jpg",
-    src: "assets/music/A1eu6Spaz3g.m4a"
-  },
-  {
-    title: "Vivir el Tiempo",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Ay9h07Z2vcI/hqdefault.jpg",
-    src: "assets/music/Ay9h07Z2vcI.m4a"
-  },
-  {
-    title: "Volando bajo (ft. Ruzto)",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/6ovduwVuclc/hqdefault.jpg",
-    src: "assets/music/6ovduwVuclc.m4a"
-  },
-  {
-    title: "Zenit",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/scSt7nVbeC8/hqdefault.jpg",
-    src: "assets/music/scSt7nVbeC8.m4a"
-  },
-  {
-    title: "Éter",
-    artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/3BcgyeNGCJ4/hqdefault.jpg",
-    src: "assets/music/3BcgyeNGCJ4.m4a"
-  }
+        {
+          title: "Saber Amar",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/69F3NYS9W-Q/hqdefault.jpg",
+          src: "assets/music/69F3NYS9W-Q.m4a"
+        },
+        {
+          title: "2:22",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/C6Mvd9Y7m4A/hqdefault.jpg",
+          src: "assets/music/C6Mvd9Y7m4A.m4a"
+        },
+        {
+          title: "3 De Septiembre",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/ozlZfVa7DtM/hqdefault.jpg",
+          src: "assets/music/ozlZfVa7DtM.m4a"
+        },
+        {
+          title: "369 (ft. Reboll333)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/CgtULIbzQmM/hqdefault.jpg",
+          src: "assets/music/CgtULIbzQmM.m4a"
+        },
+        {
+          title: "A Ciegas",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/PjsoP-O9EtQ/hqdefault.jpg",
+          src: "assets/music/PjsoP-O9EtQ.m4a"
+        },
+        {
+          title: "Aires de Grandeza",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/GJf3R8Y0Ecc/hqdefault.jpg",
+          src: "assets/music/GJf3R8Y0Ecc.m4a"
+        },
+        {
+          title: "Al Son De La Neurona",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/x1JLel7OmTY/hqdefault.jpg",
+          src: "assets/music/x1JLel7OmTY.m4a"
+        },
+        {
+          title: "Almas Benditas (ft. Achepe)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/qeJKadkYX40/hqdefault.jpg",
+          src: "assets/music/qeJKadkYX40.m4a"
+        },
+        {
+          title: "Aquí",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/61hpBuw10l0/hqdefault.jpg",
+          src: "assets/music/61hpBuw10l0.m4a"
+        },
+        {
+          title: "Aunque (ft. Joes Yawar Cru)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/NdRA1EymW7s/hqdefault.jpg",
+          src: "assets/music/NdRA1EymW7s.m4a"
+        },
+        {
+          title: "Ayer (ft. Black Jhons One)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/DY2n2TtrEeQ/hqdefault.jpg",
+          src: "assets/music/DY2n2TtrEeQ.m4a"
+        },
+        {
+          title: "Bambú",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/-LtINl7lFss/hqdefault.jpg",
+          src: "assets/music/-LtINl7lFss.m4a"
+        },
+        {
+          title: "Cada Uno a Lo Suyo (ft. El Chojin & Almanegra)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/BH7fwwL2WXE/hqdefault.jpg",
+          src: "assets/music/BH7fwwL2WXE.m4a"
+        },
+        {
+          title: "Calle Escondida (ft. Error 999 & Mismo Perro)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/APV0rbNX1LM/hqdefault.jpg",
+          src: "assets/music/APV0rbNX1LM.m4a"
+        },
+        {
+          title: "Capítulo 7",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/1_NpskHPn0w/hqdefault.jpg",
+          src: "assets/music/1_NpskHPn0w.m4a"
+        },
+        {
+          title: "Cenizas",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/V0VpYYoSN9Q/hqdefault.jpg",
+          src: "assets/music/V0VpYYoSN9Q.m4a"
+        },
+        {
+          title: "Chimba De Día",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/w7ycW8-FVKo/hqdefault.jpg",
+          src: "assets/music/w7ycW8-FVKo.m4a"
+        },
+        {
+          title: "Codigoz (ft. Guellaz & deejay Santacruz)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/9RBbP4h9Nkw/hqdefault.jpg",
+          src: "assets/music/9RBbP4h9Nkw.m4a"
+        },
+        {
+          title: "Comentarios (ft. Eddy Mugre)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/SfOg_p8wJlc/hqdefault.jpg",
+          src: "assets/music/SfOg_p8wJlc.m4a"
+        },
+        {
+          title: "Como La Luna ft. Selene",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/JruiMsnZT-E/hqdefault.jpg",
+          src: "assets/music/JruiMsnZT-E.m4a"
+        },
+        {
+          title: "Como Yotas",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/9erDmE2i2ws/hqdefault.jpg",
+          src: "assets/music/9erDmE2i2ws.m4a"
+        },
+        {
+          title: "Compasión",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/d8nRUJOSdkQ/hqdefault.jpg",
+          src: "assets/music/d8nRUJOSdkQ.m4a"
+        },
+        {
+          title: "Condena (ft. Achepe, Sipo One & T-Killa)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/kI3564k-AmQ/hqdefault.jpg",
+          src: "assets/music/kI3564k-AmQ.m4a"
+        },
+        {
+          title: "Cuando Sea Mañana (ft. Hi-Kymon)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/KS-TxFd6uLs/hqdefault.jpg",
+          src: "assets/music/KS-TxFd6uLs.m4a"
+        },
+        {
+          title: "Cuando Ya Esté Muerto - Antes Del Alba",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
+          src: "assets/music/CFbTHc0OaEQ.m4a"
+        },
+        {
+          title: "Cuántos",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/-HJxAijznMo/hqdefault.jpg",
+          src: "assets/music/-HJxAijznMo.m4a"
+        },
+        {
+          title: "Cura",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/E3g9izI6Rww/hqdefault.jpg",
+          src: "assets/music/E3g9izI6Rww.m4a"
+        },
+        {
+          title: "Desde Abajo (álbum completo)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/M3rW8X5otwc/hqdefault.jpg",
+          src: "assets/music/M3rW8X5otwc.m4a"
+        },
+        {
+          title: "Desvelo",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/nv3gLhcs1YM/hqdefault.jpg",
+          src: "assets/music/nv3gLhcs1YM.m4a"
+        },
+        {
+          title: "Días Grises",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/6zf9uHngEVQ/hqdefault.jpg",
+          src: "assets/music/6zf9uHngEVQ.m4a"
+        },
+        {
+          title: "Efímero",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/lMFRq6rzPME/hqdefault.jpg",
+          src: "assets/music/lMFRq6rzPME.m4a"
+        },
+        {
+          title: "El 1% (el RedCode ft. Penyair)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/UI40eF5MbbI/hqdefault.jpg",
+          src: "assets/music/UI40eF5MbbI.m4a"
+        },
+        {
+          title: "El Costal",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/R4HqzKnLffI/hqdefault.jpg",
+          src: "assets/music/R4HqzKnLffI.m4a"
+        },
+        {
+          title: "El Día Que El Mundo Cambie",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/BNCZ_fK-BuY/hqdefault.jpg",
+          src: "assets/music/BNCZ_fK-BuY.m4a"
+        },
+        {
+          title: "El Diablo",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/PEVztafebuk/hqdefault.jpg",
+          src: "assets/music/PEVztafebuk.m4a"
+        },
+        {
+          title: "El Final Del Cuento",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/8HSTiZWJo9U/hqdefault.jpg",
+          src: "assets/music/8HSTiZWJo9U.m4a"
+        },
+        {
+          title: "El Final Del Cuento - Antes Del Alba",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/BF7smY9vh3U/hqdefault.jpg",
+          src: "assets/music/BF7smY9vh3U.m4a"
+        },
+        {
+          title: "El Que Duro Se Para",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/JmA4g3CFUUo/hqdefault.jpg",
+          src: "assets/music/JmA4g3CFUUo.m4a"
+        },
+        {
+          title: "El Reloj",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/wiP5PUDsPv4/hqdefault.jpg",
+          src: "assets/music/wiP5PUDsPv4.m4a"
+        },
+        {
+          title: "En Casa Nadie Lo Espera",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/3BtkOApjHaA/hqdefault.jpg",
+          src: "assets/music/3BtkOApjHaA.m4a"
+        },
+        {
+          title: "Entre humo y letras",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/NSc4oDPJiEw/hqdefault.jpg",
+          src: "assets/music/NSc4oDPJiEw.m4a"
+        },
+        {
+          title: "Esperar",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/7Q5Mud5YgU0/hqdefault.jpg",
+          src: "assets/music/7Q5Mud5YgU0.m4a"
+        },
+        {
+          title: "Éter",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/3BcgyeNGCJ4/hqdefault.jpg",
+          src: "assets/music/3BcgyeNGCJ4.m4a"
+        },
+        {
+          title: "Felicidad",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/DDok_Ut69iE/hqdefault.jpg",
+          src: "assets/music/DDok_Ut69iE.m4a"
+        },
+        {
+          title: "Guayacanes y Hortensias (ft. Oblivion's Mighty Trash & Cheche Cole)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/3W0sJrXRFYI/hqdefault.jpg",
+          src: "assets/music/3W0sJrXRFYI.m4a"
+        },
+        {
+          title: "Hablar Con Actos",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/GGRiH-zBrcI/hqdefault.jpg",
+          src: "assets/music/GGRiH-zBrcI.m4a"
+        },
+        {
+          title: "Hasta Las Yemas - Antes Del Alba",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/ybxVczv73Ac/hqdefault.jpg",
+          src: "assets/music/ybxVczv73Ac.m4a"
+        },
+        {
+          title: "I Don't Know",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/9IHmdI8eKIc/hqdefault.jpg",
+          src: "assets/music/9IHmdI8eKIc.m4a"
+        },
+        {
+          title: "Igual",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/-cG1v34b62c/hqdefault.jpg",
+          src: "assets/music/-cG1v34b62c.m4a"
+        },
+        {
+          title: "Infierno",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/VPquW0K-goQ/hqdefault.jpg",
+          src: "assets/music/VPquW0K-goQ.m4a"
+        },
+        {
+          title: "Inquebrantable",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/-sVab-CQ7kE/hqdefault.jpg",
+          src: "assets/music/-sVab-CQ7kE.m4a"
+        },
+        {
+          title: "Intento Tras Intento (El Muisca ft. Penyair)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/bE8KYHJF3tI/hqdefault.jpg",
+          src: "assets/music/bE8KYHJF3tI.m4a"
+        },
+        {
+          title: "Karma",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/XPrirTJ1_A4/hqdefault.jpg",
+          src: "assets/music/XPrirTJ1_A4.m4a"
+        },
+        {
+          title: "La 70 (ft. Deuxer, Dexta Small & DaStreetGenie)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/nBw0-Xu2nxQ/hqdefault.jpg",
+          src: "assets/music/nBw0-Xu2nxQ.m4a"
+        },
+        {
+          title: "La Cicatriz",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/9rqgrKpUmuA/hqdefault.jpg",
+          src: "assets/music/9rqgrKpUmuA.m4a"
+        },
+        {
+          title: "La culpa",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/3axEOIr1OmU/hqdefault.jpg",
+          src: "assets/music/3axEOIr1OmU.m4a"
+        },
+        {
+          title: "La Intuición",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/Flp8MX2Zem0/hqdefault.jpg",
+          src: "assets/music/Flp8MX2Zem0.m4a"
+        },
+        {
+          title: "La Luz",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/Ls1cOqGf7oI/hqdefault.jpg",
+          src: "assets/music/Ls1cOqGf7oI.m4a"
+        },
+        {
+          title: "La Misma Cara",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/ak9GNPBxK94/hqdefault.jpg",
+          src: "assets/music/ak9GNPBxK94.m4a"
+        },
+        {
+          title: "La Moral (ft. Pielroja & Alka Produce)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/6l8m-nj8eZM/hqdefault.jpg",
+          src: "assets/music/6l8m-nj8eZM.m4a"
+        },
+        {
+          title: "La Música",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/Um-T2wsssag/hqdefault.jpg",
+          src: "assets/music/Um-T2wsssag.m4a"
+        },
+        {
+          title: "La Papa Y La Leña",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/7u2zY4WVwD4/hqdefault.jpg",
+          src: "assets/music/7u2zY4WVwD4.m4a"
+        },
+        {
+          title: "Las Calles Son Clases",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/zMJ4VJXS3mQ/hqdefault.jpg",
+          src: "assets/music/zMJ4VJXS3mQ.m4a"
+        },
+        {
+          title: "Las Ganas",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/PHA_N_LXjyc/hqdefault.jpg",
+          src: "assets/music/PHA_N_LXjyc.m4a"
+        },
+        {
+          title: "Le Decían Que No Podía",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/eXRfRwkYZEs/hqdefault.jpg",
+          src: "assets/music/eXRfRwkYZEs.m4a"
+        },
+        {
+          title: "Lejos De Falsos",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/x77asaCh5V8/hqdefault.jpg",
+          src: "assets/music/x77asaCh5V8.m4a"
+        },
+        {
+          title: "Llegan Se Van",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/90UfJKzBBOA/hqdefault.jpg",
+          src: "assets/music/90UfJKzBBOA.m4a"
+        },
+        {
+          title: "Lobos (ft. Diavlitx)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/toaKAHcAa1o/hqdefault.jpg",
+          src: "assets/music/toaKAHcAa1o.m4a"
+        },
+        {
+          title: "Los Dueños",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/CUZA9tM1x9c/hqdefault.jpg",
+          src: "assets/music/CUZA9tM1x9c.m4a"
+        },
+        {
+          title: "Los Petit Fellas",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/w_P2krK9z4U/hqdefault.jpg",
+          src: "assets/music/w_P2krK9z4U.m4a"
+        },
+        {
+          title: "Madrugadas ft. Gona",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/Xysz1kxL5qQ/hqdefault.jpg",
+          src: "assets/music/Xysz1kxL5qQ.m4a"
+        },
+        {
+          title: "Maldito Siglo XXI",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/gcVNFjhaIdI/hqdefault.jpg",
+          src: "assets/music/gcVNFjhaIdI.m4a"
+        },
+        {
+          title: "María / Aroma de Jardín (ft. Charles Ans & BCN)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/gCRfJuJGdcw/hqdefault.jpg",
+          src: "assets/music/gCRfJuJGdcw.m4a"
+        },
+        {
+          title: "Máscaras",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/HIxEaIBSiTI/hqdefault.jpg",
+          src: "assets/music/HIxEaIBSiTI.m4a"
+        },
+        {
+          title: "Menos Plata Más Amor",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/QH8skkEg0m4/hqdefault.jpg",
+          src: "assets/music/QH8skkEg0m4.m4a"
+        },
+        {
+          title: "Mi Loma Natal",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/n8S4xAAQ27w/hqdefault.jpg",
+          src: "assets/music/n8S4xAAQ27w.m4a"
+        },
+        {
+          title: "Mi Rap - Antes Del Alba",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/UY11Lczb2MA/hqdefault.jpg",
+          src: "assets/music/UY11Lczb2MA.m4a"
+        },
+        {
+          title: "Mic Check Session #290 (The Cypher Effect)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/sCtd-r3vvvc/hqdefault.jpg",
+          src: "assets/music/sCtd-r3vvvc.m4a"
+        },
+        {
+          title: "Mujer Sin Nombre",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/yOX7cfNhdzQ/hqdefault.jpg",
+          src: "assets/music/yOX7cfNhdzQ.m4a"
+        },
+        {
+          title: "Mujeres",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/PIQJl1y5WMg/hqdefault.jpg",
+          src: "assets/music/PIQJl1y5WMg.m4a"
+        },
+        {
+          title: "Nada",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/XQWKBRuUWw4/hqdefault.jpg",
+          src: "assets/music/XQWKBRuUWw4.m4a"
+        },
+        {
+          title: "No Copy",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/B8sAqa7dEq8/hqdefault.jpg",
+          src: "assets/music/B8sAqa7dEq8.m4a"
+        },
+        {
+          title: "No Critique A Los Demás",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/epQfTYf9Q2c/hqdefault.jpg",
+          src: "assets/music/epQfTYf9Q2c.m4a"
+        },
+        {
+          title: "No Sabía Que Sabía",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/RpfWsx45Rgo/hqdefault.jpg",
+          src: "assets/music/RpfWsx45Rgo.m4a"
+        },
+        {
+          title: "No Somos Iguales",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/lfCDiBAqH6s/hqdefault.jpg",
+          src: "assets/music/lfCDiBAqH6s.m4a"
+        },
+        {
+          title: "Osama",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/BWvIHzlaH8o/hqdefault.jpg",
+          src: "assets/music/BWvIHzlaH8o.m4a"
+        },
+        {
+          title: "Oscuridad",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/gNPJMEoP6KI/hqdefault.jpg",
+          src: "assets/music/gNPJMEoP6KI.m4a"
+        },
+        {
+          title: "Otoño",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/IzSdLJxsfmc/hqdefault.jpg",
+          src: "assets/music/IzSdLJxsfmc.m4a"
+        },
+        {
+          title: "Otra noche",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/UUUoEUUfp8s/hqdefault.jpg",
+          src: "assets/music/UUUoEUUfp8s.m4a"
+        },
+        {
+          title: "Paisaje De Mi Herida ft. Kazu",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/OpJmg6eVGAs/hqdefault.jpg",
+          src: "assets/music/OpJmg6eVGAs.m4a"
+        },
+        {
+          title: "Para No Volver Jamás (el RedCode ft. Penyair)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/SCa11_1Ezx4/hqdefault.jpg",
+          src: "assets/music/SCa11_1Ezx4.m4a"
+        },
+        {
+          title: "Parcera",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/yEZjtgpqWhg/hqdefault.jpg",
+          src: "assets/music/yEZjtgpqWhg.m4a"
+        },
+        {
+          title: "Perder",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/oCI-LvnibUg/hqdefault.jpg",
+          src: "assets/music/oCI-LvnibUg.m4a"
+        },
+        {
+          title: "Perro Fino",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/fVolstaflyo/hqdefault.jpg",
+          src: "assets/music/fVolstaflyo.m4a"
+        },
+        {
+          title: "Pon Fin - Antes Del Alba",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/Kq-CIz4-FR8/hqdefault.jpg",
+          src: "assets/music/Kq-CIz4-FR8.m4a"
+        },
+        {
+          title: "Por Si Los Días No Vuelven ft. Sharif",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/Zv4I8_Fg2G4/hqdefault.jpg",
+          src: "assets/music/Zv4I8_Fg2G4.m4a"
+        },
+        {
+          title: "Que den la vuelta (ft. Jam Block Jr & Hi-Kymon)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/9yBUd8iS5uc/hqdefault.jpg",
+          src: "assets/music/9yBUd8iS5uc.m4a"
+        },
+        {
+          title: "Qué Más Da (ft. Melodico & La Loquera)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/WdGZ4LOn0lQ/hqdefault.jpg",
+          src: "assets/music/WdGZ4LOn0lQ.m4a"
+        },
+        {
+          title: "Que Nada Te Aplaste",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/hqdefault.jpg",
+          src: "assets/music/-WPPMOE2jeE.m4a"
+        },
+        {
+          title: "Quimera",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/3N9Q8XIqhUo/hqdefault.jpg",
+          src: "assets/music/3N9Q8XIqhUo.m4a"
+        },
+        {
+          title: "Rapero Porque Quiero",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/BbTgoluQyu4/hqdefault.jpg",
+          src: "assets/music/BbTgoluQyu4.m4a"
+        },
+        {
+          title: "Ratas y Ladys (ft. Eddy Mugre)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/7TpeooPW_0Q/hqdefault.jpg",
+          src: "assets/music/7TpeooPW_0Q.m4a"
+        },
+        {
+          title: "Realidad Mental - Lo Que Más Importa",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/VnznSUg2rT4/hqdefault.jpg",
+          src: "assets/music/VnznSUg2rT4.m4a"
+        },
+        {
+          title: "Realidad Mental - Vivir El Tiempo",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/WJnumOjQEn8/hqdefault.jpg",
+          src: "assets/music/WJnumOjQEn8.m4a"
+        },
+        {
+          title: "Realidad Mental - Ya Verás",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/kiTKGKjjS2I/hqdefault.jpg",
+          src: "assets/music/kiTKGKjjS2I.m4a"
+        },
+        {
+          title: "Sabor",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/Iv_hbcKlH4E/hqdefault.jpg",
+          src: "assets/music/Iv_hbcKlH4E.m4a"
+        },
+        {
+          title: "Salmo",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/DdylyF4gWPc/hqdefault.jpg",
+          src: "assets/music/DdylyF4gWPc.m4a"
+        },
+        {
+          title: "Ser feliz es gratis",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/KHQuqfbcII0/hqdefault.jpg",
+          src: "assets/music/KHQuqfbcII0.m4a"
+        },
+        {
+          title: "Si No Estás",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/X48zbOA3I8I/hqdefault.jpg",
+          src: "assets/music/X48zbOA3I8I.m4a"
+        },
+        {
+          title: "Sigo aquí (ft. Ali A.K.A Mind)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/giOWXLeBMbg/hqdefault.jpg",
+          src: "assets/music/giOWXLeBMbg.m4a"
+        },
+        {
+          title: "Sin Excusas (ft. Santa RM & Alka Produce)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/BYBYorRK_h8/hqdefault.jpg",
+          src: "assets/music/BYBYorRK_h8.m4a"
+        },
+        {
+          title: "Sin Visajes",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/Aaa5_xY4Kko/hqdefault.jpg",
+          src: "assets/music/Aaa5_xY4Kko.m4a"
+        },
+        {
+          title: "Soledad",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/0RvSHbhsXLY/hqdefault.jpg",
+          src: "assets/music/0RvSHbhsXLY.m4a"
+        },
+        {
+          title: "Solitario Soldado",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/-RDWIsrVt0s/hqdefault.jpg",
+          src: "assets/music/-RDWIsrVt0s.m4a"
+        },
+        {
+          title: "Solo Es Una",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/XVvXuK4hZ_c/hqdefault.jpg",
+          src: "assets/music/XVvXuK4hZ_c.m4a"
+        },
+        {
+          title: "Sus Mentiras",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/BMMt6ADT6W8/hqdefault.jpg",
+          src: "assets/music/BMMt6ADT6W8.m4a"
+        },
+        {
+          title: "Tarde Que Temprano",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/GIS450UJbMQ/hqdefault.jpg",
+          src: "assets/music/GIS450UJbMQ.m4a"
+        },
+        {
+          title: "Tema Explícito ft. Joes Ywc",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
+          src: "assets/music/vFQ_0jRTUt0.m4a"
+        },
+        {
+          title: "Tierra Santa",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/BZw-GbuR4UI/hqdefault.jpg",
+          src: "assets/music/BZw-GbuR4UI.m4a"
+        },
+        {
+          title: "Tío Armando",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/lAoj2JTQtbQ/hqdefault.jpg",
+          src: "assets/music/lAoj2JTQtbQ.m4a"
+        },
+        {
+          title: "Tú Tienes El Son",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/_2fNpGHig6s/hqdefault.jpg",
+          src: "assets/music/_2fNpGHig6s.m4a"
+        },
+        {
+          title: "Un Minuto de Silencio",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/NQA-mnkKej0/hqdefault.jpg",
+          src: "assets/music/NQA-mnkKej0.m4a"
+        },
+        {
+          title: "Un Pelito Y Un Tamal",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/A1eu6Spaz3g/hqdefault.jpg",
+          src: "assets/music/A1eu6Spaz3g.m4a"
+        },
+        {
+          title: "Vértigo",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/HFQp-PZptFg/hqdefault.jpg",
+          src: "assets/music/HFQp-PZptFg.m4a"
+        },
+        {
+          title: "Vivir el Tiempo",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/Ay9h07Z2vcI/hqdefault.jpg",
+          src: "assets/music/Ay9h07Z2vcI.m4a"
+        },
+        {
+          title: "Volando bajo (ft. Ruzto)",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/6ovduwVuclc/hqdefault.jpg",
+          src: "assets/music/6ovduwVuclc.m4a"
+        },
+        {
+          title: "Zenit",
+          artist: "Penyair",
+          cover: "https://i.ytimg.com/vi/scSt7nVbeC8/hqdefault.jpg",
+          src: "assets/music/scSt7nVbeC8.m4a"
+        }
       ];
 
       let currentSongIndex = 0;
@@ -3431,8 +4138,50 @@ function loadSong(index) {
           }
         });
       }
-      if(prevBtn) prevBtn.addEventListener('click', prevSong);
-      if(nextBtn) nextBtn.addEventListener('click', () => nextSong(false));
+      // Toque corto: cambia de canción. Mantener presionado: retrocede o adelanta
+      // la canción mientras el dedo siga en el botón; al soltar, se detiene.
+      function holdButton(button, onTap, direction) {
+        if (!button) return;
+        let holdTimer = null;
+        let seekTimer = null;
+        let held = false;
+        const stop = () => {
+          clearTimeout(holdTimer);
+          clearInterval(seekTimer);
+          holdTimer = seekTimer = null;
+          button.classList.remove('holding');
+        };
+        button.addEventListener('pointerdown', (e) => {
+          held = false;
+          button.setPointerCapture(e.pointerId);
+          holdTimer = setTimeout(() => {
+            held = true;
+            button.classList.add('holding');
+            seekTimer = setInterval(() => {
+              if (!isFinite(audioPlayer.duration)) return;
+              audioPlayer.currentTime = Math.min(Math.max(0, audioPlayer.currentTime + direction * 3), audioPlayer.duration - 0.5);
+            }, 150);
+          }, 420);
+        });
+        button.addEventListener('pointerup', () => {
+          const wasHeld = held;
+          stop();
+          if (!wasHeld) onTap();
+          else saveState();
+        });
+        button.addEventListener('pointercancel', stop);
+        button.addEventListener('contextmenu', (e) => e.preventDefault());
+        // teclado: Enter / Espacio siguen funcionando como un toque
+        button.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTap(); }
+        });
+      }
+      holdButton(prevBtn, () => {
+        // como en cualquier reproductor: si ya avanzó, vuelve al inicio de la canción
+        if (audioPlayer.currentTime > 4) { audioPlayer.currentTime = 0; return; }
+        prevSong();
+      }, -1);
+      holdButton(nextBtn, () => nextSong(false), 1);
       if (progressContainer) {
         progressContainer.addEventListener('pointerdown', (e) => {
           seeking = true;

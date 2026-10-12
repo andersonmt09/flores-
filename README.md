@@ -8,17 +8,18 @@ Un pequeño jardín nocturno en 3D, creado con Three.js.
 
 Abre `index.html` en un navegador moderno con conexión a Internet. La escena carga Three.js desde CDN.
 
-Puedes arrastrar para mirar el ramo desde otro ángulo, usar el gesto de pellizco o la rueda para acercarte y pausar o reanudar el movimiento con el botón inferior.
+- **Mirar:** arrastra con el dedo o el ratón; pellizca o usa la rueda para acercarte.
+- **Caminar:** en computador usa W A S D o las flechas (Shift para ir más rápido); en el celular, el círculo de abajo a la izquierda.
+- **Volver a la entrada:** botón de la casita. El botón de pausa detiene el viento y las luciérnagas.
 
 ## Detalles
 
-- Jardín circular al atardecer: macizo central de tulipanes en anillos de color (rojo, rosa, blanco), sendero de grava con piedras de borde y seis parterres que alternan lirios araña rojos con tulipanes en manchas de color (cálidos, claros y morados).
-- Césped instanciado que se mece con el viento, seto bajo de boj, prado y árboles a contraluz en el horizonte.
-- Cielo procedural con sol bajo, nubes finas y niebla atmosférica; sombras reales del sol.
-- Polen que brilla a contraluz, luciérnagas que destellan como las reales y mariposas que vuelan entre las flores.
-- Reproductor de música: recuerda la última canción, barra que se puede arrastrar, búsqueda sin tildes y acceso rápido desde el jardín.
+- Jardín nocturno grande: macizo central de tulipanes, seis parterres de tulipanes y lirios araña con seto, dos anillos de paseo, avenidas en cruz, campos de tulipanes en franjas de colores y praderas de lirios araña.
+- Faroles encendidos a lo largo de los senderos, luna llena, estrellas que titilan, Vía Láctea y constelaciones reales (Orión, Osa Mayor, Casiopea, Cisne, Cruz del Sur, Escorpión y Lira).
+- Luciérnagas, césped y flores que se mecen con el viento.
+- Reproductor: 127 canciones de Penyair, cada una con su audio; recuerda la última canción, barra arrastrable, búsqueda sin tildes, mantener presionado ⏮/⏭ para retroceder o adelantar, y acceso rápido desde el jardín.
 - En móvil se reduce la cantidad de plantas y efectos para que siga fluido.
-- Respeta `prefers-reduced-motion` para reducir el movimiento cuando el sistema lo solicita.
+- Respeta `prefers-reduced-motion`.
 
 ---
 
