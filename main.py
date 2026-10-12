@@ -1,3 +1,5 @@
+import re
+import time
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -21,6 +23,39 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+
+
+VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
+_oembed_cache = {}
+OEMBED_TTL = 7 * 24 * 3600
+
+
+@app.get("/api/oembed/{video_id}")
+def oembed(video_id: str):
+    """Título y canal reales de un video de YouTube (API oEmbed), con caché."""
+    if not VIDEO_ID.match(video_id):
+        raise HTTPException(status_code=400, detail="Invalid video id")
+    cached = _oembed_cache.get(video_id)
+    if cached and time.time() - cached[0] < OEMBED_TTL:
+        return cached[1]
+    try:
+        res = requests.get(
+            "https://www.youtube.com/oembed",
+            params={"url": f"https://www.youtube.com/watch?v={video_id}", "format": "json"},
+            timeout=8,
+        )
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    if res.status_code != 200:
+        raise HTTPException(status_code=404 if res.status_code in (401, 403, 404) else 502, detail="oEmbed unavailable")
+    data = res.json()
+    result = {
+        "title": data.get("title", ""),
+        "author_name": data.get("author_name", ""),
+        "thumbnail_url": data.get("thumbnail_url", ""),
+    }
+    _oembed_cache[video_id] = (time.time(), result)
+    return result
 
 
 @app.get("/search")
