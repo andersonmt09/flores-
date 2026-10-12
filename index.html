@@ -203,6 +203,31 @@
         pointer-events: auto;
       }
 
+      .playlist-count { text-align: center; color: var(--muted); font-size: 0.85rem; margin: 0 0 1.4rem; letter-spacing: 0.04em; }
+      .playlist-empty { text-align: center; color: var(--muted); padding: 2rem 0; }
+      .now-playing {
+        display: none;
+        align-items: center;
+        gap: 0.55rem;
+        max-width: min(15rem, 48vw);
+        height: 2.45rem;
+        padding: 0 0.9rem 0 0.35rem;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--glass);
+        color: var(--cream);
+        font: inherit;
+        font-size: 0.78rem;
+        cursor: pointer;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .now-playing.visible { display: inline-flex; }
+      .now-playing-cover { flex: 0 0 auto; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: #233 center/cover; }
+      .now-playing.playing .now-playing-cover { animation: spin 8s linear infinite; }
+      .now-playing-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .progress-container { touch-action: none; }
       .round-button {
         display: inline-grid;
         width: 2.45rem;
@@ -716,7 +741,6 @@
               </li>
             </ul>
           </div>
-          </div>
         </div>
       </header>
 
@@ -729,6 +753,10 @@
           <span>Arrastra para explorar · pellizca para acercar</span>
         </div>
         <div class="controls">
+          <button class="now-playing" id="nowPlayingBtn" type="button" aria-label="Abrir reproductor">
+            <span class="now-playing-cover" id="nowPlayingCover"></span>
+            <span class="now-playing-title" id="nowPlayingTitle"></span>
+          </button>
           <button class="round-button" id="motionToggle" type="button" aria-label="Pausar movimiento" title="Pausar movimiento">
             <svg id="pauseIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M8 5v14M16 5v14"/>
@@ -751,7 +779,7 @@
     
     <!-- Playlist Overlay (Pantalla completa de canciones) -->
     <div id="playlistOverlay" class="full-screen-overlay">
-      <div class="dynamic-bg" style="background-image: url('assets/music/cover_placeholder.jpg');"></div>
+      <div class="dynamic-bg" style="background-image: url('assets/images/saber_amar_cover.jpg');"></div>
       <div class="bg-overlay"></div>
       <nav class="music-nav-top">
         <button class="close-music-btn" id="closePlaylistBtn">
@@ -762,8 +790,9 @@
         </button>
       </nav>
       <div class="playlist-full-container">
-        <h1 style="color: var(--gold); text-align: center; font-family: 'Iowan Old Style', serif; font-size: clamp(2rem, 5vw, 2.5rem); margin: 0 auto 2rem; width: 100%;">Catálogo de Penyair</h1>
-        <input type="text" class="playlist-search" id="playlistSearch" placeholder="Buscar canción..." style="max-width: 600px; margin: 0 auto 2rem; display: block; width: 90%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1rem; border-radius: 20px; color: white;">
+        <h1 style="color: var(--gold); text-align: center; font-family: 'Iowan Old Style', serif; font-size: clamp(2rem, 5vw, 2.5rem); margin: 0 auto 0.4rem; width: 100%;">Catálogo de Penyair</h1>
+        <p class="playlist-count" id="playlistCount"></p>
+        <input type="text" class="playlist-search" id="playlistSearch" placeholder="Buscar canción..." autocomplete="off" style="max-width: 600px; margin: 0 auto 2rem; display: block; width: 90%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1rem; border-radius: 20px; color: white;">
         <ul class="playlist-items" id="playlistItems" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.5rem; padding: 0 1rem; list-style: none;">
         </ul>
       </div>
@@ -848,6 +877,11 @@
     <script type="module">
       import * as THREE from "three";
       import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+      import { mergeGeometries, mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
       const container = document.getElementById("app");
       const motionToggle = document.getElementById("motionToggle");
@@ -857,6 +891,10 @@
       const topMenuToggle = document.getElementById("topMenuToggle");
       const topMenuPanel = document.getElementById("topMenuPanel");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const compactViewport = window.matchMedia("(max-width: 640px)").matches;
+      const lowPower = compactViewport || (navigator.hardwareConcurrency || 8) <= 4;
+      // Escala de cantidades: el móvil recibe un jardín igual de lleno pero más ligero.
+      const Q = lowPower ? 0.5 : 1;
 
       if (topMenuToggle && topMenuPanel) {
         topMenuToggle.addEventListener("click", () => {
@@ -868,603 +906,59 @@
         if (splashScreen) splashScreen.classList.add("hidden");
       }, 2600);
 
+      // ---------- RENDER ----------
       const renderer = new THREE.WebGLRenderer({
         antialias: true,
-        alpha: true,
         powerPreference: "high-performance"
       });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const maxPixelRatio = lowPower ? 1.5 : 2;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.05;
+      renderer.toneMappingExposure = 1.08;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       container.appendChild(renderer.domElement);
       document.documentElement.classList.add("webgl-ready");
 
       const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x103330, 0.042);
+      const horizonColor = new THREE.Color("#f7d2a2");
+      scene.fog = new THREE.Fog(new THREE.Color("#efc9a0"), 26, 190);
 
-      const camera = new THREE.PerspectiveCamera(43, window.innerWidth / window.innerHeight, 0.1, 240);
-      camera.position.set(0.8, 5.3, 12.4);
+      const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 400);
+      camera.position.set(1.4, 2.9, 11.6);
 
-      scene.add(new THREE.HemisphereLight(0xfff3c0, 0x07211e, 1.38));
+      // Sol bajo de atardecer, detrás del jardín: contraluz cálido en los pétalos.
+      const sunLightDir = new THREE.Vector3(-0.42, 0.46, -1).normalize();
+      const sunSkyDir = new THREE.Vector3(-0.42, 0.075, -1).normalize();
 
-      const keyLight = new THREE.DirectionalLight(0xffe6a2, 2.55);
-      keyLight.position.set(6.5, 12, 7);
-      scene.add(keyLight);
-
-      const fillLight = new THREE.DirectionalLight(0x76c9bd, 0.78);
-      fillLight.position.set(-8, 5, -8);
-      scene.add(fillLight);
-
-      const haloLight = new THREE.PointLight(0xffc94d, 38, 27, 2);
-      haloLight.position.set(0, 5.8, -5.6);
-      scene.add(haloLight);
-
-      const frontLight = new THREE.PointLight(0xffaa35, 15, 15, 2);
-      frontLight.position.set(1.3, 2.6, 5.3);
-      scene.add(frontLight);
-
-      const softAmber = new THREE.PointLight(0xffc978, 14, 20, 2);
-      softAmber.position.set(-4, 3.2, -2);
-      scene.add(softAmber);
-
-      const redAccentLight = new THREE.PointLight(0xff3b30, 10, 19, 2);
-      redAccentLight.position.set(3.6, 2.6, -2.4);
-      scene.add(redAccentLight);
-
-      const redAccentLight2 = new THREE.PointLight(0xff4433, 8, 17, 2);
-      redAccentLight2.position.set(-3.4, 2.4, 2);
-      scene.add(redAccentLight2);
-
-      const petalMaterials = [
-        new THREE.MeshStandardMaterial({
-          color: 0xffc928,
-          roughness: 0.46,
-          metalness: 0.02,
-          emissive: 0x6e4200,
-          emissiveIntensity: 0.32,
-          side: THREE.DoubleSide
-        }),
-        new THREE.MeshStandardMaterial({
-          color: 0xffdf64,
-          roughness: 0.5,
-          metalness: 0.02,
-          emissive: 0x693f07,
-          emissiveIntensity: 0.25,
-          side: THREE.DoubleSide
-        }),
-        new THREE.MeshStandardMaterial({
-          color: 0xf6b91d,
-          roughness: 0.42,
-          metalness: 0.025,
-          emissive: 0x5f3900,
-          emissiveIntensity: 0.34,
-          side: THREE.DoubleSide
-        }),
-        new THREE.MeshStandardMaterial({
-          color: 0xffe873,
-          roughness: 0.45,
-          metalness: 0.025,
-          emissive: 0x6d4308,
-          emissiveIntensity: 0.25,
-          side: THREE.DoubleSide
-        })
-      ];
-
-      const centerMaterial = new THREE.MeshStandardMaterial({
-        color: 0x4a2d0e,
-        roughness: 0.9,
-        metalness: 0
-      });
-      const centerTopMaterial = new THREE.MeshStandardMaterial({
-        color: 0x81521b,
-        roughness: 0.82,
-        metalness: 0
-      });
-      const seedMaterial = new THREE.MeshStandardMaterial({
-        color: 0x201104,
-        roughness: 0.86,
-        metalness: 0
-      });
-      const stemMaterial = new THREE.MeshStandardMaterial({
-        color: 0x2d7843,
-        roughness: 0.76,
-        metalness: 0
-      });
-      const leafMaterial = new THREE.MeshStandardMaterial({
-        color: 0x40834b,
-        roughness: 0.72,
-        metalness: 0,
-        side: THREE.DoubleSide
-      });
-
-      const spiderPetalMaterials = [
-        new THREE.MeshStandardMaterial({
-          color: 0xe61a2e,
-          roughness: 0.36,
-          metalness: 0.05,
-          emissive: 0x55000a,
-          emissiveIntensity: 0.58,
-          side: THREE.DoubleSide
-        }),
-        new THREE.MeshStandardMaterial({
-          color: 0xff3327,
-          roughness: 0.38,
-          metalness: 0.05,
-          emissive: 0x5c0008,
-          emissiveIntensity: 0.55,
-          side: THREE.DoubleSide
-        }),
-        new THREE.MeshStandardMaterial({
-          color: 0xc4101f,
-          roughness: 0.34,
-          metalness: 0.06,
-          emissive: 0x3e0004,
-          emissiveIntensity: 0.62,
-          side: THREE.DoubleSide
-        })
-      ];
-      const spiderStemMaterial = new THREE.MeshStandardMaterial({
-        color: 0x5c1a1a,
-        roughness: 0.68,
-        metalness: 0
-      });
-      const spiderCenterMaterial = new THREE.MeshStandardMaterial({
-        color: 0x6e0f14,
-        roughness: 0.6,
-        metalness: 0
-      });
-      const stamenMaterial = new THREE.MeshStandardMaterial({
-        color: 0xb3202a,
-        roughness: 0.48,
-        metalness: 0.02
-      });
-      const antherMaterial = new THREE.MeshStandardMaterial({
-        color: 0x4a0a0d,
-        roughness: 0.55,
-        metalness: 0
-      });
-
-      function createPetalGeometry() {
-        const shape = new THREE.Shape();
-        shape.moveTo(0, 0);
-        shape.bezierCurveTo(0.27, 0.16, 0.47, 0.74, 0.03, 1.28);
-        shape.bezierCurveTo(-0.42, 0.82, -0.3, 0.18, 0, 0);
-
-        const geometry = new THREE.ExtrudeGeometry(shape, {
-          depth: 0.05,
-          bevelEnabled: true,
-          bevelThickness: 0.025,
-          bevelSize: 0.042,
-          bevelOffset: 0,
-          bevelSegments: 2,
-          curveSegments: 16,
-          steps: 1
-        });
-
-        const position = geometry.attributes.position;
-        const vertex = new THREE.Vector3();
-        for (let i = 0; i < position.count; i += 1) {
-          vertex.fromBufferAttribute(position, i);
-          const progress = THREE.MathUtils.clamp(vertex.y / 1.28, 0, 1);
-          position.setZ(i, vertex.z + progress * progress * 0.29);
+      // ---------- RUIDO (JS) ----------
+      function hash2(x, z) {
+        const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
+        return s - Math.floor(s);
+      }
+      function valueNoise(x, z) {
+        const ix = Math.floor(x), iz = Math.floor(z);
+        const fx = x - ix, fz = z - iz;
+        const ux = fx * fx * (3 - 2 * fx), uz = fz * fz * (3 - 2 * fz);
+        const a = hash2(ix, iz), b = hash2(ix + 1, iz), c = hash2(ix, iz + 1), d = hash2(ix + 1, iz + 1);
+        return a + (b - a) * ux + (c - a) * uz + (a - b - c + d) * ux * uz;
+      }
+      function fbm(x, z) {
+        let v = 0, amp = 0.5, f = 1;
+        for (let i = 0; i < 4; i += 1) {
+          v += valueNoise(x * f, z * f) * amp;
+          f *= 2.03;
+          amp *= 0.5;
         }
-        position.needsUpdate = true;
-        geometry.computeVertexNormals();
-        return geometry;
+        return v;
       }
-
-      function createLeafGeometry() {
-        const shape = new THREE.Shape();
-        shape.moveTo(0, 0);
-        shape.bezierCurveTo(0.35, 0.22, 0.48, 0.88, 0, 1.34);
-        shape.bezierCurveTo(-0.43, 0.85, -0.34, 0.22, 0, 0);
-
-        const geometry = new THREE.ExtrudeGeometry(shape, {
-          depth: 0.028,
-          bevelEnabled: true,
-          bevelThickness: 0.012,
-          bevelSize: 0.028,
-          bevelOffset: 0,
-          bevelSegments: 2,
-          curveSegments: 12,
-          steps: 1
-        });
-
-        const position = geometry.attributes.position;
-        const vertex = new THREE.Vector3();
-        for (let i = 0; i < position.count; i += 1) {
-          vertex.fromBufferAttribute(position, i);
-          const progress = THREE.MathUtils.clamp(vertex.y / 1.34, 0, 1);
-          position.setZ(i, vertex.z - progress * progress * 0.3);
-        }
-        position.needsUpdate = true;
-        geometry.computeVertexNormals();
-        return geometry;
+      function groundHeight(x, z) {
+        const r = Math.hypot(x, z);
+        const rise = THREE.MathUtils.smoothstep(r, 15, 48);
+        return rise * (fbm(x * 0.035 + 7, z * 0.035 - 3) * 7.5 - 1.2);
       }
-
-      function createSpiderPetalGeometry() {
-        const shape = new THREE.Shape();
-        shape.moveTo(0, 0);
-        shape.bezierCurveTo(0.1, 0.12, 0.15, 0.58, 0.08, 1.08);
-        shape.bezierCurveTo(0.045, 1.38, 0.02, 1.55, 0, 1.64);
-        shape.bezierCurveTo(-0.02, 1.55, -0.045, 1.38, -0.08, 1.08);
-        shape.bezierCurveTo(-0.15, 0.58, -0.1, 0.12, 0, 0);
-
-        const geometry = new THREE.ExtrudeGeometry(shape, {
-          depth: 0.02,
-          bevelEnabled: true,
-          bevelThickness: 0.008,
-          bevelSize: 0.012,
-          bevelOffset: 0,
-          bevelSegments: 1,
-          curveSegments: 16,
-          steps: 1
-        });
-
-        const position = geometry.attributes.position;
-        const vertex = new THREE.Vector3();
-        for (let i = 0; i < position.count; i += 1) {
-          vertex.fromBufferAttribute(position, i);
-          const progress = THREE.MathUtils.clamp(vertex.y / 1.64, 0, 1);
-          const curl = progress * progress * progress * 1.55;
-          const ripple = Math.sin(progress * Math.PI * 3) * 0.028 * progress;
-          position.setZ(i, vertex.z + curl);
-          position.setX(i, vertex.x + ripple);
-        }
-        position.needsUpdate = true;
-        geometry.computeVertexNormals();
-        return geometry;
-      }
-
-      function createStamenCurve() {
-        return new THREE.CatmullRomCurve3([
-          new THREE.Vector3(0, 0, 0),
-          new THREE.Vector3(0, 0.34, 0.1),
-          new THREE.Vector3(0, 0.74, 0.4),
-          new THREE.Vector3(0, 0.92, 0.76),
-          new THREE.Vector3(0, 0.88, 1.06)
-        ]);
-      }
-
-      const petalGeometry = createPetalGeometry();
-      const leafGeometry = createLeafGeometry();
-      const seedGeometry = new THREE.SphereGeometry(0.037, 8, 6);
-      const spiderPetalGeometry = createSpiderPetalGeometry();
-      const stamenCurve = createStamenCurve();
-      const stamenGeometry = new THREE.TubeGeometry(stamenCurve, 18, 0.011, 6, false);
-      const antherGeometry = new THREE.SphereGeometry(0.035, 8, 6);
-      const flowers = [];
-
-      function addPetalLayer(head, material, count, scale, angleOffset, tilt, zOffset) {
-        for (let i = 0; i < count; i += 1) {
-          const holder = new THREE.Group();
-          holder.rotation.z = angleOffset + (i / count) * Math.PI * 2;
-
-          const petal = new THREE.Mesh(petalGeometry, material);
-          petal.rotation.x = tilt;
-          petal.scale.setScalar(scale * (0.93 + ((i * 17) % 5) * 0.018));
-          petal.position.z = zOffset;
-          holder.add(petal);
-          head.add(holder);
-        }
-      }
-
-      function addStamenLayer(head, count, scale, angleOffset, tilt) {
-        const tipPosition = stamenCurve.getPoint(1).clone().multiplyScalar(scale);
-        tipPosition.applyAxisAngle(new THREE.Vector3(1, 0, 0), tilt);
-
-        for (let i = 0; i < count; i += 1) {
-          const holder = new THREE.Group();
-          holder.rotation.z = angleOffset + (i / count) * Math.PI * 2;
-
-          const stamen = new THREE.Mesh(stamenGeometry, stamenMaterial);
-          stamen.rotation.x = tilt;
-          stamen.scale.setScalar(scale);
-          holder.add(stamen);
-
-          const anther = new THREE.Mesh(antherGeometry, antherMaterial);
-          anther.position.copy(tipPosition);
-          anther.scale.setScalar(Math.max(0.7, scale));
-          holder.add(anther);
-          head.add(holder);
-        }
-      }
-
-      function addSeeds(head, scale) {
-        const seeds = new THREE.Group();
-        const count = 58;
-        const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-
-        for (let i = 0; i < count; i += 1) {
-          const fraction = (i + 0.5) / count;
-          const radius = Math.sqrt(fraction) * 0.31 * scale;
-          const angle = i * goldenAngle;
-          const seed = new THREE.Mesh(seedGeometry, seedMaterial);
-          seed.position.set(
-            Math.cos(angle) * radius,
-            Math.sin(angle) * radius,
-            0.225 * scale + (1 - fraction) * 0.018
-          );
-          seed.scale.setScalar(0.55 + (i % 4) * 0.1);
-          seeds.add(seed);
-        }
-        head.add(seeds);
-      }
-
-      
-// ---------- MATERIALES DE TULIPANES ----------
-const tulipStemMaterial = new THREE.MeshStandardMaterial({ color: 0x6fa84a, roughness: 0.65 });
-const tulipLeafMaterial = new THREE.MeshStandardMaterial({
-  color: 0x5d9b6a, roughness: 0.55, side: THREE.DoubleSide, vertexColors: true
-});
-const tulipPetalMaterials = [0xd9142b, 0xf06292, 0xffc107, 0xff7a1a, 0x8e3fb5, 0xf4efe6, 0xe8446d, 0x1e88e5, 0x0d47a1, 0x2962ff, 0x00b0ff, 0x1565c0, 0x1565c0, 0x0d47a1, 0x1e88e5].map(
-  (color) =>
-    new THREE.MeshStandardMaterial({
-      color, roughness: 0.42, metalness: 0.0, side: THREE.DoubleSide, vertexColors: true
-    })
-);
-const tulipCenterMaterial = new THREE.MeshStandardMaterial({ color: 0x3a2a4a, roughness: 0.6 });
-const tulipFilamentMaterial = new THREE.MeshStandardMaterial({ color: 0xe9e2b0, roughness: 0.7 });
-const tulipAntherMaterial = new THREE.MeshStandardMaterial({ color: 0x2b1b3a, roughness: 0.5 });
-const tulipPistilMaterial = new THREE.MeshStandardMaterial({ color: 0xb5c95a, roughness: 0.6 });
-
-function createTulipPetalGeometry(outer) {
-  const segU = 22, segV = 10;
-  const H = outer ? 1.0 : 0.93;
-  const halfW = outer ? 0.31 : 0.29;
-  const cup = outer ? 1.45 : 1.65;
-  const flick = outer ? 0.16 : 0.04;
- 
-  const positions = [], colors = [], indices = [];
- 
-  for (let i = 0; i <= segU; i++) {
-    const u = i / segU;
-    const w = Math.max(Math.pow(Math.sin(Math.PI * Math.pow(u, 0.8)), 0.6), 0.14 * (1 - u));
-    const R = 0.06 + 0.27 * Math.sin(Math.PI * Math.pow(u, 0.88)) + flick * Math.pow(u, 6);
- 
-    for (let j = 0; j <= segV; j++) {
-      const v = (j / segV) * 2 - 1;
-      const y = v * w * halfW;
-      const x = R - cup * y * y;
-      const z = u * H;
-      positions.push(x, y, z);
- 
-      const base = 0.7 + 0.3 * Math.min(1, u / 0.35);
-      const edge = 1 + 0.07 * Math.pow(Math.abs(v), 2);
-      const streak = 0.95 + 0.05 * Math.abs(v);
-      const c = Math.min(1, base * edge * streak);
-      colors.push(c, c * 0.98, c * 0.98);
-    }
-  }
-  const row = segV + 1;
-  for (let i = 0; i < segU; i++) {
-    for (let j = 0; j < segV; j++) {
-      const a = i * row + j, b = a + 1, c = a + row, d = c + 1;
-      indices.push(a, c, b, b, c, d);
-    }
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
-  g.setIndex(indices);
-  g.computeVertexNormals();
-  return g;
-}
-
-function createTulipLeafGeometry() {
-  const segU = 24, segV = 8;
-  const positions = [], colors = [], indices = [];
-  let yy = 0, zz = 0.03;
-  const du = 1 / segU;
- 
-  for (let i = 0; i <= segU; i++) {
-    const u = i / segU;
-    if (i > 0) {
-      const theta = 0.12 + 1.15 * Math.pow(u, 1.6);
-      yy += Math.cos(theta) * du;
-      zz += Math.sin(theta) * du;
-    }
-    const w = 0.15 * Math.pow(Math.sin(Math.PI * Math.pow(u, 0.5)), 0.9) * (1 - 0.25 * u);
- 
-    for (let j = 0; j <= segV; j++) {
-      const v = (j / segV) * 2 - 1;
-      const x = v * w;
-      const fold = -0.9 * Math.abs(x) * (1 - u * 0.5);
-      const wave = 0.012 * Math.sin(u * 14 + v * 3);
-      positions.push(x, yy, zz + fold + wave);
- 
-      const shade = 0.72 + 0.28 * u + 0.06 * (1 - Math.abs(v));
-      colors.push(shade * 0.95, shade, shade * 0.95);
-    }
-  }
-  const row = segV + 1;
-  for (let i = 0; i < segU; i++) {
-    for (let j = 0; j < segV; j++) {
-      const a = i * row + j, b = a + 1, c = a + row, d = c + 1;
-      indices.push(a, b, c, b, d, c);
-    }
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
-  g.setIndex(indices);
-  g.computeVertexNormals();
-  return g;
-}
- 
-const outerPetalGeometry = createTulipPetalGeometry(true);
-const innerPetalGeometry = createTulipPetalGeometry(false);
-const tulipLeafGeometry = createTulipLeafGeometry();
- 
-const tulipFilamentGeometry = new THREE.CylinderGeometry(0.008, 0.01, 0.4, 6);
-tulipFilamentGeometry.rotateX(Math.PI / 2);
-tulipFilamentGeometry.translate(0, 0, 0.2);
-const tulipAntherGeometry = new THREE.BoxGeometry(0.03, 0.02, 0.09);
-const pistilStemGeometry = new THREE.CylinderGeometry(0.02, 0.026, 0.38, 8);
-pistilStemGeometry.rotateX(Math.PI / 2);
-pistilStemGeometry.translate(0, 0, 0.19);
-const pistilTopGeometry = new THREE.SphereGeometry(0.045, 10, 8);
-const calyxGeometry = new THREE.SphereGeometry(0.075, 12, 10);
-
-function addTepals(head, material, geometry, angleOffset, openAngle, rnd) {
-  for (let i = 0; i < 3; i++) {
-    const holder = new THREE.Group();
-    holder.rotation.z = angleOffset + (i / 3) * Math.PI * 2;
-    const petal = new THREE.Mesh(geometry, material);
-    petal.rotation.y = openAngle + (rnd(i * 5 + angleOffset * 10) - 0.5) * 0.08;
-    petal.rotation.x = (rnd(i * 3 + 40) - 0.5) * 0.06;
-    const s = 0.96 + rnd(i * 9 + 5) * 0.08;
-    petal.scale.set(s, s, 0.96 + rnd(i * 4 + 2) * 0.08);
-    holder.add(petal);
-    head.add(holder);
-  }
-}
-
-function addStamens(head, rnd) {
-  for (let i = 0; i < 6; i++) {
-    const a = (i / 6) * Math.PI * 2 + rnd(i + 60) * 0.3;
-    const holder = new THREE.Group();
-    holder.rotation.z = a;
-    const filament = new THREE.Mesh(tulipFilamentGeometry, tulipFilamentMaterial);
-    filament.position.x = 0.075;
-    filament.rotation.y = 0.07 + rnd(i + 70) * 0.05;
-    holder.add(filament);
-    const anther = new THREE.Mesh(tulipAntherGeometry, tulipAntherMaterial);
-    anther.position.set(0.075 + Math.sin(filament.rotation.y) * 0.4, 0, 0.4);
-    holder.add(anther);
-    head.add(holder);
-  }
-  const pistil = new THREE.Group();
-  const pStem = new THREE.Mesh(pistilStemGeometry, tulipPistilMaterial);
-  const pTop = new THREE.Mesh(pistilTopGeometry, tulipPistilMaterial);
-  pTop.scale.set(1, 1, 0.8);
-  pTop.position.z = 0.38;
-  pistil.add(pStem, pTop);
-  head.add(pistil);
-}
-
-function createFlower(config) {
-  const group = new THREE.Group();
-  group.position.set(config.x, 0, config.z);
- 
-  const rnd = (n) => {
-    const s = Math.sin(n * 127.1 + config.seed * 311.7) * 43758.5453;
-    return s - Math.floor(s);
-  };
- 
-  const curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(config.bendX * 0.18, config.height * 0.32, config.bendZ * 0.18),
-    new THREE.Vector3(config.bendX * 0.6, config.height * 0.68, config.bendZ * 0.6),
-    new THREE.Vector3(config.bendX, config.height, config.bendZ)
-  ]);
-  const stem = new THREE.Mesh(
-    new THREE.TubeGeometry(curve, 32, 0.04 * config.scale, 8, false),
-    tulipStemMaterial
-  );
-  group.add(stem);
- 
-  const leafCount = config.scale < 0.6 ? 2 : 3;
-  for (let i = 0; i < leafCount; i++) {
-    const leaf = new THREE.Mesh(tulipLeafGeometry, tulipLeafMaterial);
-    leaf.position.set(0, 0.02 + i * 0.05 * config.height, 0);
-    leaf.rotation.y = config.seed * 6.28 + i * (Math.PI * 2 / leafCount) + (rnd(i + 1) - 0.5) * 0.5;
-    leaf.rotation.x = (rnd(i + 7) - 0.5) * 0.15;
-    const len = config.height * (0.62 - i * 0.1) * (0.9 + rnd(i + 3) * 0.2);
-    leaf.scale.setScalar(len);
-    group.add(leaf);
-  }
- 
-  const head = new THREE.Group();
-  head.position.copy(curve.getPoint(1));
-  head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
-  head.scale.setScalar(config.scale * 0.95);
- 
-  const material = tulipPetalMaterials[config.materialIndex % tulipPetalMaterials.length];
-  const open = config.open !== undefined ? config.open : 0.25 + rnd(11) * 0.35;
- 
-  const calyx = new THREE.Mesh(calyxGeometry, tulipStemMaterial);
-  calyx.scale.set(1, 1, 0.8);
-  calyx.position.z = -0.01;
-  head.add(calyx);
- 
-  addTepals(head, material, outerPetalGeometry, 0 + rnd(21) * 0.2, 0.05 + open * 0.28, rnd);
-  addTepals(head, material, innerPetalGeometry, Math.PI / 3 + rnd(22) * 0.2, 0.01 + open * 0.16, rnd);
- 
-  const inner = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 10), tulipCenterMaterial);
-  inner.scale.set(1, 1, 0.55);
-  inner.position.z = 0.03;
-  head.add(inner);
- 
-  if (config.detail !== false) addStamens(head, rnd);
- 
-  group.add(head);
-  return { group, head, phase: config.seed * Math.PI * 2, spin: config.spin };
-}
-
-
-      function createSpiderLily(config) {
-        const group = new THREE.Group();
-        group.position.set(config.x, 0, config.z);
-
-        const curve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(0, 0, 0),
-          new THREE.Vector3(config.bendX * 0.18, config.height * 0.35, config.bendZ * 0.18),
-          new THREE.Vector3(config.bendX * 0.6, config.height * 0.7, config.bendZ * 0.6),
-          new THREE.Vector3(config.bendX, config.height, config.bendZ)
-        ]);
-
-        const stem = new THREE.Mesh(
-          new THREE.TubeGeometry(curve, 20, 0.03 * config.scale, 8, false),
-          spiderStemMaterial
-        );
-        group.add(stem);
-
-        const head = new THREE.Group();
-        head.position.copy(curve.getPoint(1));
-        head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
-        const material = spiderPetalMaterials[config.materialIndex % spiderPetalMaterials.length];
-
-        for (const layer of [
-          { count: 6, scale: config.scale, angle: 0, tilt: -0.06, offset: 0.015 },
-          { count: 6, scale: config.scale * 0.82, angle: Math.PI / 6, tilt: 0.1, offset: 0.03 }
-        ]) {
-          for (let i = 0; i < layer.count; i += 1) {
-            const holder = new THREE.Group();
-            holder.rotation.z = layer.angle + (i / layer.count) * Math.PI * 2;
-            const petal = new THREE.Mesh(spiderPetalGeometry, material);
-            petal.rotation.x = layer.tilt;
-            petal.scale.setScalar(layer.scale);
-            petal.position.z = layer.offset;
-            holder.add(petal);
-            head.add(holder);
-          }
-        }
-
-        const center = new THREE.Mesh(
-          new THREE.SphereGeometry(0.085 * config.scale, 10, 8),
-          spiderCenterMaterial
-        );
-        head.add(center);
-        addStamenLayer(head, 6, 1.18 * config.scale, Math.PI / 12, 0);
-        group.add(head);
-
-        return { group, head, phase: config.seed * Math.PI * 2, spin: config.spin };
-      }
-
-      const heroLayout = [
-        { x: 0, z: 0, height: 3.92, petals: 16, scale: 1.1, tilt: 0.1, bendX: 0.05, bendZ: 0.1, spin: 0.2, materialIndex: 3, seed: 0.13, detail: true },
-        { x: -1.92, z: 0.66, height: 2.78, petals: 14, scale: 0.91, tilt: 0.3, bendX: 0.55, bendZ: 0.22, spin: 0.9, materialIndex: 7, seed: 0.41, detail: true },
-        { x: 2.08, z: -0.5, height: 3.05, petals: 14, scale: 0.97, tilt: 0.26, bendX: -0.6, bendZ: -0.18, spin: 1.7, materialIndex: 8, seed: 0.67, detail: true },
-        { x: -1.18, z: -1.72, height: 2.15, petals: 12, scale: 0.79, tilt: 0.46, bendX: 0.38, bendZ: -0.55, spin: 2.4, materialIndex: 9, seed: 0.22, detail: true },
-        { x: 1.34, z: 1.61, height: 2.37, petals: 12, scale: 0.84, tilt: 0.4, bendX: -0.45, bendZ: 0.52, spin: 3.1, materialIndex: 10, seed: 0.85, detail: true },
-        { x: -2.75, z: -0.88, height: 1.87, petals: 11, scale: 0.69, tilt: 0.56, bendX: 0.72, bendZ: -0.32, spin: 3.9, materialIndex: 2, seed: 0.55, detail: true },
-        { x: 2.78, z: 1.04, height: 1.98, petals: 11, scale: 0.75, tilt: 0.5, bendX: -0.68, bendZ: 0.38, spin: 4.6, materialIndex: 0, seed: 0.93, detail: true },
-        { x: 0.4, z: 2.6, height: 2.05, petals: 12, scale: 0.78, tilt: 0.44, bendX: -0.2, bendZ: 0.6, spin: 5.3, materialIndex: 11, seed: 0.31, detail: true },
-        { x: -0.6, z: -3, height: 1.9, petals: 11, scale: 0.72, tilt: 0.52, bendX: 0.15, bendZ: -0.62, spin: 6, materialIndex: 1, seed: 0.71, detail: true }
-      ];
 
       function seededRandom(seed) {
         let state = seed % 2147483647;
@@ -1474,374 +968,1330 @@ function createFlower(config) {
           return (state - 1) / 2147483646;
         };
       }
+      const random = seededRandom(20260921);
 
-      function scatterPoints(
-        count,
-        random,
-        { centerX = 0, centerZ = 0, minRadius = 0, maxRadius, minSpacing, avoid = [] }
-      ) {
-        const placed = [];
-        let attempts = 0;
-        const maxAttempts = count * 80;
+      // ---------- DISEÑO DEL JARDÍN ----------
+      // Jardín circular: macizo central de tulipanes, sendero de grava en anillo,
+      // seis parterres por especie separados por pasillos de césped, y un seto bajo.
+      const GARDEN = {
+        centerBed: 3.2,
+        pathInner: 3.45,
+        pathOuter: 4.65,
+        bedInner: 5.0,
+        bedOuter: 8.7,
+        hedge: 10.3,
+        sectorCount: 6,
+        walkHalf: 0.55
+      };
+      const SECTOR = (Math.PI * 2) / GARDEN.sectorCount;
 
-        while (placed.length < count && attempts < maxAttempts) {
-          attempts += 1;
-          const angle = random() * Math.PI * 2;
-          const radius = minRadius + random() * (maxRadius - minRadius);
-          const x = centerX + Math.cos(angle) * radius;
-          const z = centerZ + Math.sin(angle) * radius;
-          const hasConflict = [...avoid, ...placed].some((point) => {
-            const spacing = point.spacing ?? minSpacing;
-            return Math.hypot(point.x - x, point.z - z) < spacing;
-          });
+      function sectorInfo(x, z) {
+        const r = Math.hypot(x, z);
+        // desfase de 30°: los pasillos quedan en el eje z, donde están las entradas
+        const theta = Math.atan2(z, x) - SECTOR / 2;
+        let a = theta % SECTOR;
+        if (a < 0) a += SECTOR;
+        const index = Math.round((theta - a) / SECTOR + 6) % 6;
+        // distancia (en arco) al borde del parterre
+        const local = a - SECTOR / 2;
+        const edge = (SECTOR / 2 - Math.abs(local)) * r;
+        return { r, theta, index, edge };
+      }
+      function onPath(x, z) {
+        const r = Math.hypot(x, z);
+        if (r > GARDEN.pathInner - 0.12 && r < GARDEN.pathOuter + 0.12) return true;
+        return Math.abs(x) < 0.62 && r > GARDEN.pathOuter - 0.2 && r < GARDEN.hedge + 1.6;
+      }
+      function inBed(x, z, margin = 0) {
+        const s = sectorInfo(x, z);
+        if (s.r < GARDEN.centerBed - margin) return "center";
+        if (s.r > GARDEN.bedInner + margin && s.r < GARDEN.bedOuter - margin && s.edge > GARDEN.walkHalf + margin) {
+          return s.index;
+        }
+        return null;
+      }
 
-          if (!hasConflict) placed.push({ x, z, spacing: minSpacing });
+      // ---------- CIELO ----------
+      const NOISE_GLSL = `
+        float gHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float gNoise(vec2 p) {
+          vec2 i = floor(p); vec2 f = fract(p);
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          float a = gHash(i), b = gHash(i + vec2(1.0, 0.0));
+          float c = gHash(i + vec2(0.0, 1.0)), d = gHash(i + vec2(1.0, 1.0));
+          return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+        }
+        float gFbm(vec2 p) {
+          float v = 0.0; float a = 0.5;
+          for (int i = 0; i < 5; i++) { v += gNoise(p) * a; p = p * 2.03 + 17.0; a *= 0.5; }
+          return v;
+        }
+      `;
+
+      const skyUniforms = {
+        uSunDir: { value: sunSkyDir },
+        uTop: { value: new THREE.Color("#3d6fb6") },
+        uMid: { value: new THREE.Color("#f3a77f") },
+        uHorizon: { value: horizonColor.clone() },
+        uSunColor: { value: new THREE.Color("#ffb46b") },
+        uTime: { value: 0 }
+      };
+      const sky = new THREE.Mesh(
+        new THREE.SphereGeometry(300, 48, 24),
+        new THREE.ShaderMaterial({
+          uniforms: skyUniforms,
+          side: THREE.BackSide,
+          depthWrite: false,
+          fog: false,
+          vertexShader: `
+            varying vec3 vDir;
+            void main() {
+              vDir = normalize(position);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            uniform vec3 uSunDir; uniform vec3 uTop; uniform vec3 uMid; uniform vec3 uHorizon; uniform vec3 uSunColor;
+            uniform float uTime;
+            varying vec3 vDir;
+            ${NOISE_GLSL}
+            void main() {
+              vec3 dir = normalize(vDir);
+              float h = dir.y;
+              vec3 mauve = vec3(0.86, 0.5, 0.52);
+              vec3 col = mix(uHorizon, uMid, smoothstep(0.0, 0.14, h));
+              col = mix(col, mauve, smoothstep(0.12, 0.36, h));
+              col = mix(col, uTop, smoothstep(0.3, 0.85, h));
+              col = mix(col, uHorizon, smoothstep(0.0, -0.15, h));
+              float sd = max(dot(dir, uSunDir), 0.0);
+              col += uSunColor * (pow(sd, 4.0) * 0.4 + pow(sd, 32.0) * 0.6 + pow(sd, 400.0) * 1.4);
+              col += vec3(1.0, 0.93, 0.78) * smoothstep(0.99935, 0.99965, sd) * 5.0;
+              // nubes altas y finas
+              vec2 cuv = dir.xz / (h + 0.12);
+              float n = gFbm(cuv * 0.9 + vec2(uTime * 0.006, uTime * 0.002));
+              float band = smoothstep(0.015, 0.14, h) * (1.0 - smoothstep(0.35, 0.8, h));
+              float cloud = smoothstep(0.52, 0.82, n) * band;
+              vec3 cloudCol = mix(vec3(0.85, 0.5, 0.48), vec3(1.0, 0.78, 0.52), pow(sd, 3.0));
+              col = mix(col, cloudCol, cloud * 0.65);
+              gl_FragColor = vec4(col, 1.0);
+              #include <tonemapping_fragment>
+              #include <colorspace_fragment>
+            }
+          `
+        })
+      );
+      scene.add(sky);
+
+      // ---------- LUCES ----------
+      scene.add(new THREE.HemisphereLight(0xc4d6f2, 0x5b5a2c, 0.95));
+
+      const sunLight = new THREE.DirectionalLight(0xffc690, 3.4);
+      sunLight.position.copy(sunLightDir).multiplyScalar(30);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
+      sunLight.shadow.camera.left = -13;
+      sunLight.shadow.camera.right = 13;
+      sunLight.shadow.camera.top = 13;
+      sunLight.shadow.camera.bottom = -13;
+      sunLight.shadow.camera.near = 5;
+      sunLight.shadow.camera.far = 60;
+      sunLight.shadow.bias = -0.0004;
+      sunLight.shadow.normalBias = 0.025;
+      sunLight.shadow.radius = 3;
+      scene.add(sunLight);
+
+      // Luz de rebote suave desde el lado de la cámara para que nada quede negro.
+      const bounceLight = new THREE.DirectionalLight(0xffe2c4, 0.8);
+      bounceLight.position.set(4, 6, 12);
+      scene.add(bounceLight);
+
+      // ---------- VIENTO COMPARTIDO ----------
+      const windUniforms = { uTime: { value: 0 } };
+      function addWind(material, amplitude, height) {
+        material.onBeforeCompile = (shader) => {
+          shader.uniforms.uTime = windUniforms.uTime;
+          shader.uniforms.uAmp = { value: amplitude };
+          shader.uniforms.uHeight = { value: height };
+          shader.vertexShader = shader.vertexShader
+            .replace(
+              "#include <common>",
+              "#include <common>\nuniform float uTime; uniform float uAmp; uniform float uHeight;"
+            )
+            .replace(
+              "#include <begin_vertex>",
+              `#include <begin_vertex>
+              #ifdef USE_INSTANCING
+                vec3 ip = instanceMatrix[3].xyz;
+              #else
+                vec3 ip = vec3(0.0);
+              #endif
+              float hN = clamp(position.y / uHeight, 0.0, 1.5);
+              float gust = sin(uTime * 0.55 + ip.x * 0.16 + ip.z * 0.09) * 0.5 + 0.5;
+              float sway = sin(uTime * 1.6 + ip.x * 0.8 + ip.z * 0.55) * 0.65
+                + sin(uTime * 2.7 + ip.z * 1.3 - ip.x * 0.4) * 0.25;
+              float bend = (sway * (0.35 + gust) + gust * 0.6) * uAmp * hN * hN;
+              transformed.x += bend;
+              transformed.z += bend * 0.45;
+              transformed.y -= abs(bend) * 0.25 * hN;`
+            );
+        };
+      }
+
+      // ---------- SUELO PROCEDURAL ----------
+      const groundSize = 260;
+      const groundSegments = lowPower ? 140 : 220;
+      const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, groundSegments, groundSegments);
+      groundGeometry.rotateX(-Math.PI / 2);
+      {
+        const pos = groundGeometry.attributes.position;
+        for (let i = 0; i < pos.count; i += 1) {
+          pos.setY(i, groundHeight(pos.getX(i), pos.getZ(i)));
+        }
+        groundGeometry.computeVertexNormals();
+      }
+      const groundMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, metalness: 0 });
+      groundMaterial.onBeforeCompile = (shader) => {
+        shader.vertexShader = shader.vertexShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vGW;")
+          .replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nvGW = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+        shader.fragmentShader = shader.fragmentShader
+          .replace("#include <common>", `#include <common>\nvarying vec3 vGW;\n${NOISE_GLSL}\nfloat gRough = 1.0;`)
+          .replace(
+            "#include <color_fragment>",
+            `#include <color_fragment>
+            {
+              vec2 p = vGW.xz;
+              float r = length(p);
+              float th = atan(p.y, p.x);
+              float nBig = gFbm(p * 0.22);
+              float nMid = gFbm(p * 1.4);
+              float nFine = gNoise(p * 38.0);
+              float edgeN = (gFbm(p * 2.6) - 0.5) * 0.22;
+
+              // césped
+              vec3 grassA = pow(vec3(0.24, 0.33, 0.11), vec3(2.2));
+              vec3 grassB = pow(vec3(0.38, 0.45, 0.17), vec3(2.2));
+              vec3 dry = pow(vec3(0.55, 0.5, 0.27), vec3(2.2));
+              vec3 col = mix(grassA, grassB, nMid);
+              col = mix(col, dry, smoothstep(0.6, 0.82, nBig) * 0.45 + smoothstep(20.0, 70.0, r) * 0.2);
+              col *= 0.82 + nFine * 0.28;
+              float rough = 0.95;
+
+              // tierra / mantillo de los parterres
+              float sectorA = 6.2831853 / 6.0;
+              float a = mod(th - sectorA * 0.5, sectorA);
+              float edgeArc = (sectorA * 0.5 - abs(a - sectorA * 0.5)) * r;
+              float bed = (1.0 - smoothstep(${GARDEN.centerBed.toFixed(2)} - 0.05, ${GARDEN.centerBed.toFixed(2)} + 0.12, r + edgeN));
+              float outerBed = smoothstep(${GARDEN.bedInner.toFixed(2)} - 0.1, ${GARDEN.bedInner.toFixed(2)} + 0.05, r + edgeN)
+                * (1.0 - smoothstep(${GARDEN.bedOuter.toFixed(2)} - 0.05, ${GARDEN.bedOuter.toFixed(2)} + 0.12, r + edgeN))
+                * smoothstep(${GARDEN.walkHalf.toFixed(2)} - 0.08, ${GARDEN.walkHalf.toFixed(2)} + 0.06, edgeArc + edgeN);
+              bed = max(bed, outerBed);
+              vec3 soilA = pow(vec3(0.17, 0.11, 0.07), vec3(2.2));
+              vec3 soilB = pow(vec3(0.3, 0.2, 0.13), vec3(2.2));
+              vec3 soil = mix(soilA, soilB, gNoise(p * 9.0) * 0.6 + nFine * 0.4);
+              soil = mix(soil, grassA * 0.9, smoothstep(0.55, 0.9, gNoise(p * 3.0)) * 0.35);
+              col = mix(col, soil, bed);
+              rough = mix(rough, 1.0, bed);
+
+              // sendero de grava: anillo + entradas norte/sur
+              float ring = smoothstep(${GARDEN.pathInner.toFixed(2)} - 0.04, ${GARDEN.pathInner.toFixed(2)} + 0.06, r + edgeN * 0.25)
+                * (1.0 - smoothstep(${GARDEN.pathOuter.toFixed(2)} - 0.06, ${GARDEN.pathOuter.toFixed(2)} + 0.04, r + edgeN * 0.25));
+              float spoke = (1.0 - smoothstep(0.46, 0.56, abs(p.x) + edgeN * 0.2))
+                * smoothstep(${GARDEN.pathOuter.toFixed(2)} - 0.3, ${GARDEN.pathOuter.toFixed(2)}, r)
+                * (1.0 - smoothstep(${(GARDEN.hedge + 1.2).toFixed(2)}, ${(GARDEN.hedge + 2.2).toFixed(2)}, r));
+              float path = max(ring, spoke);
+              float pebble = gNoise(p * 55.0);
+              float pebble2 = gNoise(p * 23.0 + 4.0);
+              vec3 gravel = mix(pow(vec3(0.5, 0.46, 0.4), vec3(2.2)), pow(vec3(0.74, 0.69, 0.6), vec3(2.2)), pebble);
+              gravel *= 0.82 + pebble2 * 0.3;
+              gravel = mix(gravel, pow(vec3(0.36, 0.32, 0.27), vec3(2.2)), smoothstep(0.78, 0.95, gNoise(p * 70.0)) * 0.6);
+              col = mix(col, gravel, path);
+              rough = mix(rough, 0.88, path);
+
+              diffuseColor.rgb = col;
+              gRough = rough;
+            }`
+          )
+          .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = gRough;");
+      };
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      // ---------- ÁRBOLES Y ARBUSTOS ----------
+      function blobGeometry(detail, roughness, seed) {
+        let g = new THREE.IcosahedronGeometry(1, detail);
+        g.deleteAttribute("normal");
+        g.deleteAttribute("uv");
+        g = mergeVertices(g);
+        const pos = g.attributes.position;
+        const v = new THREE.Vector3();
+        for (let i = 0; i < pos.count; i += 1) {
+          v.fromBufferAttribute(pos, i);
+          const n = fbm(v.x * 2.2 + seed, v.z * 2.2 + v.y * 1.7 - seed);
+          v.multiplyScalar(1 + (n - 0.5) * roughness);
+          pos.setXYZ(i, v.x, v.y, v.z);
+        }
+        g.computeVertexNormals();
+        return g;
+      }
+
+      // Árboles del fondo pintados como siluetas a contraluz: miles de hojas
+      // pequeñas con borde dorado donde las toca el sol.
+      function createTreeTexture(kind, seed) {
+        const rand = seededRandom(seed);
+        const W = 256, H = 384;
+        const canvas = document.createElement("canvas");
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext("2d");
+        const trunkTop = kind === "poplar" ? H * 0.3 : H * 0.45;
+        // tronco y ramas
+        ctx.strokeStyle = "#2a1d15";
+        ctx.lineCap = "round";
+        ctx.lineWidth = kind === "oak" ? 16 : 11;
+        ctx.beginPath();
+        ctx.moveTo(W / 2, H);
+        ctx.quadraticCurveTo(W / 2 + (rand() - 0.5) * 20, H * 0.75, W / 2 + (rand() - 0.5) * 14, trunkTop);
+        ctx.stroke();
+        ctx.lineWidth = 5;
+        for (let b = 0; b < 5; b += 1) {
+          const y = H - (H - trunkTop) * (0.45 + rand() * 0.5);
+          const dir = rand() < 0.5 ? -1 : 1;
+          ctx.beginPath();
+          ctx.moveTo(W / 2, y);
+          ctx.quadraticCurveTo(W / 2 + dir * 30, y - 30, W / 2 + dir * (40 + rand() * 40), y - 60 - rand() * 50);
+          ctx.stroke();
+        }
+        // masas de follaje
+        const clusters = [];
+        const count = kind === "poplar" ? 7 : 9;
+        for (let c = 0; c < count; c += 1) {
+          let cx, cy, rx, ry;
+          if (kind === "poplar") {
+            cy = H * 0.08 + (c / count) * H * 0.62;
+            cx = W / 2 + (rand() - 0.5) * 30;
+            rx = 34 + Math.sin((c / count) * Math.PI) * 26;
+            ry = 46;
+          } else {
+            const a = rand() * Math.PI * 2;
+            const spread = kind === "oak" ? 0.36 : 0.28;
+            cx = W / 2 + Math.cos(a) * W * spread * rand();
+            cy = H * (kind === "oak" ? 0.3 : 0.27) + Math.sin(a) * H * 0.17 * rand();
+            rx = 44 + rand() * 30;
+            ry = 38 + rand() * 24;
+          }
+          clusters.push({ cx, cy, rx, ry });
+        }
+        const leaves = kind === "poplar" ? 2600 : 3400;
+        for (let l = 0; l < leaves; l += 1) {
+          const c = clusters[Math.floor(rand() * clusters.length)];
+          const a = rand() * Math.PI * 2;
+          const d = Math.sqrt(rand());
+          const x = c.cx + Math.cos(a) * c.rx * d;
+          const y = c.cy + Math.sin(a) * c.ry * d;
+          // borde superior/izquierdo iluminado por el sol bajo
+          const rim = Math.max(0, -Math.cos(a) * 0.5 - Math.sin(a) * 0.7) * d;
+          const light = 12 + rim * 26 + rand() * 7;
+          const hue = 78 + rand() * 30 - rim * 25;
+          ctx.fillStyle = `hsl(${hue}, ${30 + rim * 30}%, ${light}%)`;
+          ctx.beginPath();
+          ctx.ellipse(x, y, 2.4 + rand() * 3.2, 1.8 + rand() * 2.2, rand() * Math.PI, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        return texture;
+      }
+
+      {
+        const kinds = [
+          { kind: "round", aspect: 0.72 },
+          { kind: "oak", aspect: 0.8 },
+          { kind: "poplar", aspect: 0.5 },
+          { kind: "round", aspect: 0.72 }
+        ];
+        const materials = kinds.map(
+          (k, i) =>
+            new THREE.SpriteMaterial({
+              map: createTreeTexture(k.kind, 101 + i * 37),
+              alphaTest: 0.35,
+              fog: true
+            })
+        );
+        const treeCount = Math.round(170 * (lowPower ? 0.6 : 1));
+        const sunAngle = Math.atan2(sunSkyDir.z, sunSkyDir.x);
+        for (let i = 0; i < treeCount; i += 1) {
+          const a = random() * Math.PI * 2;
+          // claro detrás del sol para dejar ver el atardecer
+          const behindSun = Math.max(0, Math.cos(a - sunAngle));
+          const r = 32 + Math.pow(random(), 0.8) * 60 + behindSun * behindSun * 30;
+          const x = Math.cos(a) * r;
+          const z = Math.sin(a) * r;
+          const k = Math.floor(random() * kinds.length);
+          const sprite = new THREE.Sprite(materials[k]);
+          const h = 9 + random() * 8;
+          sprite.center.set(0.5, 0.02);
+          sprite.scale.set(h * kinds[k].aspect * (0.9 + random() * 0.2), h, 1);
+          sprite.position.set(x, groundHeight(x, z) - 0.3, z);
+          scene.add(sprite);
+        }
+      }
+
+      // Seto bajo de boj que rodea el jardín (con dos entradas)
+      {
+        const blob = blobGeometry(2, 0.35, 8.4);
+        const hedgeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+        const step = 0.2;
+        const circumference = Math.PI * 2 * GARDEN.hedge;
+        const total = Math.floor(circumference / step);
+        const items = [];
+        for (let i = 0; i < total; i += 1) {
+          const a = (i / total) * Math.PI * 2;
+          const x = Math.cos(a) * GARDEN.hedge;
+          const z = Math.sin(a) * GARDEN.hedge;
+          if (Math.abs(x) < 0.9) continue; // entradas
+          items.push({ x, z });
+          items.push({ x: x + (random() - 0.5) * 0.2, z: z + (random() - 0.5) * 0.2, top: true });
+        }
+        const hedge = new THREE.InstancedMesh(blob, hedgeMaterial, items.length);
+        const m = new THREE.Matrix4();
+        const q = new THREE.Quaternion();
+        const color = new THREE.Color();
+        items.forEach((item, i) => {
+          const s = 0.27 + random() * 0.07;
+          q.setFromEuler(new THREE.Euler(random() * 3, random() * 3, random() * 3));
+          m.compose(new THREE.Vector3(item.x, item.top ? 0.5 : 0.26, item.z), q, new THREE.Vector3(s, s * 0.9, s));
+          hedge.setMatrixAt(i, m);
+          hedge.setColorAt(i, color.setHSL(0.27 + random() * 0.03, 0.45, 0.13 + random() * 0.05));
+        });
+        hedge.castShadow = true;
+        hedge.receiveShadow = true;
+        scene.add(hedge);
+      }
+
+      // Piedras que bordean el sendero
+      {
+        const stoneGeometry = blobGeometry(1, 0.4, 1.7);
+        const stoneMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85 });
+        const items = [];
+        for (const radius of [GARDEN.pathInner - 0.06, GARDEN.pathOuter + 0.06]) {
+          const count = Math.floor((Math.PI * 2 * radius) / 0.24);
+          for (let i = 0; i < count; i += 1) {
+            const a = (i / count) * Math.PI * 2 + random() * 0.01;
+            const x = Math.cos(a) * radius;
+            const z = Math.sin(a) * radius;
+            if (radius > GARDEN.pathInner && Math.abs(x) < 0.55) continue;
+            items.push({ x, z, a });
+          }
+        }
+        for (const side of [-1, 1]) {
+          for (let d = GARDEN.pathOuter + 0.2; d < GARDEN.hedge + 0.4; d += 0.24) {
+            items.push({ x: side * 0.57, z: d, a: Math.PI / 2 });
+            items.push({ x: side * 0.57, z: -d, a: Math.PI / 2 });
+          }
+        }
+        const stones = new THREE.InstancedMesh(stoneGeometry, stoneMaterial, items.length);
+        const m = new THREE.Matrix4();
+        const q = new THREE.Quaternion();
+        const color = new THREE.Color();
+        items.forEach((item, i) => {
+          const s = 0.075 + random() * 0.03;
+          q.setFromEuler(new THREE.Euler(0, -item.a + (random() - 0.5) * 0.4, 0));
+          m.compose(new THREE.Vector3(item.x, 0.01, item.z), q, new THREE.Vector3(s * 1.3, s * 0.55, s));
+          stones.setMatrixAt(i, m);
+          const g = 0.3 + random() * 0.16;
+          stones.setColorAt(i, color.setRGB(g, g * 0.96, g * 0.9));
+        });
+        stones.receiveShadow = true;
+        scene.add(stones);
+      }
+
+      // ---------- CÉSPED (briznas instanciadas que se mecen) ----------
+      function createGrassClumpGeometry() {
+        const positions = [], normals = [], colors = [], indices = [];
+        const blades = 7;
+        const segs = 3;
+        let base = 0;
+        const rand = seededRandom(77);
+        for (let b = 0; b < blades; b += 1) {
+          const ox = (rand() - 0.5) * 0.12;
+          const oz = (rand() - 0.5) * 0.12;
+          const h = 0.13 + rand() * 0.15;
+          const w = 0.011 + rand() * 0.007;
+          const rot = rand() * Math.PI;
+          const lean = (rand() - 0.3) * 0.5;
+          const cs = Math.cos(rot), sn = Math.sin(rot);
+          const tipTint = rand();
+          for (let s = 0; s <= segs; s += 1) {
+            const t = s / segs;
+            const y = t * h;
+            const bendOut = lean * t * t * h;
+            const half = w * (1 - t * 0.92);
+            for (const side of [-1, 1]) {
+              const lx = side * half;
+              const lz = bendOut;
+              positions.push(ox + lx * cs - lz * sn, y, oz + lx * sn + lz * cs);
+              normals.push(0, 1, 0);
+              const k = 0.35 + 0.65 * t;
+              colors.push(
+                0.1 + 0.17 * k + tipTint * 0.06 * t,
+                0.19 + 0.27 * k,
+                0.05 + 0.07 * k
+              );
+            }
+            if (s < segs) {
+              const i0 = base + s * 2;
+              indices.push(i0, i0 + 1, i0 + 2, i0 + 1, i0 + 3, i0 + 2);
+            }
+          }
+          base += (segs + 1) * 2;
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        g.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+        g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+        g.setIndex(indices);
+        return g;
+      }
+      {
+        const grassMaterial = new THREE.MeshStandardMaterial({
+          vertexColors: true,
+          roughness: 0.82,
+          side: THREE.DoubleSide
+        });
+        addWind(grassMaterial, 0.05, 0.28);
+        const clumpCount = Math.round(26000 * Q);
+        const grass = new THREE.InstancedMesh(createGrassClumpGeometry(), grassMaterial, clumpCount);
+        const m = new THREE.Matrix4();
+        const q = new THREE.Quaternion();
+        const color = new THREE.Color();
+        let placed = 0;
+        let guard = 0;
+        while (placed < clumpCount && guard < clumpCount * 8) {
+          guard += 1;
+          // más densidad cerca del centro, el campo se extiende hasta lejos
+          const r = Math.pow(random(), 0.85) * 32;
+          const a = random() * Math.PI * 2;
+          const x = Math.cos(a) * r;
+          const z = Math.sin(a) * r;
+          if (onPath(x, z)) continue;
+          const bed = inBed(x, z, -0.15);
+          if (bed !== null && random() > 0.04) continue;
+          const nearHedge = Math.abs(r - GARDEN.hedge) < 0.45;
+          if (nearHedge && random() > 0.3) continue;
+          const meadow = THREE.MathUtils.smoothstep(r, 10.5, 16);
+          const s = (0.8 + random() * 0.5) * (1 + meadow * 0.55);
+          q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), random() * Math.PI * 2);
+          m.compose(new THREE.Vector3(x, groundHeight(x, z), z), q, new THREE.Vector3(s, s * (0.85 + random() * 0.4), s));
+          grass.setMatrixAt(placed, m);
+          const v = 0.78 + random() * 0.35;
+          const dryness = fbm(x * 0.22, z * 0.22);
+          color.setRGB(v * (1 + Math.max(0, dryness - 0.6) * 0.5), v, v * 0.92);
+          grass.setColorAt(placed, color);
+          placed += 1;
+        }
+        grass.count = placed;
+        grass.receiveShadow = true;
+        scene.add(grass);
+      }
+
+      // ---------- TULIPANES ----------
+      // Colores reales de tulipán (rojos, rosas, blancos, amarillos, naranjas, morados)
+      const TULIP_COLORS = {
+        red: 0xc8102e,
+        scarlet: 0xe0362c,
+        pink: 0xef7d9a,
+        blush: 0xf6b7c6,
+        white: 0xf5efe2,
+        cream: 0xf3e3b5,
+        yellow: 0xf3c12c,
+        orange: 0xf27a22,
+        apricot: 0xf6a161,
+        purple: 0x6e2a72,
+        lilac: 0xb487c4,
+        night: 0x3e1238
+      };
+
+      function createTulipPetalGeometry(outer) {
+        const segU = 14, segV = 7;
+        const H = outer ? 1.0 : 0.93;
+        const halfW = outer ? 0.31 : 0.29;
+        const cup = outer ? 1.45 : 1.65;
+        const flick = outer ? 0.16 : 0.04;
+        const positions = [], colors = [], indices = [];
+        for (let i = 0; i <= segU; i++) {
+          const u = i / segU;
+          const w = Math.max(Math.pow(Math.sin(Math.PI * Math.pow(u, 0.8)), 0.6), 0.14 * (1 - u));
+          const R = 0.06 + 0.27 * Math.sin(Math.PI * Math.pow(u, 0.88)) + flick * Math.pow(u, 6);
+          for (let j = 0; j <= segV; j++) {
+            const v = (j / segV) * 2 - 1;
+            const y = v * w * halfW;
+            const x = R - cup * y * y;
+            const z = u * H;
+            positions.push(x, y, z);
+            // base del pétalo más oscura/verdosa, borde más luminoso
+            const base = 0.62 + 0.38 * Math.min(1, u / 0.4);
+            const edge = 1 + 0.08 * Math.pow(Math.abs(v), 2) * u;
+            const c = Math.min(1.05, base * edge);
+            colors.push(c * (u < 0.15 ? 0.92 : 1), c * (u < 0.15 ? 1.02 : 1), c * 0.97);
+          }
+        }
+        const row = segV + 1;
+        for (let i = 0; i < segU; i++) {
+          for (let j = 0; j < segV; j++) {
+            const a = i * row + j, b = a + 1, c = a + row, d = c + 1;
+            indices.push(a, c, b, b, c, d);
+          }
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+        g.setIndex(indices);
+        g.computeVertexNormals();
+        return g;
+      }
+
+      function createTulipLeafGeometry() {
+        const segU = 14, segV = 4;
+        const positions = [], colors = [], indices = [];
+        let yy = 0, zz = 0.03;
+        const du = 1 / segU;
+        for (let i = 0; i <= segU; i++) {
+          const u = i / segU;
+          if (i > 0) {
+            const theta = 0.12 + 1.15 * Math.pow(u, 1.6);
+            yy += Math.cos(theta) * du;
+            zz += Math.sin(theta) * du;
+          }
+          const w = 0.15 * Math.pow(Math.sin(Math.PI * Math.pow(u, 0.5)), 0.9) * (1 - 0.25 * u);
+          for (let j = 0; j <= segV; j++) {
+            const v = (j / segV) * 2 - 1;
+            const x = v * w;
+            const fold = -0.9 * Math.abs(x) * (1 - u * 0.5);
+            positions.push(x, yy, zz + fold);
+            const shade = 0.7 + 0.3 * u + 0.08 * (1 - Math.abs(v));
+            colors.push(shade * 0.95, shade, shade * 0.95);
+          }
+        }
+        const row = segV + 1;
+        for (let i = 0; i < segU; i++) {
+          for (let j = 0; j < segV; j++) {
+            const a = i * row + j, b = a + 1, c = a + row, d = c + 1;
+            indices.push(a, b, c, b, d, c);
+          }
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+        g.setIndex(indices);
+        g.computeVertexNormals();
+        return g;
+      }
+
+      const outerPetalGeometry = createTulipPetalGeometry(true);
+      const innerPetalGeometry = createTulipPetalGeometry(false);
+      const tulipLeafGeometry = createTulipLeafGeometry();
+      const tulipFilamentGeometry = new THREE.CylinderGeometry(0.008, 0.01, 0.4, 5);
+      tulipFilamentGeometry.rotateX(Math.PI / 2);
+      tulipFilamentGeometry.translate(0, 0, 0.2);
+      const tulipAntherGeometry = new THREE.BoxGeometry(0.03, 0.02, 0.09);
+      const pistilStemGeometry = new THREE.CylinderGeometry(0.02, 0.026, 0.38, 6);
+      pistilStemGeometry.rotateX(Math.PI / 2);
+      pistilStemGeometry.translate(0, 0, 0.19);
+      const pistilTopGeometry = new THREE.SphereGeometry(0.045, 8, 6);
+      const calyxGeometry = new THREE.SphereGeometry(0.075, 10, 8);
+      const tulipInnerGeometry = new THREE.SphereGeometry(0.17, 10, 8);
+
+      // Los colores se guardan como "materiales" ligeros: al hornear la flor
+      // cada pieza aporta su color al vértice y todo se dibuja en una sola llamada.
+      const paint = (hex) => ({ color: new THREE.Color(hex) });
+      const tulipStemPaint = paint(0x5e8f3a);
+      const tulipLeafPaint = paint(0x5a8a5c);
+      const tulipCenterPaint = paint(0x2f2418);
+      const tulipFilamentPaint = paint(0xe4dba0);
+      const tulipAntherPaint = paint(0x2b1b2a);
+      const tulipPistilPaint = paint(0xb8c860);
+
+      const flowerMaterial = new THREE.MeshPhysicalMaterial({
+        vertexColors: true,
+        roughness: 0.62,
+        metalness: 0,
+        sheen: 0.55,
+        sheenRoughness: 0.55,
+        sheenColor: new THREE.Color(0xffffff),
+        side: THREE.DoubleSide
+      });
+
+      function bakePlant(group) {
+        group.updateMatrixWorld(true);
+        const inverse = new THREE.Matrix4().copy(group.matrixWorld).invert();
+        const parts = [];
+        const relative = new THREE.Matrix4();
+        group.traverse((obj) => {
+          if (!obj.isMesh) return;
+          relative.multiplyMatrices(inverse, obj.matrixWorld);
+          let g = obj.geometry.index ? obj.geometry.toNonIndexed() : obj.geometry.clone();
+          g.applyMatrix4(relative);
+          const count = g.attributes.position.count;
+          const tint = obj.material.color;
+          const colors = new Float32Array(count * 3);
+          const source = g.attributes.color;
+          for (let i = 0; i < count; i += 1) {
+            const k = source ? source.getX(i) : 1;
+            const k2 = source ? source.getY(i) : 1;
+            const k3 = source ? source.getZ(i) : 1;
+            colors[i * 3] = tint.r * k;
+            colors[i * 3 + 1] = tint.g * k2;
+            colors[i * 3 + 2] = tint.b * k3;
+          }
+          const clean = new THREE.BufferGeometry();
+          clean.setAttribute("position", g.attributes.position);
+          clean.setAttribute("normal", g.attributes.normal);
+          clean.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+          parts.push(clean);
+        });
+        const merged = mergeGeometries(parts, false);
+        const mesh = new THREE.Mesh(merged, flowerMaterial);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        const baked = new THREE.Group();
+        baked.position.copy(group.position);
+        baked.add(mesh);
+        return baked;
+      }
+
+      function addTepals(head, material, geometry, angleOffset, openAngle, rnd) {
+        for (let i = 0; i < 3; i++) {
+          const holder = new THREE.Group();
+          holder.rotation.z = angleOffset + (i / 3) * Math.PI * 2;
+          const petal = new THREE.Mesh(geometry, material);
+          petal.rotation.y = openAngle + (rnd(i * 5 + angleOffset * 10) - 0.5) * 0.08;
+          petal.rotation.x = (rnd(i * 3 + 40) - 0.5) * 0.06;
+          const s = 0.96 + rnd(i * 9 + 5) * 0.08;
+          petal.scale.set(s, s, 0.96 + rnd(i * 4 + 2) * 0.08);
+          holder.add(petal);
+          head.add(holder);
+        }
+      }
+
+      function addTulipStamens(head, rnd) {
+        for (let i = 0; i < 6; i++) {
+          const a = (i / 6) * Math.PI * 2 + rnd(i + 60) * 0.3;
+          const holder = new THREE.Group();
+          holder.rotation.z = a;
+          const filament = new THREE.Mesh(tulipFilamentGeometry, tulipFilamentPaint);
+          filament.position.x = 0.075;
+          filament.rotation.y = 0.07 + rnd(i + 70) * 0.05;
+          holder.add(filament);
+          const anther = new THREE.Mesh(tulipAntherGeometry, tulipAntherPaint);
+          anther.position.set(0.075 + Math.sin(filament.rotation.y) * 0.4, 0, 0.4);
+          holder.add(anther);
+          head.add(holder);
+        }
+        const pStem = new THREE.Mesh(pistilStemGeometry, tulipPistilPaint);
+        const pTop = new THREE.Mesh(pistilTopGeometry, tulipPistilPaint);
+        pTop.scale.set(1, 1, 0.8);
+        pTop.position.z = 0.38;
+        head.add(pStem, pTop);
+      }
+
+      function createTulip(config) {
+        const group = new THREE.Group();
+        group.position.set(config.x, 0, config.z);
+        const rnd = (n) => {
+          const s = Math.sin(n * 127.1 + config.seed * 311.7) * 43758.5453;
+          return s - Math.floor(s);
+        };
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(config.bendX * 0.18, config.height * 0.32, config.bendZ * 0.18),
+          new THREE.Vector3(config.bendX * 0.6, config.height * 0.68, config.bendZ * 0.6),
+          new THREE.Vector3(config.bendX, config.height, config.bendZ)
+        ]);
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 14, 0.045 * config.scale, 6, false), tulipStemPaint));
+
+        const leafCount = 2 + (rnd(1) > 0.5 ? 1 : 0);
+        for (let i = 0; i < leafCount; i++) {
+          const leaf = new THREE.Mesh(tulipLeafGeometry, tulipLeafPaint);
+          leaf.position.set(0, 0.01 + i * 0.04 * config.height, 0);
+          leaf.rotation.y = config.seed * 6.28 + i * ((Math.PI * 2) / leafCount) + (rnd(i + 1) - 0.5) * 0.5;
+          leaf.rotation.x = (rnd(i + 7) - 0.5) * 0.15;
+          const len = config.height * (0.5 - i * 0.08) * (0.9 + rnd(i + 3) * 0.2);
+          leaf.scale.set(len * 1.25, len, len);
+          group.add(leaf);
         }
 
+        const head = new THREE.Group();
+        head.position.copy(curve.getPoint(1));
+        head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
+        head.scale.setScalar(config.scale);
+        const petalPaint = paint(config.color);
+        const open = config.open !== undefined ? config.open : 0.2 + rnd(11) * 0.3;
+        const calyx = new THREE.Mesh(calyxGeometry, tulipStemPaint);
+        calyx.scale.set(1, 1, 0.8);
+        calyx.position.z = -0.01;
+        head.add(calyx);
+        addTepals(head, petalPaint, outerPetalGeometry, rnd(21) * 0.2, 0.05 + open * 0.28, rnd);
+        addTepals(head, petalPaint, innerPetalGeometry, Math.PI / 3 + rnd(22) * 0.2, 0.01 + open * 0.16, rnd);
+        const inner = new THREE.Mesh(tulipInnerGeometry, tulipCenterPaint);
+        inner.scale.set(1, 1, 0.55);
+        inner.position.z = 0.03;
+        head.add(inner);
+        if (config.detail) addTulipStamens(head, rnd);
+        group.add(head);
+        return bakePlant(group);
+      }
+
+      // ---------- LIRIOS ARAÑA (Lycoris) ----------
+      function createSpiderPetalGeometry() {
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.bezierCurveTo(0.1, 0.12, 0.15, 0.58, 0.08, 1.08);
+        shape.bezierCurveTo(0.045, 1.38, 0.02, 1.55, 0, 1.64);
+        shape.bezierCurveTo(-0.02, 1.55, -0.045, 1.38, -0.08, 1.08);
+        shape.bezierCurveTo(-0.15, 0.58, -0.1, 0.12, 0, 0);
+        const geometry = new THREE.ShapeGeometry(shape, 8);
+        const position = geometry.attributes.position;
+        const colors = [];
+        for (let i = 0; i < position.count; i += 1) {
+          const y = position.getY(i);
+          const x = position.getX(i);
+          const progress = THREE.MathUtils.clamp(y / 1.64, 0, 1);
+          // el pétalo sale hacia arriba y se curva hacia atrás, como en Lycoris real
+          const curl = -progress * progress * 1.25;
+          const ripple = Math.sin(progress * Math.PI * 4) * 0.03 * progress;
+          position.setZ(i, curl + (0.1 - Math.abs(x)) * 0.1);
+          position.setX(i, x + ripple);
+          const c = 0.78 + 0.22 * Math.min(1, progress * 2);
+          colors.push(c, c, c);
+        }
+        geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+        geometry.computeVertexNormals();
+        return geometry;
+      }
+      const spiderPetalGeometry = createSpiderPetalGeometry();
+      const spiderStamenCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 0.34, 0.1),
+        new THREE.Vector3(0, 0.74, 0.4),
+        new THREE.Vector3(0, 0.92, 0.76),
+        new THREE.Vector3(0, 0.88, 1.06)
+      ]);
+      const spiderStamenGeometry = new THREE.TubeGeometry(spiderStamenCurve, 10, 0.011, 4, false);
+      const spiderAntherGeometry = new THREE.SphereGeometry(0.035, 6, 4);
+      const spiderCenterGeometry = new THREE.SphereGeometry(0.085, 8, 6);
+      const LYCORIS_COLORS = [0xd0182b, 0xe02a2d, 0xb8121f];
+      const spiderStemPaint = paint(0x4f7a32);
+      const spiderCenterPaint = paint(0x7a1a14);
+      const spiderStamenPaint = paint(0xd23a3a);
+      const spiderAntherPaint = paint(0x5a3a12);
+
+      function createSpiderLily(config) {
+        const group = new THREE.Group();
+        group.position.set(config.x, 0, config.z);
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(config.bendX * 0.18, config.height * 0.35, config.bendZ * 0.18),
+          new THREE.Vector3(config.bendX * 0.6, config.height * 0.7, config.bendZ * 0.6),
+          new THREE.Vector3(config.bendX, config.height, config.bendZ)
+        ]);
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 12, 0.03 * config.scale, 6, false), spiderStemPaint));
+        const head = new THREE.Group();
+        head.position.copy(curve.getPoint(1));
+        head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
+        head.scale.setScalar(config.scale);
+        const petalPaint = paint(config.color);
+        // Umbela: 5–6 florecillas que miran hacia afuera, cada una con 6 tépalos
+        // estrechos que se curvan hacia atrás y estambres largos que sobresalen.
+        const florets = 5 + (config.seed > 0.5 ? 1 : 0);
+        head.add(new THREE.Mesh(spiderCenterGeometry, spiderCenterPaint));
+        for (let f = 0; f < florets; f += 1) {
+          const floret = new THREE.Group();
+          floret.rotation.z = (f / florets) * Math.PI * 2 + config.seed;
+          const inner = new THREE.Group();
+          inner.rotation.x = -0.95; // inclina la flor hacia afuera
+          inner.position.y = 0.06;
+          inner.scale.setScalar(0.48);
+          for (let i = 0; i < 6; i += 1) {
+            const holder = new THREE.Group();
+            holder.rotation.z = (i / 6) * Math.PI * 2 + f;
+            const petal = new THREE.Mesh(spiderPetalGeometry, petalPaint);
+            petal.rotation.x = 0.55 + ((i * 7 + f) % 3) * 0.08;
+            petal.scale.set(0.9, 0.95, 1);
+            holder.add(petal);
+            inner.add(holder);
+          }
+          for (let i = 0; i < 6; i += 1) {
+            const holder = new THREE.Group();
+            holder.rotation.z = Math.PI / 6 + (i / 6) * Math.PI * 2;
+            const stamen = new THREE.Mesh(spiderStamenGeometry, spiderStamenPaint);
+            stamen.rotation.x = -0.35;
+            stamen.scale.setScalar(1.55);
+            holder.add(stamen);
+            const anther = new THREE.Mesh(spiderAntherGeometry, spiderAntherPaint);
+            anther.position.copy(spiderStamenCurve.getPoint(1)).multiplyScalar(1.55).applyAxisAngle(new THREE.Vector3(1, 0, 0), -0.35);
+            holder.add(anther);
+            inner.add(holder);
+          }
+          floret.add(inner);
+          head.add(floret);
+        }
+        group.add(head);
+        return bakePlant(group);
+      }
+
+      // ---------- PLANTAS INSTANCIADAS ----------
+      function plantInstances(geometry, material, items, opts = {}) {
+        const mesh = new THREE.InstancedMesh(geometry, material, items.length);
+        const m = new THREE.Matrix4();
+        const q = new THREE.Quaternion();
+        const e = new THREE.Euler();
+        const color = new THREE.Color();
+        items.forEach((item, i) => {
+          e.set(item.tiltX || 0, item.yaw || 0, item.tiltZ || 0, "YXZ");
+          q.setFromEuler(e);
+          m.compose(new THREE.Vector3(item.x, item.y || 0, item.z), q, new THREE.Vector3(item.s, item.sy || item.s, item.s));
+          mesh.setMatrixAt(i, m);
+          const v = item.shade || 1;
+          mesh.setColorAt(i, color.setRGB(v, v, v));
+        });
+        mesh.castShadow = opts.castShadow ?? false;
+        mesh.receiveShadow = true;
+        scene.add(mesh);
+        return mesh;
+      }
+
+      // ---------- DISTRIBUCIÓN DE PLANTAS ----------
+      function scatterInArea(count, spacing, test, rMin, rMax, avoid = []) {
+        const placed = [];
+        let attempts = 0;
+        while (placed.length < count && attempts < count * 120) {
+          attempts += 1;
+          const r = Math.sqrt(rMin * rMin + random() * (rMax * rMax - rMin * rMin));
+          const a = random() * Math.PI * 2;
+          const x = Math.cos(a) * r;
+          const z = Math.sin(a) * r;
+          if (!test(x, z)) continue;
+          let ok = true;
+          for (const p of placed) {
+            if ((p.x - x) ** 2 + (p.z - z) ** 2 < spacing * spacing) { ok = false; break; }
+          }
+          if (ok) {
+            for (const p of avoid) {
+              if ((p.x - x) ** 2 + (p.z - z) ** 2 < (p.spacing || spacing) ** 2) { ok = false; break; }
+            }
+          }
+          if (ok) placed.push({ x, z });
+        }
         return placed;
       }
 
-      function makeFieldFlowers(count, random) {
-        const heroAvoid = heroLayout.map((flower) => ({
-          x: flower.x,
-          z: flower.z,
-          spacing: 1.05
-        }));
-
-        return scatterPoints(count, random, {
-          minRadius: 3.4,
-          maxRadius: 8.2,
-          minSpacing: 0.98,
-          avoid: heroAvoid
-        }).map((point) => ({
-          x: point.x,
-          z: point.z,
-          height: 1.05 + random() * 1.15,
-          petals: 8 + Math.floor(random() * 5),
-          scale: 0.34 + random() * 0.34,
-          tilt: 0.34 + random() * 0.34,
-          bendX: (random() - 0.5) * 1.2,
-          bendZ: (random() - 0.5) * 1.2,
-          spin: random() * Math.PI * 2,
-          materialIndex: Math.floor(random() * tulipPetalMaterials.length),
-          seed: random(),
-          detail: false
-        }));
-      }
-
-      const random = seededRandom(20260921);
-      const fieldFlowerCount = window.matchMedia("(max-width: 640px)").matches ? 40 : 80;
-      const layout = heroLayout.concat(makeFieldFlowers(fieldFlowerCount, random));
-
-      function createSpiderLilyLayout(random) {
-        const compactViewport = window.matchMedia("(max-width: 640px)").matches;
-        const yellowAvoid = layout.map((flower) => ({
-          x: flower.x,
-          z: flower.z,
-          spacing: 1.35
-        }));
-        const clusters = compactViewport
-          ? [
-              { x: 4.1, z: -2.2, count: 8, radius: 2.5 },
-              { x: -3.7, z: 2.4, count: 6, radius: 2.2 },
-              { x: -0.5, z: -4.3, count: 5, radius: 2.0 },
-              { x: 3.0, z: 3.5, count: 4, radius: 1.8 },
-              { x: -4.5, z: -1.0, count: 4, radius: 1.8 }
-            ]
-          : [
-              { x: 4.1, z: -2.2, count: 14, radius: 3.0 },
-              { x: -3.7, z: 2.4, count: 12, radius: 2.8 },
-              { x: -0.5, z: -4.3, count: 10, radius: 2.5 },
-              { x: 3.0, z: 3.5, count: 9, radius: 2.2 },
-              { x: -4.5, z: -1.0, count: 8, radius: 2.2 },
-              { x: 0.8, z: 5.0, count: 7, radius: 2.0 },
-              { x: -2.0, z: -5.5, count: 6, radius: 1.8 }
-            ];
-        const points = [];
-
-        for (const cluster of clusters) {
-          const avoided = yellowAvoid.concat(
-            points.map((point) => ({ x: point.x, z: point.z, spacing: 0.54 }))
-          );
-          const clusterPoints = scatterPoints(cluster.count, random, {
-            centerX: cluster.x,
-            centerZ: cluster.z,
-            minRadius: 0.2,
-            maxRadius: cluster.radius,
-            minSpacing: 0.54,
-            avoid: avoided
-          }).map((point) => ({
-            ...point,
-            patchX: cluster.x,
-            patchZ: cluster.z,
-            patchRadius: cluster.radius,
-            loose: false
-          }));
-          points.push(...clusterPoints);
-        }
-
-        const loosePoints = scatterPoints(compactViewport ? 5 : 12, random, {
-          minRadius: 2.4,
-          maxRadius: 8.8,
-          minSpacing: 1.8,
-          avoid: yellowAvoid.concat(points.map((point) => ({ x: point.x, z: point.z, spacing: 1.6 })))
-        }).map((point) => ({
-          ...point,
-          patchX: point.x,
-          patchZ: point.z,
-          patchRadius: 1,
-          loose: true
-        }));
-        points.push(...loosePoints);
-
-        return points.map((point) => {
-          const distance = Math.hypot(point.x - point.patchX, point.z - point.patchZ);
-          const edge = point.loose ? 0 : Math.min(distance / point.patchRadius, 1);
-          return {
-            x: point.x,
-            z: point.z,
-            height: (point.loose ? 1.8 : 2.3) - edge * 0.85 + random() * (point.loose ? 0.35 : 0.25),
-            scale: (point.loose ? 0.55 : 0.58) + (1 - edge) * 0.24 + random() * 0.08,
-            tilt: 0.14 + edge * 0.24 + random() * 0.08,
-            bendX: (random() - 0.5) * 0.85,
-            bendZ: (random() - 0.5) * 0.85,
-            spin: random() * Math.PI * 2,
-            materialIndex: Math.floor(random() * spiderPetalMaterials.length),
-            seed: random()
-          };
+      const plants = [];
+      function registerPlant(group, phase, sway) {
+        group.scale.setScalar(0.0001);
+        scene.add(group);
+        plants.push({
+          group,
+          phase,
+          sway,
+          bloomProgress: 0,
+          bloomDelay: Math.hypot(group.position.x, group.position.z) * 0.12 + random() * 0.6,
+          bloomSpeed: 0.45 + random() * 0.35
         });
       }
 
-      const spiderLayout = createSpiderLilyLayout(random);
+      // Macizo central: anillos de color, del rojo intenso al amarillo.
+      const centerRings = [
+        { rMin: 0, rMax: 0.55, colors: ["red"], spacing: 0.38, height: [1.75, 2.05], scale: [0.44, 0.5] },
+        { rMin: 0.55, rMax: 1.35, colors: ["red", "scarlet"], spacing: 0.4, height: [1.5, 1.8], scale: [0.4, 0.46] },
+        { rMin: 1.35, rMax: 2.15, colors: ["pink", "blush"], spacing: 0.42, height: [1.25, 1.55], scale: [0.38, 0.43] },
+        { rMin: 2.15, rMax: 2.95, colors: ["white", "cream"], spacing: 0.42, height: [1.0, 1.3], scale: [0.35, 0.4] }
+      ];
+      const centerPoints = [];
+      for (const ring of centerRings) {
+        const area = Math.PI * (ring.rMax ** 2 - ring.rMin ** 2);
+        const target = Math.max(1, Math.round((area / (ring.spacing * ring.spacing * 1.25)) * (lowPower ? 0.7 : 1)));
+        const pts = scatterInArea(target, ring.spacing, () => true, ring.rMin, ring.rMax, centerPoints);
+        if (ring.rMin === 0 && pts.length === 0) pts.push({ x: 0, z: 0 });
+        for (const p of pts) {
+          centerPoints.push({ ...p, spacing: ring.spacing });
+          const r = Math.hypot(p.x, p.z);
+          const lean = 0.12 + r * 0.05;
+          const height = THREE.MathUtils.lerp(ring.height[0], ring.height[1], random());
+          const colorName = ring.colors[Math.floor(random() * ring.colors.length)];
+          const seed = random();
+          const group = createTulip({
+            x: p.x,
+            z: p.z,
+            height,
+            scale: THREE.MathUtils.lerp(ring.scale[0], ring.scale[1], random()),
+            tilt: 0.05 + random() * 0.15,
+            bendX: (p.x / (r || 1)) * lean + (random() - 0.5) * 0.12,
+            bendZ: (p.z / (r || 1)) * lean + (random() - 0.5) * 0.12,
+            spin: random() * Math.PI * 2,
+            color: TULIP_COLORS[colorName],
+            seed,
+            detail: !lowPower && ring.rMin < 1,
+            open: 0.15 + random() * 0.35
+          });
+          registerPlant(group, seed * Math.PI * 2, 1);
+        }
+      }
 
-      function createShadowTexture() {
+      // Parterres exteriores, uno por especie.
+      // Alternan lirios araña rojos con tulipanes en manchas de color: cálidos, claros y morados.
+      const bedTest = (index) => (x, z) => inBed(x, z, 0.12) === index;
+
+      function tulipBed(index, palette) {
+        const pts = scatterInArea(Math.round(85 * Q), lowPower ? 0.45 : 0.36, bedTest(index), GARDEN.bedInner, GARDEN.bedOuter);
+        for (const p of pts) {
+          const seed = random();
+          // drifts: el color depende de la posición para formar manchas naturales
+          const drift = fbm(p.x * 0.45 + index * 3, p.z * 0.45);
+          const colorName = palette[Math.min(palette.length - 1, Math.floor(drift * palette.length * 1.15))];
+          const r = Math.hypot(p.x, p.z);
+          const depth = (r - GARDEN.bedInner) / (GARDEN.bedOuter - GARDEN.bedInner);
+          registerPlant(
+            createTulip({
+              x: p.x,
+              z: p.z,
+              height: 0.95 + depth * 0.45 + random() * 0.25,
+              scale: 0.33 + random() * 0.07,
+              tilt: 0.05 + random() * 0.2,
+              bendX: (random() - 0.5) * 0.3,
+              bendZ: (random() - 0.5) * 0.3,
+              spin: random() * Math.PI * 2,
+              color: TULIP_COLORS[colorName],
+              seed,
+              detail: false
+            }),
+            seed * Math.PI * 2,
+            1.1
+          );
+        }
+      }
+
+      function lycorisBed(index) {
+        const pts = scatterInArea(Math.round(80 * Q), lowPower ? 0.46 : 0.36, bedTest(index), GARDEN.bedInner, GARDEN.bedOuter);
+        for (const p of pts) {
+          const seed = random();
+          const r = Math.hypot(p.x, p.z);
+          const depth = (r - GARDEN.bedInner) / (GARDEN.bedOuter - GARDEN.bedInner);
+          registerPlant(
+            createSpiderLily({
+              x: p.x,
+              z: p.z,
+              height: 0.85 + depth * 0.35 + random() * 0.25,
+              scale: 0.3 + random() * 0.06,
+              tilt: 0.12 + random() * 0.25,
+              bendX: (random() - 0.5) * 0.35,
+              bendZ: (random() - 0.5) * 0.35,
+              spin: random() * Math.PI * 2,
+              color: LYCORIS_COLORS[Math.floor(random() * LYCORIS_COLORS.length)],
+              seed
+            }),
+            seed * Math.PI * 2,
+            1.25
+          );
+        }
+      }
+
+      const grassClumpGeometry = createGrassClumpGeometry();
+      const coverMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, side: THREE.DoubleSide });
+      addWind(coverMaterial, 0.05, 0.45);
+
+      lycorisBed(0);
+      tulipBed(1, ["yellow", "apricot", "orange", "scarlet"]);
+      lycorisBed(2);
+      tulipBed(3, ["white", "cream", "blush", "pink"]);
+      lycorisBed(4);
+      tulipBed(5, ["lilac", "purple", "night", "pink"]);
+
+      // Cobertura verde baja entre las flores para que los parterres se vean llenos
+      {
+        const cover = scatterInArea(
+          Math.round(1500 * Q),
+          0.22,
+          (x, z) => inBed(x, z, 0.05) !== null,
+          0,
+          GARDEN.bedOuter
+        ).map((p) => ({ x: p.x, z: p.z, s: 1.2 + random() * 0.6, sy: 0.9 + random() * 0.4, yaw: random() * 6, shade: 0.6 + random() * 0.25 }));
+        plantInstances(grassClumpGeometry, coverMaterial, cover);
+      }
+
+      // ---------- POLEN Y POLVO EN EL AIRE ----------
+      const particleUniforms = {
+        uTime: { value: 0 },
+        uPixelRatio: { value: renderer.getPixelRatio() },
+        uSunDir: { value: sunSkyDir }
+      };
+      {
+        const count = Math.round(900 * Q);
+        const positions = new Float32Array(count * 3);
+        const seeds = new Float32Array(count * 3);
+        for (let i = 0; i < count; i += 1) {
+          const r = Math.sqrt(random()) * 16;
+          const a = random() * Math.PI * 2;
+          positions[i * 3] = Math.cos(a) * r;
+          positions[i * 3 + 1] = 0.2 + Math.pow(random(), 1.6) * 6;
+          positions[i * 3 + 2] = Math.sin(a) * r;
+          seeds[i * 3] = random();
+          seeds[i * 3 + 1] = random();
+          seeds[i * 3 + 2] = random();
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute("seed", new THREE.BufferAttribute(seeds, 3));
+        const material = new THREE.ShaderMaterial({
+          uniforms: particleUniforms,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          vertexShader: `
+            attribute vec3 seed;
+            uniform float uTime; uniform float uPixelRatio; uniform vec3 uSunDir;
+            varying float vBright;
+            void main() {
+              vec3 p = position;
+              float t = uTime;
+              // deriva lenta, como motas de polen llevadas por una brisa
+              p.x += sin(t * (0.07 + seed.x * 0.08) + seed.y * 6.28) * 1.1 + t * 0.05 * (seed.z - 0.3);
+              p.z += cos(t * (0.06 + seed.y * 0.07) + seed.z * 6.28) * 1.1;
+              p.y += sin(t * (0.11 + seed.z * 0.1) + seed.x * 6.28) * 0.35;
+              p.x = mod(p.x + 18.0, 36.0) - 18.0;
+              vec4 world = modelMatrix * vec4(p, 1.0);
+              vec4 mv = viewMatrix * world;
+              vec3 view = normalize(world.xyz - cameraPosition);
+              float forward = pow(max(dot(view, uSunDir), 0.0), 3.0);
+              float twinkle = 0.65 + 0.35 * sin(t * (1.2 + seed.y * 2.5) + seed.x * 40.0);
+              vBright = (0.14 + forward * 1.4) * twinkle;
+              float size = 0.022 + seed.z * 0.03;
+              gl_PointSize = size * uPixelRatio * (520.0 / -mv.z);
+              gl_Position = projectionMatrix * mv;
+            }
+          `,
+          fragmentShader: `
+            varying float vBright;
+            void main() {
+              float d = length(gl_PointCoord - 0.5);
+              float a = smoothstep(0.5, 0.0, d);
+              a *= a;
+              vec3 col = vec3(1.0, 0.86, 0.6) * vBright;
+              gl_FragColor = vec4(col, a);
+              #include <tonemapping_fragment>
+              #include <colorspace_fragment>
+            }
+          `
+        });
+        scene.add(new THREE.Points(geometry, material));
+      }
+
+      // ---------- LUCIÉRNAGAS ----------
+      {
+        const count = Math.round(70 * Q);
+        const positions = new Float32Array(count * 3);
+        const seeds = new Float32Array(count * 4);
+        for (let i = 0; i < count; i += 1) {
+          const r = 2 + Math.sqrt(random()) * 13;
+          const a = random() * Math.PI * 2;
+          positions[i * 3] = Math.cos(a) * r;
+          positions[i * 3 + 1] = 0.3 + random() * 1.6;
+          positions[i * 3 + 2] = Math.sin(a) * r;
+          seeds[i * 4] = random();
+          seeds[i * 4 + 1] = random();
+          seeds[i * 4 + 2] = random();
+          seeds[i * 4 + 3] = random();
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute("seed", new THREE.BufferAttribute(seeds, 4));
+        const material = new THREE.ShaderMaterial({
+          uniforms: particleUniforms,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          vertexShader: `
+            attribute vec4 seed;
+            uniform float uTime; uniform float uPixelRatio;
+            varying float vFlash;
+            void main() {
+              vec3 p = position;
+              float t = uTime;
+              float s1 = 0.18 + seed.x * 0.25;
+              p.x += sin(t * s1 + seed.y * 6.28) * 0.9 + sin(t * s1 * 2.3 + seed.z * 9.0) * 0.25;
+              p.z += cos(t * s1 * 0.85 + seed.z * 6.28) * 0.9 + cos(t * s1 * 1.9 + seed.w * 7.0) * 0.25;
+              p.y += sin(t * s1 * 1.4 + seed.w * 6.28) * 0.35;
+              // destello real: encendido corto, luego varios segundos apagado
+              float cycle = fract(t / (2.4 + seed.w * 3.2) + seed.x);
+              float flash = smoothstep(0.0, 0.06, cycle) * (1.0 - smoothstep(0.08, 0.3, cycle));
+              vFlash = flash * 0.95 + 0.04;
+              vec4 mv = modelViewMatrix * vec4(p, 1.0);
+              gl_PointSize = 0.42 * uPixelRatio * (300.0 / -mv.z);
+              gl_Position = projectionMatrix * mv;
+            }
+          `,
+          fragmentShader: `
+            varying float vFlash;
+            void main() {
+              float d = length(gl_PointCoord - 0.5);
+              float core = exp(-d * d * 260.0);
+              float halo = exp(-d * d * 22.0) * 0.35;
+              float a = (core + halo) * vFlash;
+              vec3 col = vec3(0.82, 1.0, 0.42) * (core * 2.6 + halo);
+              gl_FragColor = vec4(col * vFlash, clamp(a, 0.0, 1.0));
+              #include <tonemapping_fragment>
+              #include <colorspace_fragment>
+            }
+          `
+        });
+        scene.add(new THREE.Points(geometry, material));
+      }
+
+      // ---------- MARIPOSAS ----------
+      function createWingTexture(style) {
         const canvas = document.createElement("canvas");
         canvas.width = canvas.height = 256;
-        const context = canvas.getContext("2d");
-        const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
-        gradient.addColorStop(0, "rgba(0, 0, 0, 0.52)");
-        gradient.addColorStop(0.46, "rgba(0, 0, 0, 0.2)");
-        gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, 256, 256);
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.colorSpace = THREE.SRGBColorSpace;
-        return texture;
-      }
-
-      const shadowMaterial = new THREE.MeshBasicMaterial({
-        map: createShadowTexture(),
-        transparent: true,
-        depthWrite: false,
-        opacity: 0.8
-      });
-      const shadowGeometry = new THREE.PlaneGeometry(1, 1);
-
-      layout.forEach((config) => {
-        const flower = createFlower(config);
-        flowers.push(flower);
-        scene.add(flower.group);
-          flower.group.scale.setScalar(0);
-          flower.bloomProgress = 0;
-          flower.bloomSpeed = 0.25 + Math.random() * 0.5;
-
-        const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
-        shadow.rotation.x = -Math.PI / 2;
-        shadow.position.set(
-          config.x + config.bendX * 0.5,
-          0.01,
-          config.z + config.bendZ * 0.5
-        );
-        shadow.scale.setScalar(2.12 * config.scale + config.height * 0.25);
-        scene.add(shadow);
-      });
-
-      spiderLayout.forEach((config) => {
-        const flower = createSpiderLily(config);
-        flowers.push(flower);
-        scene.add(flower.group);
-          flower.group.scale.setScalar(0);
-          flower.bloomProgress = 0;
-          flower.bloomSpeed = 0.2 + Math.random() * 0.4;
-
-        const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
-        shadow.rotation.x = -Math.PI / 2;
-        shadow.position.set(
-          config.x + config.bendX * 0.5,
-          0.01,
-          config.z + config.bendZ * 0.5
-        );
-        shadow.scale.setScalar(1.7 * config.scale + config.height * 0.28);
-        scene.add(shadow);
-      });
-
-      const particleBatches = [];
-      const particleBatchCount = window.matchMedia("(max-width: 640px)").matches ? 4 : 6;
-      const particlesPerBatch = window.matchMedia("(max-width: 640px)").matches ? 28 : 46;
-
-      for (let batchIndex = 0; batchIndex < particleBatchCount; batchIndex += 1) {
-        const positions = new Float32Array(particlesPerBatch * 3);
-        const baseX = new Float32Array(particlesPerBatch);
-        const baseZ = new Float32Array(particlesPerBatch);
-        const speed = new Float32Array(particlesPerBatch);
-        const driftPhase = new Float32Array(particlesPerBatch);
-
-        for (let i = 0; i < particlesPerBatch; i += 1) {
-          const x = (random() - 0.5) * 17;
-          const y = random() * 8.2;
-          const z = (random() - 0.5) * 17;
-          positions[i * 3] = x;
-          positions[i * 3 + 1] = y;
-          positions[i * 3 + 2] = z;
-          baseX[i] = x;
-          baseZ[i] = z;
-          speed[i] = 0.32 + random() * 1.05;
-          driftPhase[i] = random() * Math.PI * 2;
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, 256, 256);
+        const drawWing = (fill, cx, cy, rx, ry, rot) => {
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(rot);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+          ctx.fillStyle = fill;
+          ctx.fill();
+          ctx.restore();
+        };
+        // ala anterior (arriba) y posterior (abajo); el borde x=0 es la bisagra
+        const fore = { cx: 110, cy: 92, rx: 112, ry: 70, rot: -0.35 };
+        const hind = { cx: 92, cy: 178, rx: 84, ry: 62, rot: 0.3 };
+        if (style.border) {
+          drawWing(style.border, fore.cx, fore.cy, fore.rx, fore.ry, fore.rot);
+          drawWing(style.border, hind.cx, hind.cy, hind.rx, hind.ry, hind.rot);
         }
-
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-        const baseSize = 0.05 + random() * 0.035;
-        const material = new THREE.PointsMaterial({
-          color: new THREE.Color().setHSL((42 + random() * 18) / 360, 0.85, 0.64),
-          size: baseSize,
-          transparent: true,
-          opacity: 0.75,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          sizeAttenuation: true
-        });
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
-        particleBatches.push({
-          geometry,
-          material,
-          baseX,
-          baseZ,
-          speed,
-          driftPhase,
-          baseSize,
-          phase: random() * Math.PI * 2,
-          pulseSpeed: 0.6 + random() * 0.9
-        });
-      }
-
-      const redParticleBatchCount = window.matchMedia("(max-width: 640px)").matches ? 1 : 2;
-      const redParticlesPerBatch = window.matchMedia("(max-width: 640px)").matches ? 20 : 30;
-
-      for (let batchIndex = 0; batchIndex < redParticleBatchCount; batchIndex += 1) {
-        const positions = new Float32Array(redParticlesPerBatch * 3);
-        const baseX = new Float32Array(redParticlesPerBatch);
-        const baseZ = new Float32Array(redParticlesPerBatch);
-        const speed = new Float32Array(redParticlesPerBatch);
-        const driftPhase = new Float32Array(redParticlesPerBatch);
-
-        for (let i = 0; i < redParticlesPerBatch; i += 1) {
-          const x = (random() - 0.5) * 17;
-          const y = random() * 8.2;
-          const z = (random() - 0.5) * 17;
-          positions[i * 3] = x;
-          positions[i * 3 + 1] = y;
-          positions[i * 3 + 2] = z;
-          baseX[i] = x;
-          baseZ[i] = z;
-          speed[i] = 0.28 + random() * 0.95;
-          driftPhase[i] = random() * Math.PI * 2;
+        const inset = style.border ? 12 : 0;
+        drawWing(style.fill, fore.cx - 6, fore.cy + 2, fore.rx - inset, fore.ry - inset, fore.rot);
+        drawWing(style.fill2 || style.fill, hind.cx - 6, hind.cy - 2, hind.rx - inset, hind.ry - inset, hind.rot);
+        if (style.veins) {
+          ctx.strokeStyle = style.veins;
+          ctx.lineWidth = 3.2;
+          for (let i = 0; i < 7; i += 1) {
+            const a = -0.9 + i * 0.32;
+            ctx.beginPath();
+            ctx.moveTo(4, 128);
+            ctx.quadraticCurveTo(80 * Math.cos(a) + 20, 128 + 60 * Math.sin(a), 200 * Math.cos(a), 128 + 140 * Math.sin(a));
+            ctx.stroke();
+          }
         }
-
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-        const hue = random() < 0.5 ? random() * 0.03 : 0.97 + random() * 0.03;
-        const baseSize = 0.052 + random() * 0.03;
-        const material = new THREE.PointsMaterial({
-          color: new THREE.Color().setHSL(hue, 0.9, 0.53),
-          size: baseSize,
-          transparent: true,
-          opacity: 0.7,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          sizeAttenuation: true
+        if (style.dots) {
+          ctx.fillStyle = style.dots;
+          for (let i = 0; i < 16; i += 1) {
+            const a = -1.2 + i * 0.16;
+            ctx.beginPath();
+            ctx.arc(110 + Math.cos(a) * 112, 128 + Math.sin(a) * 110, 3.2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        if (style.spot) {
+          ctx.fillStyle = style.spot;
+          ctx.beginPath();
+          ctx.arc(150, 70, 13, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // recorta todo lo que quede fuera de las alas
+        ctx.globalCompositeOperation = "destination-in";
+        drawWing("#000", fore.cx, fore.cy, fore.rx, fore.ry, fore.rot);
+        drawWing("#000", hind.cx, hind.cy, hind.rx, hind.ry, hind.rot);
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = 4;
+        return tex;
+      }
+      const butterflyStyles = [
+        { fill: "#e9771c", fill2: "#f08a2a", border: "#1b1310", veins: "#1b1310", dots: "#fff7ea" }, // monarca
+        { fill: "#f4f0e2", border: "#3a3530", spot: "#3a3530" }, // blanquita de la col
+        { fill: "#f2dc6b", fill2: "#efd35a", veins: "rgba(120, 100, 40, 0.5)", spot: "#e98a2a" }, // limonera
+        { fill: "#e9771c", fill2: "#f08a2a", border: "#1b1310", veins: "#1b1310", dots: "#fff7ea" }
+      ];
+      const wingGeometry = new THREE.PlaneGeometry(1, 1);
+      wingGeometry.rotateX(Math.PI / 2);
+      wingGeometry.translate(0.5, 0, 0);
+      const bodyGeometry = new THREE.CapsuleGeometry(0.07, 0.75, 3, 6);
+      bodyGeometry.rotateX(Math.PI / 2);
+      const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x1d1611, roughness: 0.7 });
+      const butterflies = [];
+      const butterflyCount = lowPower ? 4 : 7;
+      for (let i = 0; i < butterflyCount; i += 1) {
+        const style = butterflyStyles[i % butterflyStyles.length];
+        const material = new THREE.MeshStandardMaterial({
+          map: createWingTexture(style),
+          alphaTest: 0.5,
+          side: THREE.DoubleSide,
+          roughness: 0.65
         });
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
-        particleBatches.push({
-          geometry,
-          material,
-          baseX,
-          baseZ,
-          speed,
-          driftPhase,
-          baseSize,
-          phase: random() * Math.PI * 2,
-          pulseSpeed: 0.55 + random() * 0.9
+        const group = new THREE.Group();
+        const right = new THREE.Mesh(wingGeometry, material);
+        const left = new THREE.Mesh(wingGeometry, material);
+        left.scale.x = -1;
+        right.castShadow = left.castShadow = true;
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        group.add(right, left, body);
+        const size = 0.13 + random() * 0.06;
+        group.scale.setScalar(size / 0.13 * 0.15);
+        scene.add(group);
+        butterflies.push({
+          group,
+          left,
+          right,
+          cx: (random() - 0.5) * 9,
+          cz: (random() - 0.5) * 9,
+          ax: 2.5 + random() * 3.5,
+          az: 2.5 + random() * 3.5,
+          fx: 0.08 + random() * 0.06,
+          fz: 0.07 + random() * 0.06,
+          px: random() * 6.28,
+          pz: random() * 6.28,
+          baseY: 1.0 + random() * 1.2,
+          flap: 10 + random() * 5,
+          phase: random() * 100
         });
       }
-
-      function createGlowTexture() {
-        const canvas = document.createElement("canvas");
-        canvas.width = canvas.height = 128;
-        const context = canvas.getContext("2d");
-        const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
-        gradient.addColorStop(0, "rgba(255,244,196,1)");
-        gradient.addColorStop(0.35, "rgba(255,212,112,0.55)");
-        gradient.addColorStop(1, "rgba(255,180,60,0)");
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, 128, 128);
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.colorSpace = THREE.SRGBColorSpace;
-        return texture;
+      const butterflyNext = new THREE.Vector3();
+      function butterflyPosition(b, t, out) {
+        out.set(
+          b.cx + Math.sin(t * b.fx + b.px) * b.ax + Math.sin(t * b.fx * 3.1 + b.pz) * 0.6,
+          b.baseY + Math.sin(t * 0.7 + b.phase) * 0.35 + Math.sin(t * 2.3 + b.phase) * 0.08,
+          b.cz + Math.sin(t * b.fz + b.pz) * b.az + Math.cos(t * b.fz * 2.7 + b.px) * 0.6
+        );
+        return out;
       }
 
-      const glowTexture = createGlowTexture();
-      const fireflies = [];
-      const fireflyCount = window.matchMedia("(max-width: 640px)").matches ? 12 : 22;
-
-      for (let i = 0; i < fireflyCount; i += 1) {
-        const material = new THREE.SpriteMaterial({
-          map: glowTexture,
-          transparent: true,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-          opacity: 0.8
-        });
-        const sprite = new THREE.Sprite(material);
-        const scale = 0.2 + random() * 0.26;
-        sprite.scale.set(scale, scale, 1);
-
-        const angle = random() * Math.PI * 2;
-        const radius = 1.4 + random() * 6.6;
-        const baseX = Math.cos(angle) * radius;
-        const baseY = 0.35 + random() * 3.3;
-        const baseZ = Math.sin(angle) * radius;
-        sprite.position.set(baseX, baseY, baseZ);
-        scene.add(sprite);
-        fireflies.push({
-          sprite,
-          material,
-          baseX,
-          baseY,
-          baseZ,
-          phaseX: random() * Math.PI * 2,
-          phaseY: random() * Math.PI * 2,
-          phaseZ: random() * Math.PI * 2,
-          speed: 0.22 + random() * 0.45,
-          pulseSpeed: 0.7 + random() * 1.3,
-          pulsePhase: random() * Math.PI * 2
-        });
+      // ---------- POSTPROCESO ----------
+      let composer = null;
+      let bloomPass = null;
+      if (!lowPower) {
+        composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.32, 0.55, 0.88);
+        composer.addPass(bloomPass);
+        composer.addPass(new OutputPass());
       }
 
+      // ---------- CONTROLES ----------
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.06;
       controls.enablePan = false;
-      controls.rotateSpeed = 0.76;
-      controls.zoomSpeed = 0.82;
-      controls.minDistance = 4.25;
-      controls.maxDistance = 28;
-      controls.minPolarAngle = 0.2;
-      controls.maxPolarAngle = Math.PI * 0.52;
-      controls.target.set(0, 2.2, 0);
-      controls.autoRotateSpeed = 0.46;
+      controls.rotateSpeed = 0.7;
+      controls.zoomSpeed = 0.8;
+      controls.minDistance = 3.2;
+      controls.maxDistance = 21;
+      controls.minPolarAngle = 0.25;
+      controls.maxPolarAngle = Math.PI * 0.47;
+      controls.target.set(0, 0.9, 0);
+      controls.autoRotateSpeed = 0.35;
       controls.update();
 
       let isPaused = reduceMotion;
@@ -1883,11 +2333,16 @@ function createFlower(config) {
         const height = window.innerHeight;
         const aspect = width / height;
         camera.aspect = aspect;
-        camera.fov = aspect < 1 ? Math.min(84, 43 * Math.pow(1 / aspect, 0.5)) : 43;
+        camera.fov = aspect < 1 ? Math.min(78, 42 * Math.pow(1 / aspect, 0.5)) : 42;
         camera.updateProjectionMatrix();
-        controls.target.set(0, aspect < 1 ? 2.36 : 2.2, 0);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        controls.target.set(0, aspect < 1 ? 1.05 : 0.9, 0);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
         renderer.setSize(width, height);
+        particleUniforms.uPixelRatio.value = renderer.getPixelRatio();
+        if (composer) {
+          composer.setPixelRatio(renderer.getPixelRatio());
+          composer.setSize(width, height);
+        }
       }
 
       window.addEventListener("resize", resize, { passive: true });
@@ -1896,92 +2351,54 @@ function createFlower(config) {
 
       const clock = new THREE.Clock();
       let elapsed = 0;
+      let bloomClock = 0;
 
-      
-        function animate() {
-          requestAnimationFrame(animate);
-          
-          // Stop rendering if overlays are active to save massive CPU/GPU!
-          const isOverlayActive = (document.getElementById('playlistOverlay')?.classList.contains('active')) || 
-                                  (document.getElementById('musicOverlay')?.classList.contains('active'));
-          
-          if (isOverlayActive) return;
+      function animate() {
+        requestAnimationFrame(animate);
 
-          const delta = Math.min(clock.getDelta(), 0.05);
+        // No renderizar mientras el reproductor cubre la escena (ahorra batería)
+        const isOverlayActive =
+          document.getElementById("playlistOverlay")?.classList.contains("active") ||
+          document.getElementById("musicOverlay")?.classList.contains("active");
+        const delta = Math.min(clock.getDelta(), 0.05);
+        if (isOverlayActive) return;
 
         if (!isPaused) elapsed += delta;
+        bloomClock += delta;
+        windUniforms.uTime.value = elapsed;
+        particleUniforms.uTime.value = elapsed;
+        skyUniforms.uTime.value = elapsed;
 
         const wind = Math.sin(elapsed * 0.18) * 0.5 + 0.5;
-        const windAmplitude = (0.028 + 0.022 * wind) * (isPaused ? 0 : 1);
+        const windAmplitude = (0.018 + 0.016 * wind) * (isPaused ? 0 : 1);
 
-        for (const flower of flowers) {
-          const phase = flower.phase;
-          flower.group.rotation.z = Math.sin(elapsed * 0.72 + phase) * windAmplitude;
-          flower.group.rotation.x = Math.cos(elapsed * 0.55 + phase * 1.3) * windAmplitude * 0.85;
-          flower.head.rotation.z =
-            flower.spin + Math.sin(elapsed * 0.95 + phase) * 0.036 * (0.6 + wind) * (isPaused ? 0 : 1);
+        for (const plant of plants) {
+          const phase = plant.phase + plant.group.position.x * 0.35;
+          plant.group.rotation.z = Math.sin(elapsed * 1.1 + phase) * windAmplitude * plant.sway;
+          plant.group.rotation.x = Math.cos(elapsed * 0.8 + phase * 1.3) * windAmplitude * 0.7 * plant.sway;
+          if (plant.bloomProgress < 1) {
+            const t = bloomClock - plant.bloomDelay;
+            if (t > 0) {
+              plant.bloomProgress = Math.min(1, plant.bloomProgress + delta * plant.bloomSpeed);
+              const ease = 1 - Math.pow(1 - plant.bloomProgress, 3);
+              plant.group.scale.set(0.6 + ease * 0.4, Math.max(0.0001, ease), 0.6 + ease * 0.4);
+            }
+          }
         }
 
-                  for (const flower of flowers) {
-            if (flower.bloomProgress === undefined) {
-              flower.bloomProgress = 0;
-              flower.bloomSpeed = 0.3 + Math.random() * 0.4;
-              flower.group.scale.setScalar(0);
-            }
-            if (flower.bloomProgress < 1) {
-              flower.bloomProgress += delta * flower.bloomSpeed;
-              if (flower.bloomProgress > 1) flower.bloomProgress = 1;
-              const easeOut = 1 - Math.pow(1 - flower.bloomProgress, 4);
-              flower.group.scale.setScalar(easeOut);
-            }
-          }
-
-          if (!isPaused) {
-          for (const batch of particleBatches) {
-            const position = batch.geometry.attributes.position;
-            for (let i = 0; i < position.count; i += 1) {
-              let y = position.getY(i) + delta * batch.speed[i] * 0.24;
-              if (y > 8.4) y = -0.4;
-              position.setY(i, y);
-              position.setX(
-                i,
-                batch.baseX[i] + Math.sin(elapsed * 0.42 + batch.driftPhase[i]) * 0.38
-              );
-              position.setZ(
-                i,
-                batch.baseZ[i] + Math.cos(elapsed * 0.36 + batch.driftPhase[i] * 1.4) * 0.38
-              );
-            }
-            position.needsUpdate = true;
-
-            const twinkle = Math.sin(elapsed * batch.pulseSpeed + batch.phase) * 0.5 + 0.5;
-            batch.material.size = batch.baseSize * (0.7 + twinkle * 0.7);
-            batch.material.opacity = 0.5 + twinkle * 0.42;
-          }
-
-
-          for (const firefly of fireflies) {
-            firefly.sprite.position.x =
-              firefly.baseX + Math.sin(elapsed * firefly.speed + firefly.phaseX) * 0.7;
-            firefly.sprite.position.y =
-              firefly.baseY +
-              Math.sin(elapsed * firefly.speed * 0.72 + firefly.phaseY) * 0.55 +
-              Math.sin(elapsed * 0.25 + firefly.phaseY) * 0.2;
-            firefly.sprite.position.z =
-              firefly.baseZ + Math.cos(elapsed * firefly.speed + firefly.phaseZ) * 0.7;
-            firefly.material.opacity =
-              0.3 + 0.55 * Math.abs(Math.sin(elapsed * firefly.pulseSpeed + firefly.pulsePhase));
-          }
-
-          haloLight.intensity = 38 + Math.sin(elapsed * 0.8) * 4;
-          frontLight.intensity = 15 + Math.sin(elapsed * 0.8) * 3;
-          softAmber.intensity = 12 + Math.sin(elapsed * 0.6 + 1.4) * 5;
-          redAccentLight.intensity = 10 + Math.sin(elapsed * 0.7 + 2.1) * 2.8;
-          redAccentLight2.intensity = 8 + Math.sin(elapsed * 0.65 + 0.6) * 2.4;
+        for (const b of butterflies) {
+          const t = elapsed + b.phase;
+          butterflyPosition(b, t, b.group.position);
+          butterflyPosition(b, t + 0.15, butterflyNext);
+          b.group.lookAt(butterflyNext);
+          const flap = Math.sin(t * b.flap) * 0.85 + 0.25;
+          b.right.rotation.z = flap;
+          b.left.rotation.z = -flap;
         }
 
         controls.update();
-        renderer.render(scene, camera);
+        if (composer) composer.render();
+        else renderer.render(scene, camera);
       }
 
       // Music Player Logic
@@ -1989,20 +2406,8 @@ function createFlower(config) {
   {
     title: "Saber Amar",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/69F3NYS9W-Q/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/69F3NYS9W-Q/hqdefault.jpg",
     src: "assets/music/69F3NYS9W-Q.m4a"
-  },
-  {
-    title: "1% (ft. el RedCode)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/UI40eF5MbbI/hqdefault.jpg",
-    src: "assets/music/UI40eF5MbbI.m4a"
-  },
-  {
-    title: "2000 Siempre24/7 (ft. Ziferk)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
-    src: "assets/music/vFQ_0jRTUt0.m4a"
   },
   {
     title: "3 De Septiembre",
@@ -2013,247 +2418,157 @@ function createFlower(config) {
   {
     title: "369 (ft. Reboll333)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/CgtULIbzQmM/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/CgtULIbzQmM/hqdefault.jpg",
     src: "assets/music/CgtULIbzQmM.m4a"
-  },
-  {
-    title: "A las afueras",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
-  },
-  {
-    title: "A mi modo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/69F3NYS9W-Q/hqdefault.jpg",
-    src: "assets/music/69F3NYS9W-Q.m4a"
   },
   {
     title: "Al Son De La Neurona",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/x1JLel7OmTY/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/x1JLel7OmTY/hqdefault.jpg",
     src: "assets/music/x1JLel7OmTY.m4a"
   },
   {
     title: "Almas Benditas (ft. Achepe)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/qeJKadkYX40/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/qeJKadkYX40/hqdefault.jpg",
     src: "assets/music/qeJKadkYX40.m4a"
-  },
-  {
-    title: "Almas perdidas",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/qeJKadkYX40/hqdefault.jpg",
-    src: "assets/music/qeJKadkYX40.m4a"
-  },
-  {
-    title: "Antes de que acabe el día",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
     title: "Aquí",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/61hpBuw10l0/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/61hpBuw10l0/hqdefault.jpg",
     src: "assets/music/61hpBuw10l0.m4a"
   },
   {
     title: "Aunque (ft. Joes Yawar Cru)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/NdRA1EymW7s/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/NdRA1EymW7s/hqdefault.jpg",
     src: "assets/music/NdRA1EymW7s.m4a"
-  },
-  {
-    title: "Ausencia",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/_2fNpGHig6s/hqdefault.jpg",
-    src: "assets/music/_2fNpGHig6s.m4a"
   },
   {
     title: "Ayer (ft. Black Jhons One)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/DY2n2TtrEeQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/DY2n2TtrEeQ/hqdefault.jpg",
     src: "assets/music/DY2n2TtrEeQ.m4a"
-  },
-  {
-    title: "Bajo cero",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/lfCDiBAqH6s/hqdefault.jpg",
-    src: "assets/music/lfCDiBAqH6s.m4a"
   },
   {
     title: "Bambú",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/-LtINl7lFss/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/-LtINl7lFss/hqdefault.jpg",
     src: "assets/music/-LtINl7lFss.m4a"
-  },
-  {
-    title: "Bambú (COLORS / COQE)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/-LtINl7lFss/hqdefault.jpg",
-    src: "assets/music/-LtINl7lFss.m4a"
-  },
-  {
-    title: "Bipolar",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/69F3NYS9W-Q/hqdefault.jpg",
-    src: "assets/music/69F3NYS9W-Q.m4a"
   },
   {
     title: "Cada Uno a Lo Suyo (ft. El Chojin & Almanegra)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BH7fwwL2WXE/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/BH7fwwL2WXE/hqdefault.jpg",
     src: "assets/music/BH7fwwL2WXE.m4a"
   },
   {
     title: "Calle Escondida (ft. Error 999 & Mismo Perro)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/APV0rbNX1LM/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/APV0rbNX1LM/hqdefault.jpg",
     src: "assets/music/APV0rbNX1LM.m4a"
-  },
-  {
-    title: "Caminando (ft. Ziferk)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
-    src: "assets/music/vFQ_0jRTUt0.m4a"
   },
   {
     title: "Capítulo 7",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/1_NpskHPn0w/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/1_NpskHPn0w/hqdefault.jpg",
     src: "assets/music/1_NpskHPn0w.m4a"
   },
   {
     title: "Cenizas",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/V0VpYYoSN9Q/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/V0VpYYoSN9Q/hqdefault.jpg",
     src: "assets/music/V0VpYYoSN9Q.m4a"
   },
   {
     title: "Chimba De Día",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/w7ycW8-FVKo/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/w7ycW8-FVKo/hqdefault.jpg",
     src: "assets/music/w7ycW8-FVKo.m4a"
-  },
-  {
-    title: "Cicatrices (ft. Ziferk)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/d8nRUJOSdkQ/hqdefault.jpg",
-    src: "assets/music/d8nRUJOSdkQ.m4a"
   },
   {
     title: "Codigoz (ft. Guellaz & deejay Santacruz)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/9RBbP4h9Nkw/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/9RBbP4h9Nkw/hqdefault.jpg",
     src: "assets/music/9RBbP4h9Nkw.m4a"
   },
   {
     title: "Comentarios (ft. Eddy Mugre)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/SfOg_p8wJlc/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/SfOg_p8wJlc/hqdefault.jpg",
     src: "assets/music/SfOg_p8wJlc.m4a"
   },
   {
     title: "Como La Luna ft. Selene",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/JruiMsnZT-E/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/JruiMsnZT-E/hqdefault.jpg",
     src: "assets/music/JruiMsnZT-E.m4a"
   },
   {
     title: "Como Yotas",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/9erDmE2i2ws/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/9erDmE2i2ws/hqdefault.jpg",
     src: "assets/music/9erDmE2i2ws.m4a"
   },
   {
     title: "Compasión",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/d8nRUJOSdkQ/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/d8nRUJOSdkQ/hqdefault.jpg",
     src: "assets/music/d8nRUJOSdkQ.m4a"
   },
   {
     title: "Condena (ft. Achepe, Sipo One & T-Killa)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/kI3564k-AmQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/kI3564k-AmQ/hqdefault.jpg",
     src: "assets/music/kI3564k-AmQ.m4a"
   },
   {
     title: "Cuando Sea Mañana (ft. Hi-Kymon)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/KS-TxFd6uLs/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/KS-TxFd6uLs/hqdefault.jpg",
     src: "assets/music/KS-TxFd6uLs.m4a"
-  },
-  {
-    title: "Cuando ya este muerto",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
-    src: "assets/music/CFbTHc0OaEQ.m4a"
   },
   {
     title: "Cuando Ya Esté Muerto - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/CFbTHc0OaEQ/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
     src: "assets/music/CFbTHc0OaEQ.m4a"
-  },
-  {
-    title: "Cuestión de tiempo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Flp8MX2Zem0/hqdefault.jpg",
-    src: "assets/music/Flp8MX2Zem0.m4a"
   },
   {
     title: "Cura",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/E3g9izI6Rww/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/E3g9izI6Rww/hqdefault.jpg",
     src: "assets/music/E3g9izI6Rww.m4a"
   },
   {
     title: "Cuántos",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-HJxAijznMo/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/-HJxAijznMo/hqdefault.jpg",
     src: "assets/music/-HJxAijznMo.m4a"
-  },
-  {
-    title: "De pie",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/oCI-LvnibUg/hqdefault.jpg",
-    src: "assets/music/oCI-LvnibUg.m4a"
-  },
-  {
-    title: "Desahogo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/lMFRq6rzPME/hqdefault.jpg",
-    src: "assets/music/lMFRq6rzPME.m4a"
   },
   {
     title: "Desde Abajo",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/M3rW8X5otwc/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/M3rW8X5otwc/hqdefault.jpg",
     src: "assets/music/M3rW8X5otwc.m4a"
   },
   {
     title: "Efímero",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/lMFRq6rzPME/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/lMFRq6rzPME/hqdefault.jpg",
     src: "assets/music/lMFRq6rzPME.m4a"
   },
   {
     title: "El Costal",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/R4HqzKnLffI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/R4HqzKnLffI/hqdefault.jpg",
     src: "assets/music/R4HqzKnLffI.m4a"
-  },
-  {
-    title: "El de Siempre",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
     title: "El Diablo",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/PEVztafebuk/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/PEVztafebuk/hqdefault.jpg",
     src: "assets/music/PEVztafebuk.m4a"
   },
   {
@@ -2265,157 +2580,121 @@ function createFlower(config) {
   {
     title: "El Final Del Cuento",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/8HSTiZWJo9U/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/8HSTiZWJo9U/hqdefault.jpg",
     src: "assets/music/8HSTiZWJo9U.m4a"
   },
   {
     title: "El Final Del Cuento (Sesión)",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/w_hMtFoFtU4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/w_hMtFoFtU4/hqdefault.jpg",
     src: "assets/music/w_hMtFoFtU4.m4a"
   },
   {
     title: "El Final Del Cuento - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BF7smY9vh3U/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/BF7smY9vh3U/hqdefault.jpg",
     src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
     title: "El Que Duro Se Para",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/JmA4g3CFUUo/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/JmA4g3CFUUo/hqdefault.jpg",
     src: "assets/music/JmA4g3CFUUo.m4a"
   },
   {
     title: "El Redcode",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/UI40eF5MbbI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/UI40eF5MbbI/hqdefault.jpg",
     src: "assets/music/UI40eF5MbbI.m4a"
-  },
-  {
-    title: "El vacío",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Flp8MX2Zem0/hqdefault.jpg",
-    src: "assets/music/Flp8MX2Zem0.m4a"
-  },
-  {
-    title: "El vuelo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/lMFRq6rzPME/hqdefault.jpg",
-    src: "assets/music/lMFRq6rzPME.m4a"
   },
   {
     title: "En Casa Nadie Lo Espera",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/3BtkOApjHaA/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/3BtkOApjHaA/hqdefault.jpg",
     src: "assets/music/3BtkOApjHaA.m4a"
   },
   {
     title: "Entre humo y letras",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/NSc4oDPJiEw/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/NSc4oDPJiEw/hqdefault.jpg",
     src: "assets/music/NSc4oDPJiEw.m4a"
-  },
-  {
-    title: "Espejos",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XVvXuK4hZ_c/hqdefault.jpg",
-    src: "assets/music/XVvXuK4hZ_c.m4a"
   },
   {
     title: "Esperar",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/7Q5Mud5YgU0/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/7Q5Mud5YgU0/hqdefault.jpg",
     src: "assets/music/7Q5Mud5YgU0.m4a"
   },
   {
     title: "Fantasmas (ft. Lianna)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/X48zbOA3I8I/hqdefault.jpg",
     src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
     title: "Felicidad",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/DDok_Ut69iE/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/DDok_Ut69iE/hqdefault.jpg",
     src: "assets/music/DDok_Ut69iE.m4a"
-  },
-  {
-    title: "Flores muertas",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
-    src: "assets/music/CFbTHc0OaEQ.m4a"
-  },
-  {
-    title: "Fuego",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/-WPPMOE2jeE/hqdefault.jpg",
-    src: "assets/music/-WPPMOE2jeE.m4a"
-  },
-  {
-    title: "Girasoles",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/d8nRUJOSdkQ/hqdefault.jpg",
-    src: "assets/music/d8nRUJOSdkQ.m4a"
   },
   {
     title: "Guayacanes y Hortensias (ft. Oblivion's Mighty Trash & Cheche Cole)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/3W0sJrXRFYI/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/3W0sJrXRFYI/hqdefault.jpg",
     src: "assets/music/3W0sJrXRFYI.m4a"
   },
   {
     title: "Hablar Con Actos",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/GGRiH-zBrcI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/GGRiH-zBrcI/hqdefault.jpg",
     src: "assets/music/GGRiH-zBrcI.m4a"
   },
   {
     title: "Hasta Las Yemas - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/ybxVczv73Ac/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/ybxVczv73Ac/hqdefault.jpg",
     src: "assets/music/ybxVczv73Ac.m4a"
   },
   {
     title: "I Don't Know",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/9IHmdI8eKIc/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/9IHmdI8eKIc/hqdefault.jpg",
     src: "assets/music/9IHmdI8eKIc.m4a"
   },
   {
     title: "Igual",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/-cG1v34b62c/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/-cG1v34b62c/hqdefault.jpg",
     src: "assets/music/-cG1v34b62c.m4a"
   },
   {
     title: "Infierno",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/VPquW0K-goQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/VPquW0K-goQ/hqdefault.jpg",
     src: "assets/music/VPquW0K-goQ.m4a"
   },
   {
     title: "Inquebrantable",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/-sVab-CQ7kE/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/-sVab-CQ7kE/hqdefault.jpg",
     src: "assets/music/-sVab-CQ7kE.m4a"
   },
   {
     title: "Intuición",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/751tzWp2X08/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/751tzWp2X08/hqdefault.jpg",
     src: "assets/music/751tzWp2X08.m4a"
   },
   {
     title: "Karma",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XPrirTJ1_A4/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/XPrirTJ1_A4/hqdefault.jpg",
     src: "assets/music/XPrirTJ1_A4.m4a"
   },
   {
     title: "La 70 (ft. Deuxer, Dexta Small & DaStreetGenie)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/nBw0-Xu2nxQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/nBw0-Xu2nxQ/hqdefault.jpg",
     src: "assets/music/nBw0-Xu2nxQ.m4a"
   },
   {
@@ -2425,22 +2704,10 @@ function createFlower(config) {
     src: "assets/music/9rqgrKpUmuA.m4a"
   },
   {
-    title: "La ciudad del humo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Ls1cOqGf7oI/hqdefault.jpg",
-    src: "assets/music/Ls1cOqGf7oI.m4a"
-  },
-  {
     title: "La culpa",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/3axEOIr1OmU/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/3axEOIr1OmU/hqdefault.jpg",
     src: "assets/music/3axEOIr1OmU.m4a"
-  },
-  {
-    title: "La Cura",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/E3g9izI6Rww/hqdefault.jpg",
-    src: "assets/music/E3g9izI6Rww.m4a"
   },
   {
     title: "La Intuición",
@@ -2451,38 +2718,32 @@ function createFlower(config) {
   {
     title: "La Luz",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Ls1cOqGf7oI/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Ls1cOqGf7oI/hqdefault.jpg",
     src: "assets/music/Ls1cOqGf7oI.m4a"
   },
   {
     title: "La Misma Cara",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/ak9GNPBxK94/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/ak9GNPBxK94/hqdefault.jpg",
     src: "assets/music/ak9GNPBxK94.m4a"
   },
   {
     title: "La Moral (ft. Pielroja & Alka Produce)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/6l8m-nj8eZM/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/6l8m-nj8eZM/hqdefault.jpg",
     src: "assets/music/6l8m-nj8eZM.m4a"
   },
   {
     title: "La Música",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Um-T2wsssag/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Um-T2wsssag/hqdefault.jpg",
     src: "assets/music/Um-T2wsssag.m4a"
   },
   {
     title: "La Papa Y La Leña",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/7u2zY4WVwD4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/7u2zY4WVwD4/hqdefault.jpg",
     src: "assets/music/7u2zY4WVwD4.m4a"
-  },
-  {
-    title: "Laberinto",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BZw-GbuR4UI/hqdefault.jpg",
-    src: "assets/music/BZw-GbuR4UI.m4a"
   },
   {
     title: "Las Calles Son Clases",
@@ -2493,98 +2754,62 @@ function createFlower(config) {
   {
     title: "Las Ganas",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/PHA_N_LXjyc/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/PHA_N_LXjyc/hqdefault.jpg",
     src: "assets/music/PHA_N_LXjyc.m4a"
   },
   {
     title: "Le Decían Que No Podía",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/eXRfRwkYZEs/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/eXRfRwkYZEs/hqdefault.jpg",
     src: "assets/music/eXRfRwkYZEs.m4a"
-  },
-  {
-    title: "Lejos de casa",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/x77asaCh5V8/hqdefault.jpg",
-    src: "assets/music/x77asaCh5V8.m4a"
   },
   {
     title: "Lejos De Falsos",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/x77asaCh5V8/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/x77asaCh5V8/hqdefault.jpg",
     src: "assets/music/x77asaCh5V8.m4a"
   },
   {
     title: "Llegan Se Van",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/90UfJKzBBOA/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/90UfJKzBBOA/hqdefault.jpg",
     src: "assets/music/90UfJKzBBOA.m4a"
   },
   {
     title: "Lobos (ft. Diavlitx)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/toaKAHcAa1o/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/toaKAHcAa1o/hqdefault.jpg",
     src: "assets/music/toaKAHcAa1o.m4a"
   },
   {
     title: "Los Dueños",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/CUZA9tM1x9c/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/CUZA9tM1x9c/hqdefault.jpg",
     src: "assets/music/CUZA9tM1x9c.m4a"
   },
   {
     title: "Los Petit Fellas",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/w_P2krK9z4U/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/w_P2krK9z4U/hqdefault.jpg",
     src: "assets/music/w_P2krK9z4U.m4a"
-  },
-  {
-    title: "Luna llena",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/JruiMsnZT-E/hqdefault.jpg",
-    src: "assets/music/JruiMsnZT-E.m4a"
-  },
-  {
-    title: "Lágrimas",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
-    src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
     title: "Madrugadas ft. Gona",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/Xysz1kxL5qQ/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/Xysz1kxL5qQ/hqdefault.jpg",
     src: "assets/music/Xysz1kxL5qQ.m4a"
-  },
-  {
-    title: "Mala fama",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
     title: "Maldito Siglo Xxi",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/gcVNFjhaIdI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/gcVNFjhaIdI/hqdefault.jpg",
     src: "assets/music/gcVNFjhaIdI.m4a"
   },
   {
     title: "María / Aroma de Jardín (ft. Charles Ans & BCN)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/gCRfJuJGdcw/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/gCRfJuJGdcw/hqdefault.jpg",
     src: "assets/music/gCRfJuJGdcw.m4a"
-  },
-  {
-    title: "Melancolía",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
-    src: "assets/music/X48zbOA3I8I.m4a"
-  },
-  {
-    title: "Memorias",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/VnznSUg2rT4/hqdefault.jpg",
-    src: "assets/music/VnznSUg2rT4.m4a"
   },
   {
     title: "Menos Plata Más Amor",
@@ -2595,121 +2820,85 @@ function createFlower(config) {
   {
     title: "Mi Loma Natal",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/n8S4xAAQ27w/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/n8S4xAAQ27w/hqdefault.jpg",
     src: "assets/music/n8S4xAAQ27w.m4a"
-  },
-  {
-    title: "Mi Rap",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/UY11Lczb2MA/hqdefault.jpg",
-    src: "assets/music/UY11Lczb2MA.m4a"
   },
   {
     title: "Mi Rap - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/UY11Lczb2MA/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/UY11Lczb2MA/hqdefault.jpg",
     src: "assets/music/UY11Lczb2MA.m4a"
   },
   {
     title: "Mujer Sin Nombre",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/yOX7cfNhdzQ/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/yOX7cfNhdzQ/hqdefault.jpg",
     src: "assets/music/yOX7cfNhdzQ.m4a"
   },
   {
     title: "Mujeres",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/PIQJl1y5WMg/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/PIQJl1y5WMg/hqdefault.jpg",
     src: "assets/music/PIQJl1y5WMg.m4a"
   },
   {
     title: "Máscaras",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/HIxEaIBSiTI/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/HIxEaIBSiTI/hqdefault.jpg",
     src: "assets/music/HIxEaIBSiTI.m4a"
   },
   {
     title: "Nada",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/XQWKBRuUWw4/maxresdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
-  },
-  {
-    title: "Nada es para siempre",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/XQWKBRuUWw4/hqdefault.jpg",
     src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
     title: "No Copy",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/B8sAqa7dEq8/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/B8sAqa7dEq8/hqdefault.jpg",
     src: "assets/music/B8sAqa7dEq8.m4a"
   },
   {
     title: "No Critique A Los Demás",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/epQfTYf9Q2c/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/epQfTYf9Q2c/hqdefault.jpg",
     src: "assets/music/epQfTYf9Q2c.m4a"
-  },
-  {
-    title: "No hay regreso",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/90UfJKzBBOA/hqdefault.jpg",
-    src: "assets/music/90UfJKzBBOA.m4a"
   },
   {
     title: "No Sabía Que Sabía",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/RpfWsx45Rgo/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/RpfWsx45Rgo/hqdefault.jpg",
     src: "assets/music/RpfWsx45Rgo.m4a"
   },
   {
     title: "No Somos Iguales",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/lfCDiBAqH6s/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/lfCDiBAqH6s/hqdefault.jpg",
     src: "assets/music/lfCDiBAqH6s.m4a"
-  },
-  {
-    title: "Nostalgia",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Flp8MX2Zem0/hqdefault.jpg",
-    src: "assets/music/Flp8MX2Zem0.m4a"
-  },
-  {
-    title: "Nunca jamás (ft. Alka Produce)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
-  },
-  {
-    title: "Ojos rojos",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/6l8m-nj8eZM/hqdefault.jpg",
-    src: "assets/music/6l8m-nj8eZM.m4a"
   },
   {
     title: "Osama",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BWvIHzlaH8o/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/BWvIHzlaH8o/hqdefault.jpg",
     src: "assets/music/BWvIHzlaH8o.m4a"
   },
   {
     title: "Oscuridad",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/gNPJMEoP6KI/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/gNPJMEoP6KI/hqdefault.jpg",
     src: "assets/music/gNPJMEoP6KI.m4a"
   },
   {
     title: "Otoño",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/IzSdLJxsfmc/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/IzSdLJxsfmc/hqdefault.jpg",
     src: "assets/music/IzSdLJxsfmc.m4a"
   },
   {
     title: "Otra noche",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/UUUoEUUfp8s/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/UUUoEUUfp8s/hqdefault.jpg",
     src: "assets/music/UUUoEUUfp8s.m4a"
   },
   {
@@ -2727,158 +2916,116 @@ function createFlower(config) {
   {
     title: "Perder",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/oCI-LvnibUg/maxresdefault.jpg",
-    src: "assets/music/oCI-LvnibUg.m4a"
-  },
-  {
-    title: "Perdón",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/oCI-LvnibUg/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/oCI-LvnibUg/hqdefault.jpg",
     src: "assets/music/oCI-LvnibUg.m4a"
   },
   {
     title: "Perro Fino",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/fVolstaflyo/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/fVolstaflyo/hqdefault.jpg",
     src: "assets/music/fVolstaflyo.m4a"
   },
   {
     title: "Pon Fin - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Kq-CIz4-FR8/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Kq-CIz4-FR8/hqdefault.jpg",
     src: "assets/music/Kq-CIz4-FR8.m4a"
   },
   {
     title: "Por Si Los Días No Vuelven ft. Sharif",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/Zv4I8_Fg2G4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/Zv4I8_Fg2G4/hqdefault.jpg",
     src: "assets/music/Zv4I8_Fg2G4.m4a"
   },
   {
     title: "Que den la vuelta (ft. Jam Block Jr & Hi-Kymon)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/9yBUd8iS5uc/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/9yBUd8iS5uc/hqdefault.jpg",
     src: "assets/music/9yBUd8iS5uc.m4a"
   },
   {
     title: "Que Nada Te Aplaste",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/hqdefault.jpg",
     src: "assets/music/-WPPMOE2jeE.m4a"
   },
   {
     title: "Quimera",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/3N9Q8XIqhUo/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/3N9Q8XIqhUo/hqdefault.jpg",
     src: "assets/music/3N9Q8XIqhUo.m4a"
   },
   {
     title: "Qué Más Da (ft. Melodico & La Loquera)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/WdGZ4LOn0lQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/WdGZ4LOn0lQ/hqdefault.jpg",
     src: "assets/music/WdGZ4LOn0lQ.m4a"
   },
   {
     title: "Rapero Porque Quiero",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/BbTgoluQyu4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/BbTgoluQyu4/hqdefault.jpg",
     src: "assets/music/BbTgoluQyu4.m4a"
   },
   {
     title: "Ratas y Ladys (ft. Eddy Mugre)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/7TpeooPW_0Q/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/7TpeooPW_0Q/hqdefault.jpg",
     src: "assets/music/7TpeooPW_0Q.m4a"
   },
   {
     title: "Realidad Mental - Lo Que Más Importa",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/VnznSUg2rT4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/VnznSUg2rT4/hqdefault.jpg",
     src: "assets/music/VnznSUg2rT4.m4a"
   },
   {
     title: "Realidad Mental - Vivir El Tiempo",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/WJnumOjQEn8/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/WJnumOjQEn8/hqdefault.jpg",
     src: "assets/music/WJnumOjQEn8.m4a"
   },
   {
     title: "Realidad Mental - Ya Verás",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/kiTKGKjjS2I/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/kiTKGKjjS2I/hqdefault.jpg",
     src: "assets/music/kiTKGKjjS2I.m4a"
-  },
-  {
-    title: "Renacer",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/fVolstaflyo/hqdefault.jpg",
-    src: "assets/music/fVolstaflyo.m4a"
-  },
-  {
-    title: "Ruido",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
-    src: "assets/music/vFQ_0jRTUt0.m4a"
   },
   {
     title: "Sabor",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Iv_hbcKlH4E/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Iv_hbcKlH4E/hqdefault.jpg",
     src: "assets/music/Iv_hbcKlH4E.m4a"
   },
   {
     title: "Salmo",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/DdylyF4gWPc/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/DdylyF4gWPc/hqdefault.jpg",
     src: "assets/music/DdylyF4gWPc.m4a"
   },
   {
     title: "Ser feliz es gratis",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/KHQuqfbcII0/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/KHQuqfbcII0/hqdefault.jpg",
     src: "assets/music/KHQuqfbcII0.m4a"
   },
   {
     title: "Si No Estas",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/qAsy_UP0GoI/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/qAsy_UP0GoI/hqdefault.jpg",
     src: "assets/music/qAsy_UP0GoI.m4a"
-  },
-  {
-    title: "Si te vas",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
-    src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
     title: "Sigo aquí (ft. Ali A.K.A Mind)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/giOWXLeBMbg/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/giOWXLeBMbg/hqdefault.jpg",
     src: "assets/music/giOWXLeBMbg.m4a"
-  },
-  {
-    title: "Sin anestesia",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
     title: "Sin Excusas (ft. Santa RM & Alka Produce)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BYBYorRK_h8/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/BYBYorRK_h8/hqdefault.jpg",
     src: "assets/music/BYBYorRK_h8.m4a"
-  },
-  {
-    title: "Sin miedo (ft. Kazu)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/OpJmg6eVGAs/hqdefault.jpg",
-    src: "assets/music/OpJmg6eVGAs.m4a"
-  },
-  {
-    title: "Sin mirar atrás",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
-    src: "assets/music/CFbTHc0OaEQ.m4a"
   },
   {
     title: "Sin Visajes",
@@ -2889,20 +3036,14 @@ function createFlower(config) {
   {
     title: "Solitario Soldado",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/-RDWIsrVt0s/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/-RDWIsrVt0s/hqdefault.jpg",
     src: "assets/music/-RDWIsrVt0s.m4a"
   },
   {
     title: "Solo Es Una",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/XVvXuK4hZ_c/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/XVvXuK4hZ_c/hqdefault.jpg",
     src: "assets/music/XVvXuK4hZ_c.m4a"
-  },
-  {
-    title: "Sombras (ft. Anyi)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/yOX7cfNhdzQ/hqdefault.jpg",
-    src: "assets/music/yOX7cfNhdzQ.m4a"
   },
   {
     title: "Sus Mentiras",
@@ -2913,105 +3054,70 @@ function createFlower(config) {
   {
     title: "Tarde Que Temprano",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/GIS450UJbMQ/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/GIS450UJbMQ/hqdefault.jpg",
     src: "assets/music/GIS450UJbMQ.m4a"
   },
   {
     title: "Tema Explícito ft. Joes Ywc",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/vFQ_0jRTUt0/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
     src: "assets/music/vFQ_0jRTUt0.m4a"
-  },
-  {
-    title: "Tiempo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/WJnumOjQEn8/hqdefault.jpg",
-    src: "assets/music/WJnumOjQEn8.m4a"
   },
   {
     title: "Tierra Santa",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/BZw-GbuR4UI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/BZw-GbuR4UI/hqdefault.jpg",
     src: "assets/music/BZw-GbuR4UI.m4a"
-  },
-  {
-    title: "Todo es prestado",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
-  },
-  {
-    title: "Todo o nada",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
     title: "Tío Armando",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/lAoj2JTQtbQ/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/lAoj2JTQtbQ/hqdefault.jpg",
     src: "assets/music/lAoj2JTQtbQ.m4a"
   },
   {
     title: "Tú Tienes El Son",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/_2fNpGHig6s/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/_2fNpGHig6s/hqdefault.jpg",
     src: "assets/music/_2fNpGHig6s.m4a"
   },
   {
     title: "Tú Tienes El Son ft. Charles",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/0c4j9hoMYWA/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/0c4j9hoMYWA/hqdefault.jpg",
     src: "assets/music/0c4j9hoMYWA.m4a"
-  },
-  {
-    title: "Un día a la vez",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
-  },
-  {
-    title: "Un minuto",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
     title: "Un Pelito Y Un Tamal",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/A1eu6Spaz3g/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/A1eu6Spaz3g/hqdefault.jpg",
     src: "assets/music/A1eu6Spaz3g.m4a"
   },
   {
     title: "Vivir el Tiempo",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Ay9h07Z2vcI/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Ay9h07Z2vcI/hqdefault.jpg",
     src: "assets/music/Ay9h07Z2vcI.m4a"
   },
   {
     title: "Volando bajo (ft. Ruzto)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/6ovduwVuclc/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/6ovduwVuclc/hqdefault.jpg",
     src: "assets/music/6ovduwVuclc.m4a"
-  },
-  {
-    title: "Volver a empezar",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
-    src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
     title: "Zenit",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/scSt7nVbeC8/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/scSt7nVbeC8/hqdefault.jpg",
     src: "assets/music/scSt7nVbeC8.m4a"
   },
   {
     title: "Éter",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/3BcgyeNGCJ4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/3BcgyeNGCJ4/hqdefault.jpg",
     src: "assets/music/3BcgyeNGCJ4.m4a"
-  },];
+  }
+      ];
 
       let currentSongIndex = 0;
       let isPlaying = false;
@@ -3052,6 +3158,37 @@ function createFlower(config) {
       const durationTimeEl = document.getElementById('durationTime');
       const playlistItemsContainer = document.getElementById('playlistItems');
       const playlistSearch = document.getElementById('playlistSearch');
+      const playlistCount = document.getElementById('playlistCount');
+      const nowPlayingBtn = document.getElementById('nowPlayingBtn');
+      const nowPlayingCover = document.getElementById('nowPlayingCover');
+      const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+      const STORAGE_KEY = 'jardin-musica';
+
+      // Recordar la última canción y el punto donde iba (si el navegador lo permite)
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ src: playlist[currentSongIndex].src, time: audioPlayer.currentTime || 0 }));
+        } catch (e) {}
+      }
+      function readState() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        } catch (e) {
+          return null;
+        }
+      }
+      // Búsqueda sin importar tildes ni mayúsculas
+      const normalize = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+      function updateNowPlaying() {
+        if (!nowPlayingBtn) return;
+        const song = playlist[currentSongIndex];
+        nowPlayingTitle.textContent = song.title;
+        nowPlayingCover.style.backgroundImage = 'url("' + song.cover + '")';
+        const started = !audioPlayer.paused || audioPlayer.currentTime > 0;
+        nowPlayingBtn.classList.toggle('visible', started);
+        nowPlayingBtn.classList.toggle('playing', !audioPlayer.paused);
+      }
 
       const musicOverlay = document.getElementById('musicOverlay');
       const closeMusicBtn = document.getElementById('closeMusicBtn');
@@ -3099,10 +3236,10 @@ function loadSong(index) {
             ]
           });
 
-          navigator.mediaSession.setActionHandler('play', function() { togglePlay(); });
-          navigator.mediaSession.setActionHandler('pause', function() { togglePlay(); });
+          navigator.mediaSession.setActionHandler('play', function() { playAudio(); });
+          navigator.mediaSession.setActionHandler('pause', function() { audioPlayer.pause(); });
           navigator.mediaSession.setActionHandler('previoustrack', function() { prevSong(); });
-          navigator.mediaSession.setActionHandler('nexttrack', function() { nextSong(); });
+          navigator.mediaSession.setActionHandler('nexttrack', function() { nextSong(false); });
         }
         updateActivePlaylistSong();
         }
@@ -3118,11 +3255,17 @@ function loadSong(index) {
           });
         }
 
+      function playAudio() {
+        // play() devuelve una promesa que falla si el navegador bloquea el audio
+        const attempt = audioPlayer.play();
+        if (attempt && attempt.catch) attempt.catch(() => updatePlayState());
+      }
+
       function togglePlay() {
-        if (isPlaying) {
-          audioPlayer.pause();
+        if (audioPlayer.paused) {
+          playAudio();
         } else {
-          audioPlayer.play();
+          audioPlayer.pause();
         }
       }
 
@@ -3136,20 +3279,26 @@ function loadSong(index) {
           playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
           albumArt.classList.add('playing');
         }
+        updateNowPlaying();
+        saveState();
       }
 
       function prevSong() {
         const idx = (currentSongIndex - 1 + playlist.length) % playlist.length;
+        const wasPlaying = !audioPlayer.paused;
         loadSong(idx);
-        if (isPlaying) audioPlayer.play();
+        if (wasPlaying) playAudio();
       }
 
-            function nextSong() {
-        if (isLoop) {
+      function nextSong(fromEnded) {
+        // Repetir solo aplica cuando la canción termina sola; el botón siempre avanza.
+        if (isLoop && fromEnded === true) {
           audioPlayer.currentTime = 0;
-          audioPlayer.play();
+          playAudio();
           return;
         }
+        // Al terminar, el navegador ya marcó el audio como pausado: hay que seguir sonando.
+        const wasPlaying = fromEnded === true || !audioPlayer.paused;
         let idx;
         if (isShuffle) {
           idx = Math.floor(Math.random() * playlist.length);
@@ -3160,15 +3309,14 @@ function loadSong(index) {
           idx = (currentSongIndex + 1) % playlist.length;
         }
         loadSong(idx);
-        if (isPlaying) audioPlayer.play();
+        if (wasPlaying) playAudio();
       }
 
       function updateProgress(e) {
         const duration = e.target.duration;
         const currentTime = e.target.currentTime;
         if(isNaN(duration)) return;
-        const progressPercent = (currentTime / duration) * 100;
-        progressBar.style.width = progressPercent + '%';
+        if (!seeking) progressBar.style.width = (currentTime / duration) * 100 + '%';
 
         let currentMins = Math.floor(currentTime / 60);
         let currentSecs = Math.floor(currentTime % 60);
@@ -3181,29 +3329,46 @@ function loadSong(index) {
         durationTimeEl.textContent = durationMins + ':' + durationSecs;
       }
 
-      function setProgress(e) {
-        const width = this.clientWidth;
-        const clickX = e.offsetX;
-        const duration = audioPlayer.duration;
-        audioPlayer.currentTime = (clickX / width) * duration;
+      // Tocar o arrastrar la barra (también con el dedo) para mover la canción
+      let seeking = false;
+      function seekTo(clientX) {
+        const rect = progressContainer.getBoundingClientRect();
+        const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+        progressBar.style.width = ratio * 100 + '%';
+        if (isFinite(audioPlayer.duration)) audioPlayer.currentTime = ratio * audioPlayer.duration;
       }
 
       function renderPlaylist(filter) {
         filter = filter || "";
         if(!playlistItemsContainer) return;
         playlistItemsContainer.innerHTML = '';
+        const query = normalize(filter.trim());
+        let shown = 0;
         playlist.forEach((song, index) => {
-          if (song.title.toLowerCase().includes(filter.toLowerCase()) || song.artist.toLowerCase().includes(filter.toLowerCase())) {
+          if (normalize(song.title).includes(query) || normalize(song.artist).includes(query)) {
+            shown += 1;
             const li = document.createElement('li');
             li.className = 'playlist-item ' + (index === currentSongIndex ? 'active-song' : '');
               li.dataset.index = index;
-            li.innerHTML = '<div class="playlist-item-img" style="background-image: url(\'' + song.cover + '\')"></div><div class="playlist-item-info"><p class="playlist-item-title">' + song.title + '</p><p class="playlist-item-artist">' + song.artist + '</p></div>';
+            const img = document.createElement('div');
+            img.className = 'playlist-item-img';
+            img.style.backgroundImage = 'url("' + song.cover + '")';
+            const info = document.createElement('div');
+            info.className = 'playlist-item-info';
+            const titleEl = document.createElement('p');
+            titleEl.className = 'playlist-item-title';
+            titleEl.textContent = song.title;
+            const artistEl = document.createElement('p');
+            artistEl.className = 'playlist-item-artist';
+            artistEl.textContent = song.artist;
+            info.append(titleEl, artistEl);
+            li.append(img, info);
             li.addEventListener('click', () => {
                 if (index !== currentSongIndex || audioPlayer.paused) {
                   if (index !== currentSongIndex) {
                     loadSong(index);
                   }
-                  audioPlayer.play();
+                  playAudio();
                 }
                 document.getElementById('playlistOverlay').classList.remove('active');
                 document.getElementById('musicOverlay').classList.add('active');
@@ -3211,6 +3376,15 @@ function loadSong(index) {
             playlistItemsContainer.appendChild(li);
           }
         });
+        if (playlistCount) {
+          playlistCount.textContent = query ? shown + ' de ' + playlist.length + ' canciones' : playlist.length + ' canciones';
+        }
+        if (shown === 0) {
+          const empty = document.createElement('li');
+          empty.className = 'playlist-empty';
+          empty.textContent = 'No encontré esa canción';
+          playlistItemsContainer.appendChild(empty);
+        }
       }
 
       
@@ -3235,6 +3409,9 @@ function loadSong(index) {
           audioPlayer.addEventListener('canplay', () => {
             if (loadingSpinner) loadingSpinner.classList.remove('active');
           });
+          audioPlayer.addEventListener('loadedmetadata', () => {
+            if (loadingSpinner && audioPlayer.paused) loadingSpinner.classList.remove('active');
+          });
           audioPlayer.addEventListener('error', () => {
             if (loadingSpinner) loadingSpinner.classList.remove('active');
           });
@@ -3244,7 +3421,7 @@ function loadSong(index) {
         audioPlayer.addEventListener('play', updatePlayState);
         audioPlayer.addEventListener('pause', updatePlayState);
         audioPlayer.addEventListener('timeupdate', updateProgress);
-        audioPlayer.addEventListener('ended', nextSong);
+        audioPlayer.addEventListener('ended', () => nextSong(true));
         audioPlayer.addEventListener('loadedmetadata', () => {
           let durationMins = Math.floor(audioPlayer.duration / 60);
           let durationSecs = Math.floor(audioPlayer.duration % 60);
@@ -3255,12 +3432,45 @@ function loadSong(index) {
         });
       }
       if(prevBtn) prevBtn.addEventListener('click', prevSong);
-      if(nextBtn) nextBtn.addEventListener('click', nextSong);
-      if(progressContainer) progressContainer.addEventListener('click', setProgress);
+      if(nextBtn) nextBtn.addEventListener('click', () => nextSong(false));
+      if (progressContainer) {
+        progressContainer.addEventListener('pointerdown', (e) => {
+          seeking = true;
+          progressContainer.setPointerCapture(e.pointerId);
+          seekTo(e.clientX);
+        });
+        progressContainer.addEventListener('pointermove', (e) => { if (seeking) seekTo(e.clientX); });
+        const endSeek = () => { seeking = false; saveState(); };
+        progressContainer.addEventListener('pointerup', endSeek);
+        progressContainer.addEventListener('pointercancel', endSeek);
+      }
+      if (nowPlayingBtn) {
+        nowPlayingBtn.addEventListener('click', () => musicOverlay.classList.add('active'));
+      }
+      // Barra espaciadora: reproducir/pausar mientras el reproductor está abierto
+      document.addEventListener('keydown', (e) => {
+        if (e.code !== 'Space' || !musicOverlay.classList.contains('active')) return;
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON')) return;
+        e.preventDefault();
+        togglePlay();
+      });
+      let lastSaved = 0;
+      audioPlayer.addEventListener('timeupdate', () => {
+        if (Date.now() - lastSaved > 5000) { lastSaved = Date.now(); saveState(); }
+      });
       
       
       renderPlaylist("");
-      loadSong(0);
+      // Retoma la última canción escuchada, en el mismo punto
+      const saved = readState();
+      const savedIndex = saved ? playlist.findIndex((song) => song.src === saved.src) : -1;
+      loadSong(savedIndex >= 0 ? savedIndex : 0);
+      if (savedIndex >= 0 && saved.time > 0) {
+        audioPlayer.addEventListener('loadedmetadata', () => {
+          if (audioPlayer.currentTime === 0 && saved.time < audioPlayer.duration) audioPlayer.currentTime = saved.time;
+        }, { once: true });
+      }
+      updateNowPlaying();
 
       animate();
     </script>
