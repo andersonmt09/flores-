@@ -977,14 +977,30 @@
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const compactViewport = window.matchMedia("(max-width: 640px)").matches;
       const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-      const lowPower = compactViewport || coarsePointer || (navigator.hardwareConcurrency || 8) <= 4;
+      // Qué tarjeta gráfica tiene el equipo: muchos PC usan la integrada (Intel)
+      // o incluso dibujan por software, y son más lentos que un celular.
+      const gpuName = (() => {
+        try {
+          const gl = document.createElement("canvas").getContext("webgl");
+          if (!gl) return "";
+          const ext = gl.getExtension("WEBGL_debug_renderer_info");
+          const name = String(gl.getParameter(ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER) || "");
+          gl.getExtension("WEBGL_lose_context")?.loseContext();
+          return name;
+        } catch (e) {
+          return "";
+        }
+      })();
+      const softwareGpu = /swiftshader|llvmpipe|software|basic render/i.test(gpuName);
+      const strongGpu = !softwareGpu && /nvidia|geforce|quadro|\brtx|\bgtx|radeon rx|radeon pro|apple m\d/i.test(gpuName);
+      const lowPower = compactViewport || coarsePointer || !strongGpu || (navigator.hardwareConcurrency || 8) <= 4;
       // Escala de cantidades: el móvil recibe el mismo jardín pero más ligero.
       const Q = lowPower ? 0.45 : 0.7;
       // Ajustes por tipo de equipo. En celulares todo lo caro (sombras, luces
       // reales, cielo y suelo calculados en cada píxel) se precalcula una vez.
       const TIER = lowPower
-        ? { prStart: 1.5, prMax: 2, prMin: 0.8, fog: [16, 72], flowerCull: 48, grassCull: 22, lodNear: 13, lampLights: 0, shadows: false }
-        : { prStart: 1, prMax: 1.5, prMin: 0.7, fog: [18, 85], flowerCull: 65, grassCull: 30, lodNear: 18, lampLights: 0, shadows: false };
+        ? { prStart: 1.5, prMax: 2, prMin: 0.8, pixels: softwareGpu ? 450000 : 1100000, fog: [16, 72], flowerCull: 48, grassCull: 22, lodNear: 13, lampLights: 0, shadows: false }
+        : { prStart: 1, prMax: 1.5, prMin: 0.7, pixels: 1600000, fog: [18, 85], flowerCull: 65, grassCull: 30, lodNear: 18, lampLights: 0, shadows: false };
       // Material base: Lambert es mucho más barato en GPUs de gama baja
       const lit = (params) => {
         if (lowPower) {
@@ -1012,9 +1028,12 @@
       });
       // Resolución adaptable: empieza moderada y se ajusta sola según los FPS reales
       const dpr = window.devicePixelRatio || 1;
-      const maxPixelRatio = Math.min(dpr, TIER.prMax);
-      const minPixelRatio = Math.min(dpr, TIER.prMin);
-      let pixelRatio = Math.min(dpr, TIER.prStart);
+      // Tope de píxeles: en una pantalla grande de PC no se dibujan más píxeles
+      // que en un celular; así el monitor grande no vuelve lento el jardín.
+      const prCap = () => Math.sqrt(TIER.pixels / Math.max(1, window.innerWidth * window.innerHeight));
+      const maxPixelRatio = () => Math.min(dpr, TIER.prMax, prCap());
+      const minPixelRatio = () => Math.min(dpr, TIER.prMin, Math.max(0.45, prCap() * 0.6));
+      let pixelRatio = Math.min(dpr, TIER.prStart, prCap());
       renderer.setPixelRatio(pixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -2567,9 +2586,15 @@
       // Las flores del centro y de los parterres se juntan en pocas piezas grandes
       // (una por parterre): cientos de flores, pocas llamadas de dibujo.
       const plantBuckets = new Map();
+      // Flores donde se pueden posar los bichitos (x, altura de la flor, z)
+      const flowerSpots = [];
       function registerPlant(group, phase, sway, bucket = "center") {
         const geometry = group.children[0].geometry;
         const { x, z } = group.position;
+        if (random() < 0.5) {
+          geometry.computeBoundingBox();
+          flowerSpots.push(x, geometry.boundingBox.max.y - 0.02, z);
+        }
         geometry.translate(x, 0, z);
         const n = geometry.attributes.position.count;
         const anchor = new Float32Array(n * 4);
@@ -2794,11 +2819,13 @@
                   const v = Math.floor(random() * 3);
                   const key = name + v;
                   if (!items[key]) items[key] = { geometry: variants[name][v], list: [] };
+                  const sy = 0.85 + random() * 0.35;
+                  if (random() < 0.04) flowerSpots.push(jx, sy + 0.06, jz);
                   items[key].list.push({
                     x: jx,
                     z: jz,
                     s: 0.9 + random() * 0.25,
-                    sy: 0.85 + random() * 0.35,
+                    sy,
                     yaw: random() * Math.PI * 2,
                     tiltX: (random() - 0.5) * 0.08,
                     tiltZ: (random() - 0.5) * 0.08,
@@ -2832,10 +2859,12 @@
           const patch = fbm(x * 0.09 + 3, z * 0.09 - 5);
           if (patch < 0.47 || random() > (patch - 0.4) * 2.2) continue;
           const k = Math.floor(random() * variants.length);
+          const sy = 0.85 + random() * 0.35;
+          if (random() < 0.06) flowerSpots.push(x, sy + 0.04, z);
           lists[k].push({
             x, z,
             s: 0.95 + random() * 0.3,
-            sy: 0.85 + random() * 0.35,
+            sy,
             yaw: random() * Math.PI * 2,
             tiltX: (random() - 0.5) * 0.12,
             tiltZ: (random() - 0.5) * 0.12,
@@ -3016,119 +3045,232 @@
         scene.add(new THREE.Points(geometry, material));
       }
 
-      let mothUniforms = null;
-      // ---------- POLILLAS ----------
-      // Bichitos nocturnos: revolotean alrededor de los faroles y pasean entre las
-      // flores. Todo su vuelo y el aleteo se calculan en la GPU (una sola pieza).
+      // ---------- BICHITOS: POLILLAS Y LIBÉLULAS ----------
+      // Pocos y repartidos: vuelan de flor en flor por todo el jardín, se posan
+      // un rato y vuelven a salir hacia otra flor, a veces lejos, hasta el fondo.
+      // Cada uno sigue su propia ruta; el vuelo se calcula en la GPU.
+      const bugUniforms = { uTime: { value: 0 } };
       {
-        const count = lowPower ? 150 : 380;
-        // un ala: abanico redondeado; el atributo "side" indica izquierda/derecha
-        const pos = [], side = [], shade = [];
-        const wing = (dir) => {
+        const nSpots = flowerSpots.length / 3;
+        const spotAt = (i) => [flowerSpots[i * 3], flowerSpots[i * 3 + 1], flowerSpots[i * 3 + 2]];
+        // la siguiente flor: a veces cerca, a veces al otro lado del jardín
+        const nextSpot = (prev, near) => {
+          for (let tries = 0; tries < 40; tries += 1) {
+            const s = spotAt(Math.floor(random() * nSpots));
+            const d = Math.hypot(s[0] - prev[0], s[2] - prev[2]);
+            const far = random() < 0.35;
+            if (far ? d > 12 && d < 40 : d > 2.5 && d < 11) {
+              if (!near || Math.hypot(s[0], s[2]) < 30 || far) return s;
+            }
+          }
+          return spotAt(Math.floor(random() * nSpots));
+        };
+
+        const buildBugs = nSpots < 4 ? () => {} : ({ count, parts, tints, legTime, rest, size, dart, arc, transparent }) => {
+          const pos = [], side = [], shade = [], alpha = [];
+          for (const p of parts) {
+            pos.push(...p.pos);
+            const n = p.pos.length / 3;
+            for (let i = 0; i < n; i += 1) {
+              side.push(p.side);
+              shade.push(p.shade[i % p.shade.length]);
+              alpha.push(p.alpha);
+            }
+          }
+          const geometry = new THREE.InstancedBufferGeometry();
+          geometry.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+          geometry.setAttribute("side", new THREE.Float32BufferAttribute(side, 1));
+          geometry.setAttribute("shade", new THREE.Float32BufferAttribute(shade, 1));
+          geometry.setAttribute("alpha", new THREE.Float32BufferAttribute(alpha, 1));
+          const s0 = new Float32Array(count * 4), s1 = new Float32Array(count * 4), s2 = new Float32Array(count * 4);
+          const glow = new Float32Array(count * 4), params = new Float32Array(count * 4), tint = new Float32Array(count * 3);
+          for (let i = 0; i < count; i += 1) {
+            // cuatro flores por ruta; la mitad empieza cerca de donde arrancas
+            const near = i % 2 === 0;
+            let s = spotAt(Math.floor(random() * nSpots));
+            if (near) for (let k = 0; k < 30 && Math.hypot(s[0], s[2]) > 26; k += 1) s = spotAt(Math.floor(random() * nSpots));
+            const route = [s];
+            for (let k = 1; k < 4; k += 1) route.push(nextSpot(route[k - 1], near));
+            const f = route.flat();
+            s0.set(f.slice(0, 4), i * 4);
+            s1.set(f.slice(4, 8), i * 4);
+            s2.set(f.slice(8, 12), i * 4);
+            glow.set(route.map((r) => Math.min(2.5, lampGlowAt(r[0], r[1] + 0.2, r[2]))), i * 4);
+            params.set([legTime[0] + random() * (legTime[1] - legTime[0]), random() * 4, rest[0] + random() * (rest[1] - rest[0]), size[0] + random() * (size[1] - size[0])], i * 4);
+            tint.set(tints[Math.floor(random() * tints.length)], i * 3);
+          }
+          geometry.setAttribute("aS0", new THREE.InstancedBufferAttribute(s0, 4));
+          geometry.setAttribute("aS1", new THREE.InstancedBufferAttribute(s1, 4));
+          geometry.setAttribute("aS2", new THREE.InstancedBufferAttribute(s2, 4));
+          geometry.setAttribute("aGlowS", new THREE.InstancedBufferAttribute(glow, 4));
+          geometry.setAttribute("aParams", new THREE.InstancedBufferAttribute(params, 4));
+          geometry.setAttribute("aTint", new THREE.InstancedBufferAttribute(tint, 3));
+          geometry.instanceCount = count;
+          const material = new THREE.ShaderMaterial({
+            uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 } }]),
+            side: THREE.DoubleSide,
+            fog: true,
+            transparent,
+            defines: dart ? { DART: 1 } : {},
+            vertexShader: `
+              attribute float side; attribute float shade; attribute float alpha;
+              attribute vec4 aS0; attribute vec4 aS1; attribute vec4 aS2;
+              attribute vec4 aGlowS; attribute vec4 aParams; attribute vec3 aTint;
+              uniform float uTime;
+              varying float vLight; varying float vAlpha; varying vec3 vTint;
+              #include <fog_pars_vertex>
+              vec3 spot(float i) {
+                if (i < 0.5) return aS0.xyz;
+                if (i < 1.5) return vec3(aS0.w, aS1.xy);
+                if (i < 2.5) return vec3(aS1.zw, aS2.x);
+                return aS2.yzw;
+              }
+              float glowOf(float i) {
+                if (i < 0.5) return aGlowS.x;
+                if (i < 1.5) return aGlowS.y;
+                if (i < 2.5) return aGlowS.z;
+                return aGlowS.w;
+              }
+              // trayecto curvo entre dos flores: sube, se desvía y ondula
+              vec3 path(vec3 A, vec3 B, float u, float seed) {
+                vec3 d = B - A;
+                float len = length(d.xz);
+                vec3 lat = vec3(-d.z, 0.0, d.x) / max(len, 0.001);
+                float e = sin(3.14159 * u);
+                vec3 p = mix(A, B, u);
+                p.y += e * (${arc.toFixed(2)} + len * 0.05);
+                p += lat * e * (sin(u * 5.0 + seed) * 0.9 + sin(u * 11.0 + seed * 2.3) * 0.3) * min(1.6, len * 0.18);
+                p.y += e * sin(u * 15.0 + seed * 3.1) * 0.1;
+                return p;
+              }
+              void main() {
+                float L = aParams.x;
+                float tau = uTime / L + aParams.y;
+                float legF = floor(tau);
+                float f = tau - legF;
+                float leg = mod(legF, 4.0);
+                float nxt = mod(leg + 1.0, 4.0);
+                vec3 A = spot(leg);
+                vec3 B = spot(nxt);
+                float seed = aParams.y * 13.0 + legF * 1.7;
+                float rest = aParams.z;
+                vec3 p; vec3 dir; float flying; float glow;
+                if (f < rest) {
+                  p = A;
+                  dir = vec3(sin(seed), 0.0, cos(seed));
+                  flying = 0.0;
+                  glow = glowOf(leg);
+                } else {
+                  float x = (f - rest) / (1.0 - rest);
+                  #ifdef DART
+                    // libélula: tramos rápidos y ratos suspendida en el aire
+                    float k = floor(x * 4.0);
+                    float u = (k + smoothstep(0.0, 0.5, fract(x * 4.0))) / 4.0;
+                  #else
+                    float u = smoothstep(0.0, 1.0, x);
+                  #endif
+                  p = path(A, B, u, seed);
+                  float u2 = clamp(u + 0.01, 0.0, 1.0);
+                  dir = path(A, B, u2, seed) - path(A, B, u2 - 0.01, seed) + (B - A) * 0.0002;
+                  flying = smoothstep(0.0, 0.03, x) * (1.0 - smoothstep(0.97, 1.0, x));
+                  #ifndef DART
+                    // polilla: aleteo nervioso de lado a lado
+                    p += vec3(sin(uTime * 3.1 + seed), sin(uTime * 2.3 + seed) * 0.6, cos(uTime * 2.7 + seed)) * 0.07 * flying;
+                  #endif
+                  glow = mix(glowOf(leg), glowOf(nxt), u);
+                }
+                float yaw = atan(dir.x, dir.z);
+                vec3 lp = position * aParams.w;
+                float span = abs(lp.x);
+                #ifdef DART
+                  float flap = mix(0.08, sin(uTime * 55.0 + seed) * 0.35, flying);
+                #else
+                  // posada: alas quietas que a veces se abren y cierran despacio
+                  float twitch = pow(max(0.0, sin(uTime * 1.6 + seed)), 6.0);
+                  float flap = mix(0.18 + twitch * 0.7, sin(uTime * 24.0 + seed * 7.0) * 0.95, flying);
+                #endif
+                if (side != 0.0) lp = vec3(side * span * cos(flap), span * sin(flap) + lp.y, lp.z);
+                float c = cos(yaw), s = sin(yaw);
+                vec3 world = p + vec3(c * lp.x + s * lp.z, lp.y + 0.01, -s * lp.x + c * lp.z);
+                vLight = shade * (0.17 + glow * 1.3);
+                vAlpha = alpha;
+                vTint = aTint;
+                vec4 mvPosition = viewMatrix * vec4(world, 1.0);
+                gl_Position = projectionMatrix * mvPosition;
+                #include <fog_vertex>
+              }
+            `,
+            fragmentShader: `
+              varying float vLight; varying float vAlpha; varying vec3 vTint;
+              #include <fog_pars_fragment>
+              void main() {
+                gl_FragColor = vec4(vTint * vLight, vAlpha);
+                #include <tonemapping_fragment>
+                #include <colorspace_fragment>
+                #include <fog_fragment>
+              }
+            `
+          });
+          if (transparent) material.depthWrite = false;
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.frustumCulled = false;
+          material.uniforms.uTime = bugUniforms.uTime;
+          scene.add(mesh);
+        };
+
+        // polilla: dos alas redondeadas y el cuerpo
+        const mothWing = (dir) => {
           const pts = [[0, 0.02], [0.05, 0.06], [0.11, 0.05], [0.13, 0.0], [0.1, -0.05], [0.04, -0.06], [0.0, -0.03]];
+          const pos = [], shade = [];
           for (let i = 0; i < pts.length - 1; i += 1) {
             for (const [x, z] of [[0, 0], pts[i], pts[i + 1]]) {
               pos.push(x * dir, 0, z);
-              side.push(dir);
               shade.push(0.75 + 0.25 * Math.hypot(x, z) / 0.13);
             }
           }
+          return { pos, shade, side: dir, alpha: 1 };
         };
-        wing(1);
-        wing(-1);
-        // cuerpo
-        for (const [x, z] of [[-0.012, 0.05], [0.012, 0.05], [0, -0.07]]) {
-          pos.push(x, 0.005, z);
-          side.push(0);
-          shade.push(0.55);
-        }
-        const geometry = new THREE.InstancedBufferGeometry();
-        geometry.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-        geometry.setAttribute("side", new THREE.Float32BufferAttribute(side, 1));
-        geometry.setAttribute("shade", new THREE.Float32BufferAttribute(shade, 1));
-        const anchors = new Float32Array(count * 4);
-        const params = new Float32Array(count * 4);
-        const glows = new Float32Array(count);
-        const beds = [];
-        for (let i = 0; i < count; i += 1) {
-          const nearLamp = random() < 0.45;
-          let x, y, z, radius;
-          if (nearLamp) {
-            const lamp = lampPositions[Math.floor(random() * lampPositions.length)];
-            x = lamp.x; z = lamp.z;
-            y = LAMP_HEIGHT + (random() - 0.4) * 0.3;
-            radius = 0.25 + random() * 0.45;
-          } else {
-            // sobre el centro, los parterres o los campos de flores
-            const r = random() < 0.5 ? Math.sqrt(random()) * GARDEN.bedOuter : GARDEN.tulipField[0] + random() * (GARDEN.lilyField[1] - GARDEN.tulipField[0]);
-            const a = random() * Math.PI * 2;
-            x = Math.cos(a) * r; z = Math.sin(a) * r;
-            y = 0.75 + random() * 0.7;
-            radius = 0.5 + random() * 1.6;
-          }
-          anchors.set([x, y, z, radius], i * 4);
-          // velocidad, fase, sentido y tamaño
-          params.set([0.5 + random() * 0.9, random() * 100, random() < 0.5 ? -1 : 1, 0.75 + random() * 0.5], i * 4);
-          glows[i] = Math.min(2.5, lampGlowAt(x, y, z));
-        }
-        geometry.setAttribute("aAnchor", new THREE.InstancedBufferAttribute(anchors, 4));
-        geometry.setAttribute("aParams", new THREE.InstancedBufferAttribute(params, 4));
-        geometry.setAttribute("aGlow", new THREE.InstancedBufferAttribute(glows, 1));
-        geometry.instanceCount = count;
-        const material = new THREE.ShaderMaterial({
-          uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 } }]),
-          side: THREE.DoubleSide,
-          fog: true,
-          vertexShader: `
-            attribute float side; attribute float shade;
-            attribute vec4 aAnchor; attribute vec4 aParams; attribute float aGlow;
-            uniform float uTime;
-            varying float vLight;
-            #include <fog_pars_vertex>
-            void main() {
-              float t = uTime * aParams.x * aParams.z + aParams.y;
-              float r = aAnchor.w;
-              // vuelo errático: órbita con desvíos rápidos, como las polillas reales
-              vec3 p = aAnchor.xyz + vec3(
-                cos(t) * r + sin(uTime * 3.1 + aParams.y) * 0.12,
-                sin(uTime * 1.7 + aParams.y * 2.0) * 0.18 + sin(t * 2.3) * 0.1,
-                sin(t) * r * 0.85 + cos(uTime * 2.7 + aParams.y) * 0.12
-              );
-              vec3 vel = vec3(-sin(t), 0.0, cos(t) * 0.85) * aParams.z;
-              float yaw = atan(vel.x, vel.z);
-              // aleteo rápido
-              float flap = sin(uTime * 26.0 + aParams.y * 7.0) * 0.95;
-              vec3 lp = position * aParams.w;
-              float span = abs(lp.x);
-              if (side != 0.0) lp = vec3(side * span * cos(flap), span * sin(flap) + lp.y, lp.z);
-              float c = cos(yaw), s = sin(yaw);
-              vec3 world = p + vec3(c * lp.x + s * lp.z, lp.y, -s * lp.x + c * lp.z);
-              vLight = shade * (0.16 + aGlow * 1.3);
-              vec4 mvPosition = viewMatrix * vec4(world, 1.0);
-              gl_Position = projectionMatrix * mvPosition;
-              #include <fog_vertex>
-            }
-          `,
-          fragmentShader: `
-            varying float vLight;
-            #include <fog_pars_fragment>
-            void main() {
-              gl_FragColor = vec4(vec3(0.82, 0.74, 0.6) * vLight, 1.0);
-              #include <tonemapping_fragment>
-              #include <colorspace_fragment>
-              #include <fog_fragment>
-            }
-          `
+        const mothBody = { pos: [-0.012, 0.005, 0.05, 0.012, 0.005, 0.05, 0, 0.005, -0.07], shade: [0.55], side: 0, alpha: 1 };
+        buildBugs({
+          count: lowPower ? 34 : 50,
+          parts: [mothWing(1), mothWing(-1), mothBody],
+          // crema, café, blanco y verde pálido (polilla luna)
+          tints: [[0.82, 0.74, 0.6], [0.58, 0.47, 0.36], [0.86, 0.85, 0.8], [0.62, 0.8, 0.58]],
+          legTime: [11, 19], rest: [0.35, 0.55], size: [0.7, 1.15], dart: false, arc: 0.6, transparent: false
         });
-        const moths = new THREE.Mesh(geometry, material);
-        moths.frustumCulled = false;
-        scene.add(moths);
-        mothUniforms = material.uniforms;
+
+        // libélula: cuerpo largo y cuatro alas finas y transparentes
+        const dfWing = (dir, z0, len, sweep) => {
+          const pos = [], shade = [];
+          const pts = [[0, 0.008], [len * 0.35, 0.014], [len * 0.8, 0.01], [len, -0.002], [len * 0.85, -0.012], [len * 0.4, -0.012], [0, -0.006]];
+          for (let i = 0; i < pts.length - 1; i += 1) {
+            for (const [x, z] of [[0, 0], pts[i], pts[i + 1]]) {
+              pos.push(x * dir, 0, z0 + z - x * sweep);
+              shade.push(1.4);
+            }
+          }
+          return { pos, shade, side: dir, alpha: 0.35 };
+        };
+        const dfBody = { pos: [], shade: [0.9, 0.9, 0.6], side: 0, alpha: 1 };
+        // abdomen en dos planos cruzados para que se vea con volumen
+        const quad = (a, b, c, d) => dfBody.pos.push(...a, ...b, ...c, ...a, ...c, ...d);
+        quad([-0.006, 0, 0.02], [0.006, 0, 0.02], [0.003, 0, -0.16], [-0.003, 0, -0.16]);
+        quad([0, -0.006, 0.02], [0, 0.006, 0.02], [0, 0.003, -0.16], [0, -0.003, -0.16]);
+        quad([-0.012, 0, 0.045], [0.012, 0, 0.045], [0.012, 0, 0.02], [-0.012, 0, 0.02]);
+        buildBugs({
+          count: lowPower ? 9 : 14,
+          parts: [dfBody, dfWing(1, 0.012, 0.085, 0.08), dfWing(-1, 0.012, 0.085, 0.08), dfWing(1, -0.008, 0.078, 0.18), dfWing(-1, -0.008, 0.078, 0.18)],
+          // azul, verde esmeralda y rojizo
+          tints: [[0.35, 0.6, 0.85], [0.35, 0.75, 0.55], [0.85, 0.42, 0.3]],
+          legTime: [8, 13], rest: [0.2, 0.35], size: [1.0, 1.3], dart: true, arc: 1.2, transparent: true
+        });
       }
 
       // ---------- POSTPROCESO ----------
       let composer = null;
-      let bloomOn = true;
+      // empieza apagado y se enciende solo si el equipo va sobrado
+      let bloomOn = false;
+      let bloomFailed = false;
       if (!lowPower) {
         composer = new EffectComposer(renderer);
         composer.addPass(new RenderPass(scene, camera));
@@ -3261,6 +3403,7 @@
         camera.aspect = aspect;
         camera.fov = aspect < 1 ? Math.min(80, 50 * Math.pow(1 / aspect, 0.45)) : 50;
         camera.updateProjectionMatrix();
+        pixelRatio = Math.max(minPixelRatio(), Math.min(pixelRatio, maxPixelRatio()));
         renderer.setPixelRatio(pixelRatio);
         renderer.setSize(width, height);
         lampGlowUniforms.uScale.value = (height * pixelRatio) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
@@ -3289,7 +3432,7 @@
       const perf = { time: 0, frames: 0, good: 0, warm: 2.5 };
       function adaptQuality(delta) {
         const dt = clock.lastRaw || delta;
-        if (dt > 0.5) { perf.time = 0; perf.frames = 0; return; } // pestaña oculta o reproductor abierto
+        if (perf.skip || dt > 2 || document.hidden) { perf.skip = false; perf.time = 0; perf.frames = 0; return; } // pestaña oculta o reproductor abierto
         perf.time += dt;
         perf.frames += 1;
         if (perf.time < 1.2) return;
@@ -3302,8 +3445,9 @@
           if (composer && bloomOn) {
             // el resplandor es lo más caro: es lo primero que se apaga
             bloomOn = false;
-          } else if (pixelRatio > minPixelRatio + 0.01) {
-            pixelRatio = Math.max(minPixelRatio, pixelRatio - (fps < 30 ? 0.2 : 0.1));
+            bloomFailed = true;
+          } else if (pixelRatio > minPixelRatio() + 0.01) {
+            pixelRatio = Math.max(minPixelRatio(), pixelRatio - (fps < 30 ? 0.2 : 0.1));
             resize();
           } else if (detailScale > 0.55) {
             detailScale = Math.max(0.55, detailScale - 0.15);
@@ -3316,9 +3460,12 @@
             if (detailScale < 1) {
               detailScale = Math.min(1, detailScale + 0.15);
               cullTimer = 0;
-            } else if (pixelRatio < maxPixelRatio - 0.01) {
-              pixelRatio = Math.min(maxPixelRatio, pixelRatio + 0.1);
+            } else if (pixelRatio < maxPixelRatio() - 0.01) {
+              pixelRatio = Math.min(maxPixelRatio(), pixelRatio + 0.1);
               resize();
+            } else if (composer && !bloomOn && !bloomFailed) {
+              // el resplandor solo se enciende si sobra potencia
+              bloomOn = true;
             }
           }
         } else {
@@ -3336,13 +3483,13 @@
         const rawDelta = clock.getDelta();
         clock.lastRaw = rawDelta;
         const delta = Math.min(rawDelta, 0.05);
-        if (isOverlayActive) return;
+        if (isOverlayActive) { perf.skip = true; return; }
 
         if (!isPaused) elapsed += delta;
         bloomClock += delta;
         windUniforms.uTime.value = elapsed;
         particleUniforms.uTime.value = elapsed;
-        if (mothUniforms) mothUniforms.uTime.value = elapsed;
+        bugUniforms.uTime.value = elapsed;
         skyUniforms.uTime.value = elapsed;
         starUniforms.uTime.value = elapsed;
 
