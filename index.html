@@ -195,37 +195,13 @@
         color: var(--gold);
       }
 
-      .controls {
+      .footer-controls {
         display: flex;
+        align-items: center;
         gap: 0.6rem;
         pointer-events: auto;
       }
 
-      .playlist-count { text-align: center; color: var(--muted); font-size: 0.85rem; margin: 0 0 1.4rem; letter-spacing: 0.04em; }
-      .playlist-empty { text-align: center; color: var(--muted); padding: 2rem 0; }
-      .now-playing {
-        display: none;
-        align-items: center;
-        gap: 0.55rem;
-        max-width: min(15rem, 48vw);
-        height: 2.45rem;
-        padding: 0 0.9rem 0 0.35rem;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: var(--glass);
-        color: var(--cream);
-        font: inherit;
-        font-size: 0.78rem;
-        cursor: pointer;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-      }
-      .now-playing.visible { display: inline-flex; }
-      .now-playing-cover { flex: 0 0 auto; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: #233 center/cover; }
-      .now-playing.playing .now-playing-cover { animation: spin 8s linear infinite; }
-      .now-playing-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-      @keyframes spin { to { transform: rotate(360deg); } }
-      .progress-container { touch-action: none; }
       .round-button {
         display: inline-grid;
         width: 2.45rem;
@@ -416,43 +392,12 @@
         text-shadow: 0 0 30px rgba(255, 212, 140, 0.35);
       }
 
-      .splash-subtitle {
-        margin: 1rem 0 0;
-        color: rgba(255, 247, 223, 0.72);
-        font-family: Iowan Old Style, Baskerville, Georgia, serif;
-        font-size: clamp(0.95rem, 2.6vw, 1.15rem);
-        font-style: italic;
-        letter-spacing: 0.06em;
-      }
-
-      .splash-bar-container {
-        width: min(220px, 60vw);
-        height: 2px;
-        background: rgba(255, 247, 223, 0.12);
-        border-radius: 2px;
-        margin: 1.8rem auto 0;
-        overflow: hidden;
-      }
-
-      .pretty-bar {
-        width: 0;
-        height: 100%;
-        background: linear-gradient(90deg, #ffd45a 0%, #ff9a9e 55%, #c9d6ff 100%);
-        border-radius: 2px;
-        box-shadow: 0 0 10px rgba(255, 212, 90, 0.6);
-        animation: loadBar 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.4s;
-      }
-
-      @keyframes loadBar {
-        to { width: 100%; }
-      }
-
       /* control para caminar (pantallas táctiles) */
       .joystick {
         display: none;
         position: relative;
-        width: 104px;
-        height: 104px;
+        width: 78px;
+        height: 78px;
         flex: 0 0 auto;
         border: 1px solid var(--line);
         border-radius: 50%;
@@ -467,9 +412,9 @@
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 44px;
-        height: 44px;
-        margin: -22px 0 0 -22px;
+        width: 30px;
+        height: 30px;
+        margin: -15px 0 0 -15px;
         border-radius: 50%;
         background: radial-gradient(circle at 40% 35%, rgba(255, 247, 223, 0.55), rgba(255, 212, 90, 0.25));
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
@@ -522,314 +467,318 @@
 
       
 
-      .dynamic-bg {
-        position: absolute;
-        inset: -50px;
-        z-index: 0;
-        background-size: cover;
-        background-position: center;
-        filter: blur(40px) brightness(0.6);
-        transition: background-image 0.5s ease;
-      }
-
-      .bg-overlay {
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        background: linear-gradient(180deg, rgba(7, 22, 22, 0.4) 0%, rgba(7, 22, 22, 0.9) 100%);
-      }
-
-      .music-nav-top {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        padding: 1.5rem;
-        z-index: 10;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .close-music-btn {
-        background: transparent;
-        border: none;
-        color: var(--cream);
-        font-size: 0.9rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        cursor: pointer;
-        display: inline-flex;
+      /* ---------- MÚSICA ---------- */
+      .now-playing {
+        display: none;
         align-items: center;
         gap: 0.5rem;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-      }
-
-            .player-layout {
-        position: relative;
-        z-index: 2;
-        width: 90%;
-        max-width: 500px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        height: 100vh;
-        padding-top: 4rem;
-        box-sizing: border-box;
-      }
-      
-      @media (max-width: 768px) {
-              .player-layout {
-        position: relative;
-        z-index: 2;
-        width: 90%;
-        max-width: 500px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        height: 100vh;
-        padding-top: 4rem;
-        box-sizing: border-box;
-      }
-      }
-
-      .player-container {
-        
-        width: 100%;
-        max-width: 380px;
-        padding: 2rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        text-align: center;
-      }
-
-      .playlist-container {
-        flex: 1;
-        width: 100%;
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 24px;
-        padding: 1.5rem;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        display: flex;
-        flex-direction: column;
-        max-height: 500px;
-      }
-
-      .playlist-search {
-        width: 100%;
-        padding: 0.8rem 1rem;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(0,0,0,0.2);
+        max-width: min(13rem, 46vw);
+        height: 2.45rem;
+        padding: 0 0.85rem 0 0.3rem;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--glass);
         color: var(--cream);
-        font-family: inherit;
-        margin-bottom: 1rem;
-        outline: none;
-      }
-      
-      .playlist-search::placeholder {
-        color: rgba(255,255,255,0.5);
-      }
-
-      
-      .playlist-item {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 0.6rem 0.8rem;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        text-align: left;
-        gap: 1rem;
+        font: inherit;
+        font-size: 0.78rem;
         cursor: pointer;
-        transition: background 0.2s, transform 0.2s;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
       }
-      .playlist-item:hover {
-        background: rgba(255, 255, 255, 0.15);
-      }
-      .playlist-item-img {
-        width: 45px;
-        height: 45px;
-        border-radius: 6px;
-        flex-shrink: 0;
-        background-size: cover;
-        background-position: center;
-        border: 1px solid rgba(255,255,255,0.1);
-      }
-      .playlist-item-info {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        flex: 1;
-        overflow: hidden;
-      }
-      .playlist-item-title {
-        font-size: 0.95rem;
-        color: var(--cream);
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-      }
-      .playlist-item-artist {
-        font-size: 0.75rem;
-        color: rgba(255,255,255,0.6);
-        margin: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-      }
+      .now-playing.visible { display: inline-flex; }
+      .now-playing-cover { flex: 0 0 auto; width: 1.85rem; height: 1.85rem; border-radius: 50%; background: #1b2436 center / auto 134% no-repeat; }
+      .now-playing.playing .now-playing-cover { animation: spin 8s linear infinite; }
+      .now-playing-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      @keyframes spin { to { transform: rotate(360deg); } }
 
-      .playlist-items {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        overflow-y: auto;
-        flex: 1;
-      }
-
-            
-
-      .playlist-item:hover {
-        background: rgba(255,255,255,0.1);
-      }
-
-      .playlist-item.active-song {
-        background: rgba(255, 212, 90, 0.15);
-        border: 1px solid rgba(255, 212, 90, 0.3);
-      }
-
-            
-
-      
-
-            
-
-                  
-
-            .album-art {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        border-radius: 50%;
-        background-size: cover;
-        background-position: center;
-        border: 4px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        animation: spin 20s linear infinite paused; -webkit-animation: spin 20s linear infinite paused;
-      }
-
-      .album-art.playing { animation-play-state: running; -webkit-animation-play-state: running; }
-
-      .album-art::after {
-        content: "";
-        width: 40px;
-        height: 40px;
-        background: #111;
-        border-radius: 50%;
-        border: 2px solid rgba(255,255,255,0.2);
-      }
-
-      
-
-      .song-title { font-family: Iowan Old Style, Baskerville, Georgia, serif; font-size: 1.4rem; margin: 0 0 0.2rem; color: var(--cream); }
-      .song-artist { font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); margin: 0 0 1.5rem; }
-
-      .controls { display: flex; align-items: center; justify-content: center; gap: 1rem; }
-      .btn-control { background: transparent; border: none; color: var(--cream); cursor: pointer; padding: 0; min-width: 44px; min-height: 44px; transition: transform 0.2s, color 0.2s; display: grid; place-items: center; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-      .btn-control:active, .btn-control.holding { transform: scale(0.92); color: var(--gold); }
-      .btn-control:hover { color: var(--gold); transform: scale(1.1); }
-      .btn-play { width: 3.5rem; height: 3.5rem; border-radius: 50%; background: rgba(255, 255, 255, 0.15); color: #fff; }
-      .btn-play:hover { background: rgba(255, 255, 255, 0.25); }
-
-      .progress-wrapper { margin: 1rem 0 1.5rem; }
-      .progress-container { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.2); border-radius: 3px; position: relative; cursor: pointer; }
-      .progress-bar { height: 100%; width: 0%; background: var(--cream); border-radius: 3px; position: relative; }
-      .progress-bar::after { content: ""; position: absolute; right: -5px; top: -3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; }
-      .time-info { display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); margin-top: 0.5rem; }
-    
-            .full-screen-overlay {
+      .mp-overlay {
         position: fixed;
         inset: 0;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
+        z-index: 60;
+        overflow: hidden;
+        background: #060b18;
+        color: var(--cream);
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.5s ease, visibility 0.5s;
-        background-color: #071616;
+        transform: translateY(14px);
+        transition: opacity 260ms ease, transform 260ms ease, visibility 0s linear 260ms;
       }
-      .full-screen-overlay.active {
+      .mp-overlay.active {
         opacity: 1;
         visibility: visible;
+        transform: none;
+        transition: opacity 260ms ease, transform 260ms ease;
       }
-                  .playlist-full-container {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-        height: 100%;
-        overflow-y: auto;
-        padding: 8rem 0rem 4rem;
-      }
-            
-      .playlist-item:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-      }
-            
-            
-                  
-
-    
-      .loading-spinner {
+      .mp-bg {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 40px;
-        height: 40px;
-        border: 4px solid rgba(255,255,255,0.2);
-        border-top-color: var(--gold);
-        border-radius: 50%;
-        animation: spin-spinner 1s linear infinite;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s;
-        z-index: 10;
+        inset: -60px;
+        background: #0b1430 center / cover no-repeat;
+        filter: blur(38px) saturate(1.25) brightness(0.5);
+        transform: scale(1.1);
+      }
+      .mp-overlay::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(4, 8, 20, 0.35) 0%, rgba(4, 8, 20, 0.55) 55%, rgba(4, 8, 20, 0.9) 100%);
         pointer-events: none;
       }
-      .loading-spinner.active {
-        opacity: 1;
-        visibility: visible;
-      }
-      @keyframes spin-spinner { to { transform: translate(-50%, -50%) rotate(360deg); } }
-            .album-container-wrapper {
+      .mp-sheet {
         position: relative;
-        display: block; 
-        margin: 0 auto 2rem; 
-        width: 250px; 
-        height: 250px;
-        border-radius: 50%;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 30rem;
+        height: 100%;
+        margin: 0 auto;
+        padding: max(0.8rem, env(safe-area-inset-top)) 1.25rem max(1.2rem, env(safe-area-inset-bottom));
       }
+      .mp-top {
+        display: grid;
+        grid-template-columns: 2.75rem 1fr 2.75rem;
+        align-items: center;
+        flex: 0 0 auto;
+        min-height: 3rem;
+      }
+      .mp-top-title {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.1rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(255, 247, 223, 0.8);
+      }
+      .mp-top-title small {
+        font-size: 0.72rem;
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        text-transform: none;
+        color: var(--muted);
+      }
+      .mp-icon-btn {
+        display: grid;
+        place-items: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--cream);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mp-icon-btn:active { background: rgba(255, 255, 255, 0.1); }
+      .mp-icon-btn svg { width: 1.4rem; height: 1.4rem; }
 
-          @keyframes spin { 100% { transform: rotate(360deg); } }
+      /* lista */
+      .mp-search {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex: 0 0 auto;
+        margin: 0.6rem 0 0.8rem;
+        padding: 0 0.95rem;
+        height: 2.75rem;
+        border-radius: 0.9rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .mp-search svg { flex: 0 0 auto; width: 1.1rem; height: 1.1rem; color: var(--muted); }
+      .mp-search input {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        border: 0;
+        background: transparent;
+        color: var(--cream);
+        font: inherit;
+        font-size: 1rem;
+        outline: none;
+      }
+      .mp-search input::placeholder { color: rgba(255, 247, 223, 0.45); }
+      .mp-items {
+        flex: 1 1 auto;
+        min-height: 0;
+        margin: 0 -0.5rem;
+        padding: 0 0 1rem;
+        list-style: none;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+      .playlist-item {
+        display: grid;
+        grid-template-columns: 3.1rem 1fr auto;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.45rem 0.5rem;
+        border-radius: 0.8rem;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .playlist-item:active { background: rgba(255, 255, 255, 0.08); }
+      @media (hover: hover) { .playlist-item:hover { background: rgba(255, 255, 255, 0.06); } }
+      .playlist-item-img {
+        width: 3.1rem;
+        height: 3.1rem;
+        border-radius: 0.55rem;
+        background: #1b2436 center / auto 134% no-repeat;
+      }
+      .playlist-item-info { min-width: 0; }
+      .playlist-item-title, .playlist-item-artist {
+        margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .playlist-item-title { font-size: 0.98rem; line-height: 1.3; }
+      .playlist-item-artist { margin-top: 0.15rem; font-size: 0.8rem; color: var(--muted); }
+      .playlist-item-eq { display: none; gap: 2px; align-items: end; height: 0.9rem; padding-right: 0.3rem; }
+      .playlist-item-eq i { width: 3px; background: var(--gold); border-radius: 1px; animation: eq 0.9s ease-in-out infinite; }
+      .playlist-item-eq i:nth-child(2) { animation-delay: -0.3s; }
+      .playlist-item-eq i:nth-child(3) { animation-delay: -0.6s; }
+      @keyframes eq { 0%, 100% { height: 30%; } 50% { height: 100%; } }
+      .playlist-item.active-song .playlist-item-title { color: var(--gold); }
+      .playlist-item.active-song .playlist-item-eq { display: flex; }
+      .playlist-item.active-song:not(.is-playing) .playlist-item-eq i { animation-play-state: paused; }
+      .playlist-empty { padding: 2.5rem 0; text-align: center; color: var(--muted); }
+
+      /* reproductor */
+      .mp-player { justify-content: space-between; }
+      .mp-art-wrap {
+        position: relative;
+        flex: 0 1 auto;
+        width: min(100%, 44vh, 22rem);
+        aspect-ratio: 1;
+        margin: 1.2rem auto 0;
+      }
+      .mp-art {
+        width: 100%;
+        height: 100%;
+        border-radius: 1.1rem;
+        background: #1b2436 center / auto 134% no-repeat;
+        box-shadow: 0 1.5rem 3.5rem rgba(0, 0, 0, 0.5);
+        transform: scale(0.94);
+        transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .mp-art.playing { transform: none; }
+      .mp-spinner {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 2.6rem;
+        height: 2.6rem;
+        margin: -1.3rem 0 0 -1.3rem;
+        border: 3px solid rgba(255, 255, 255, 0.25);
+        border-top-color: var(--gold);
+        border-radius: 50%;
+        opacity: 0;
+        animation: spin 0.8s linear infinite;
+        transition: opacity 200ms ease;
+        pointer-events: none;
+      }
+      .mp-spinner.active { opacity: 1; }
+      .mp-bottom { display: flex; flex-direction: column; gap: 1.1rem; padding-top: 1.2rem; }
+      .mp-meta { min-width: 0; }
+      .mp-meta h2 {
+        margin: 0;
+        overflow: hidden;
+        font-family: inherit;
+        font-size: 1.35rem;
+        font-weight: 600;
+        line-height: 1.25;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .mp-meta p { margin: 0.25rem 0 0; font-size: 0.95rem; color: var(--muted); }
+      .mp-track {
+        position: relative;
+        height: 1.6rem;
+        cursor: pointer;
+        touch-action: none;
+      }
+      .mp-track::before, .mp-fill {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        height: 4px;
+        margin-top: -2px;
+        border-radius: 2px;
+      }
+      .mp-track::before { right: 0; background: rgba(255, 255, 255, 0.18); }
+      .mp-fill { width: 0; background: var(--cream); }
+      .mp-fill::after {
+        content: "";
+        position: absolute;
+        right: -6px;
+        top: -4px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--cream);
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+      }
+      .mp-times {
+        display: flex;
+        justify-content: space-between;
+        margin-top: -0.2rem;
+        font-size: 0.75rem;
+        font-variant-numeric: tabular-nums;
+        color: var(--muted);
+      }
+      .mp-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto 1fr 1fr;
+        align-items: center;
+        justify-items: center;
+      }
+      .btn-control {
+        display: grid;
+        place-items: center;
+        width: 3rem;
+        height: 3rem;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--cream);
+        cursor: pointer;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: transform 120ms ease, color 120ms ease, background 120ms ease;
+      }
+      .btn-control svg { width: 1.6rem; height: 1.6rem; }
+      .btn-control.small svg { width: 1.3rem; height: 1.3rem; }
+      .btn-control.small { color: rgba(255, 247, 223, 0.5); }
+      .btn-control.small.on { color: var(--gold); }
+      .btn-control:active, .btn-control.holding { transform: scale(0.9); background: rgba(255, 255, 255, 0.08); }
+      .btn-control.holding { color: var(--gold); }
+      .btn-play {
+        width: 4.2rem;
+        height: 4.2rem;
+        background: var(--cream);
+        color: #0b1226;
+        box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.35);
+      }
+      .btn-play svg { width: 1.7rem; height: 1.7rem; }
+      .btn-play:active { background: #fff; transform: scale(0.94); }
+      .mp-tip { margin: 0; text-align: center; font-size: 0.72rem; color: rgba(255, 247, 223, 0.45); }
+      @media (max-height: 560px) and (orientation: landscape) {
+        .mp-player { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; column-gap: 1.6rem; max-width: 46rem; }
+        .mp-player .mp-top { grid-column: 1 / -1; }
+        .mp-art-wrap { width: min(62vh, 18rem); margin: 0; align-self: center; }
+        .mp-bottom { align-self: center; padding: 0; }
+        .mp-tip { display: none; }
+      }
     </style>
   </head>
   <body>
@@ -876,12 +825,7 @@
             <span class="hint-touch">Arrastra para mirar · usa el círculo para caminar</span>
           </div>
         </div>
-        <div class="controls">
-          <button class="round-button" id="homeButton" type="button" aria-label="Volver a la entrada" title="Volver a la entrada">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 11.5 12 5l8 6.5"/><path d="M6.5 10v9h11v-9"/><path d="M10 19v-5h4v5"/>
-            </svg>
-          </button>
+        <div class="footer-controls">
           <button class="now-playing" id="nowPlayingBtn" type="button" aria-label="Abrir reproductor">
             <span class="now-playing-cover" id="nowPlayingCover"></span>
             <span class="now-playing-title" id="nowPlayingTitle"></span>
@@ -900,101 +844,74 @@
       <div class="splash-moon" aria-hidden="true"></div>
       <div class="splash__card">
         <h1>PARA TI</h1>
-        <p class="splash-subtitle">un jardín bajo la luna</p>
-        <div class="splash-bar-container">
-          <div class="pretty-bar"></div>
-        </div>
       </div>
     </div>
 
-    <!-- Music Overlay -->
-    
-    <!-- Playlist Overlay (Pantalla completa de canciones) -->
-    <div id="playlistOverlay" class="full-screen-overlay">
-      <div class="dynamic-bg" style="background-image: url('assets/images/saber_amar_cover.jpg');"></div>
-      <div class="bg-overlay"></div>
-      <nav class="music-nav-top">
-        <button class="close-music-btn" id="closePlaylistBtn">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-          Volver al jardín
-        </button>
-      </nav>
-      <div class="playlist-full-container">
-        <h1 style="color: var(--gold); text-align: center; font-family: 'Iowan Old Style', serif; font-size: clamp(2rem, 5vw, 2.5rem); margin: 0 auto 0.4rem; width: 100%;">Catálogo de Penyair</h1>
-        <p class="playlist-count" id="playlistCount"></p>
-        <input type="text" class="playlist-search" id="playlistSearch" placeholder="Buscar canción..." autocomplete="off" style="max-width: 600px; margin: 0 auto 2rem; display: block; width: 90%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1rem; border-radius: 20px; color: white;">
-        <ul class="playlist-items" id="playlistItems" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.5rem; padding: 0 1rem; list-style: none;">
-        </ul>
+    <!-- Lista de canciones -->
+    <div id="playlistOverlay" class="mp-overlay full-screen-overlay" role="dialog" aria-label="Lista de canciones">
+      <div class="mp-bg" id="playlistBg"></div>
+      <div class="mp-sheet">
+        <header class="mp-top">
+          <button class="mp-icon-btn" id="closePlaylistBtn" type="button" aria-label="Volver al jardín">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="mp-top-title"><span>Música</span><small id="playlistCount"></small></div>
+          <span></span>
+        </header>
+        <label class="mp-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="playlistSearch" placeholder="Buscar canción" autocomplete="off" enterkeyhint="search">
+        </label>
+        <ul class="mp-items" id="playlistItems"></ul>
       </div>
     </div>
 
-    <div id="musicOverlay" class="full-screen-overlay">
-      <div class="dynamic-bg" id="dynamicBg"></div>
-      <div class="bg-overlay"></div>
-
-      <nav class="music-nav-top">
-        <button class="close-music-btn" id="closeMusicBtn">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-          Volver a la lista
-        </button>
-      </nav>
-
-      <div class="player-layout">
-        <!-- Reproductor -->
-        <div class="player-container">
-          
-          <div class="album-container-wrapper">
-            <div class="album-art" id="albumArt"></div>
-            <div class="loading-spinner" id="loadingSpinner"></div>
-          </div>
-
-          <h2 class="song-title" id="songTitle">Título</h2>
-          <p class="song-artist" id="songArtist">Artista</p>
-
-          <audio id="audioPlayer"></audio>
-
-          <div class="progress-wrapper">
-            <div class="progress-container" id="progressContainer">
-              <div class="progress-bar" id="progressBar"></div>
-            </div>
-            <div class="time-info">
-              <span id="currentTime">00:00</span>
-              <span id="durationTime">00:00</span>
-            </div>
-          </div>
-
-          <div class="controls">
-            <button class="btn-control" id="shuffleBtn" aria-label="Aleatorio" style="opacity: 0.5;">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
-            </button>
-            <button class="btn-control" id="prevBtn" aria-label="Anterior">
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
-                <polygon points="19 20 9 12 19 4 19 20"></polygon>
-                <line x1="5" y1="19" x2="5" y2="5"></line>
-              </svg>
-            </button>
-            <button class="btn-control btn-play" id="playBtn" aria-label="Reproducir">
-              <svg id="playIcon" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-            </button>
-            <button class="btn-control" id="nextBtn" aria-label="Siguiente">
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
-                <polygon points="5 4 15 12 5 20 5 4"></polygon>
-                <line x1="19" y1="5" x2="19" y2="19"></line>
-              </svg>
-            </button>
-              <button class="btn-control" id="loopBtn" aria-label="Repetir" style="opacity: 0.5;">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-              </button>
-          </div>
+    <!-- Reproductor -->
+    <div id="musicOverlay" class="mp-overlay full-screen-overlay" role="dialog" aria-label="Reproductor">
+      <div class="mp-bg" id="dynamicBg"></div>
+      <div class="mp-sheet mp-player">
+        <header class="mp-top">
+          <button class="mp-icon-btn" id="closeMusicBtn" type="button" aria-label="Ver la lista de canciones">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/><path d="m16 15 4 3-4 3z" fill="currentColor"/></svg>
+          </button>
+          <div class="mp-top-title"><span>Reproduciendo</span></div>
+          <button class="mp-icon-btn" id="hidePlayerBtn" type="button" aria-label="Volver al jardín">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </header>
+        <div class="mp-art-wrap">
+          <div class="mp-art" id="albumArt"></div>
+          <div class="mp-spinner" id="loadingSpinner"></div>
         </div>
-
-        
+        <div class="mp-bottom">
+          <div class="mp-meta">
+            <h2 id="songTitle"></h2>
+            <p id="songArtist"></p>
+          </div>
+          <audio id="audioPlayer" preload="metadata"></audio>
+          <div>
+            <div class="mp-track" id="progressContainer"><div class="mp-fill" id="progressBar"></div></div>
+            <div class="mp-times"><span id="currentTime">0:00</span><span id="durationTime">0:00</span></div>
+          </div>
+          <div class="mp-controls">
+            <button class="btn-control small" id="shuffleBtn" type="button" aria-label="Aleatorio" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+            </button>
+            <button class="btn-control" id="prevBtn" type="button" aria-label="Anterior (mantén para retroceder)">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>
+            </button>
+            <button class="btn-control btn-play" id="playBtn" type="button" aria-label="Reproducir">
+              <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>
+            </button>
+            <button class="btn-control" id="nextBtn" type="button" aria-label="Siguiente (mantén para adelantar)">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>
+            </button>
+            <button class="btn-control small" id="loopBtn" type="button" aria-label="Repetir canción" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="m7 22-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg>
+            </button>
+          </div>
+          <p class="mp-tip">Mantén presionado ⏮ o ⏭ para retroceder o adelantar</p>
+        </div>
       </div>
     </div>
 
@@ -1024,13 +941,25 @@
       const topMenuPanel = document.getElementById("topMenuPanel");
       const joystick = document.getElementById("joystick");
       const joystickKnob = document.getElementById("joystickKnob");
-      const homeButton = document.getElementById("homeButton");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const compactViewport = window.matchMedia("(max-width: 640px)").matches;
       const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
       const lowPower = compactViewport || coarsePointer || (navigator.hardwareConcurrency || 8) <= 4;
       // Escala de cantidades: el móvil recibe el mismo jardín pero más ligero.
       const Q = lowPower ? 0.45 : 1;
+      // Ajustes por tipo de equipo. En celulares todo lo caro (sombras, luces
+      // reales, cielo y suelo calculados en cada píxel) se precalcula una vez.
+      const TIER = lowPower
+        ? { prStart: 1, prMax: 1.25, prMin: 0.6, fog: [16, 72], flowerCull: 48, grassCull: 22, lodNear: 13, lampLights: 0, shadows: false }
+        : { prStart: 1.5, prMax: 1.75, prMin: 0.75, fog: [22, 95], flowerCull: 85, grassCull: 40, lodNear: 24, lampLights: 4, shadows: true };
+      // Material base: Lambert es mucho más barato en GPUs de gama baja
+      const lit = (params) => {
+        if (lowPower) {
+          const { roughness, metalness, ...rest } = params;
+          return new THREE.MeshLambertMaterial(rest);
+        }
+        return new THREE.MeshStandardMaterial(params);
+      };
 
       if (topMenuToggle && topMenuPanel) {
         topMenuToggle.addEventListener("click", () => {
@@ -1048,20 +977,24 @@
         antialias: !lowPower,
         powerPreference: "high-performance"
       });
-      const maxPixelRatio = lowPower ? 1.5 : 1.75;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
+      // Resolución adaptable: empieza moderada y se ajusta sola según los FPS reales
+      const dpr = window.devicePixelRatio || 1;
+      const maxPixelRatio = Math.min(dpr, TIER.prMax);
+      const minPixelRatio = Math.min(dpr, TIER.prMin);
+      let pixelRatio = Math.min(dpr, TIER.prStart);
+      renderer.setPixelRatio(pixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.25;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.enabled = TIER.shadows;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       container.appendChild(renderer.domElement);
       document.documentElement.classList.add("webgl-ready");
 
       const scene = new THREE.Scene();
       const fogColor = new THREE.Color("#0d1b38");
-      scene.fog = new THREE.Fog(fogColor, 22, 95);
+      scene.fog = new THREE.Fog(fogColor, TIER.fog[0], TIER.fog[1]);
       scene.background = fogColor;
 
       const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 600);
@@ -1234,8 +1167,11 @@
               vec2 muv = vec2(atan(dir.z, dir.x) * 3.0, dir.y * 6.0);
               float dust = gFbm(muv * 1.4) ;
               float lanes = smoothstep(0.35, 0.75, gFbm(muv * 3.1 + 5.0));
-              milky *= (0.45 + dust * 0.9) * (1.0 - lanes * 0.55);
-              col += vec3(0.42, 0.45, 0.62) * milky * 0.32 * smoothstep(0.02, 0.3, h);
+              float clumps = gFbm(muv * 7.0 - 3.0);
+              milky *= (0.4 + dust * 0.9 + clumps * 0.35) * (1.0 - lanes * 0.6);
+              float core = pow(band, 40.0) * smoothstep(0.3, 0.8, dust);
+              vec3 milkyCol = mix(vec3(0.42, 0.46, 0.66), vec3(0.62, 0.55, 0.48), core);
+              col += milkyCol * (milky * 0.3 + core * 0.12) * smoothstep(0.02, 0.3, h);
               // nubes nocturnas muy tenues, iluminadas por la luna
               vec2 cuv = dir.xz / (h + 0.15);
               float n = gFbm(cuv * 0.7 + vec2(uTime * 0.004, 0.0));
@@ -1253,7 +1189,20 @@
       // el cielo entero (estrellas, luna) viaja con la cámara
       const skyGroup = new THREE.Group();
       scene.add(skyGroup);
-      skyGroup.add(sky);
+      // El cielo (degradado, Vía Láctea, nubes) se pinta UNA sola vez en un cubemap:
+      // así cada cuadro solo lee una textura en vez de calcular ruido por píxel.
+      {
+        const skyRT = new THREE.WebGLCubeRenderTarget(lowPower ? 512 : 1024, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
+        skyRT.texture.colorSpace = THREE.SRGBColorSpace;
+        const skyScene = new THREE.Scene();
+        skyScene.add(sky);
+        const cubeCamera = new THREE.CubeCamera(1, 1000, skyRT);
+        cubeCamera.update(renderer, skyScene);
+        skyScene.remove(sky);
+        sky.geometry.dispose();
+        sky.material.dispose();
+        scene.background = skyRT.texture;
+      }
 
       // Estrellas: brillo y color según su magnitud, con titileo suave
       const starUniforms = { uTime: { value: 0 }, uPixelRatio: { value: renderer.getPixelRatio() } };
@@ -1303,7 +1252,7 @@
         return c;
       }
       {
-        const count = lowPower ? 1800 : 3600;
+        const count = lowPower ? 2600 : 5000;
         const positions = [], sizes = [], tints = [], seeds = [];
         const v = new THREE.Vector3();
         for (let i = 0; i < count; i += 1) {
@@ -1415,101 +1364,79 @@
         lg.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
         const lines = new THREE.LineSegments(
           lg,
-          new THREE.LineBasicMaterial({ color: 0xa9c4ff, transparent: true, opacity: 0.5, depthWrite: false, fog: false, blending: THREE.AdditiveBlending })
+          new THREE.LineBasicMaterial({ color: 0x9fb8ee, transparent: true, opacity: 0.17, depthWrite: false, fog: false, blending: THREE.AdditiveBlending })
         );
         lines.renderOrder = -8;
         skyGroup.add(lines);
       }
 
-      // Luna llena con mares, cráteres y halo
-      function createMoonTexture() {
-        const S = 512;
+      // Luna llena: mapa real de la superficie lunar (mares y cráteres de verdad)
+      // sobre una esfera, con un halo suave alrededor.
+      const MOON_DIST = 300;
+      const moon = new THREE.Group();
+      {
+        const geometry = new THREE.SphereGeometry(13, 48, 32);
+        geometry.rotateY(-Math.PI / 2); // la cara visible mira hacia nosotros
+        const texture = new THREE.TextureLoader().load("assets/images/luna.jpg");
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const material = new THREE.ShaderMaterial({
+          uniforms: { map: { value: texture } },
+          fog: false,
+          vertexShader: `
+            varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+            void main() {
+              vUv = uv;
+              vN = normalize(normalMatrix * normal);
+              vec4 mv = modelViewMatrix * vec4(position, 1.0);
+              vV = normalize(-mv.xyz);
+              gl_Position = projectionMatrix * mv;
+            }
+          `,
+          fragmentShader: `
+            uniform sampler2D map;
+            varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+            void main() {
+              vec3 albedo = texture2D(map, vUv).rgb;
+              // luna llena: casi sin sombra, con el borde un poco más tenue
+              float mu = max(dot(normalize(vN), normalize(vV)), 0.0);
+              float limb = 0.72 + 0.28 * pow(mu, 0.5);
+              vec3 col = albedo * vec3(1.02, 1.0, 0.95) * limb * 2.1 + vec3(0.02, 0.025, 0.04);
+              gl_FragColor = vec4(col, 1.0);
+              #include <tonemapping_fragment>
+              #include <colorspace_fragment>
+            }
+          `
+        });
+        const sphere = new THREE.Mesh(geometry, material);
+        moon.add(sphere);
+        // halo de dispersión en la atmósfera
         const canvas = document.createElement("canvas");
-        canvas.width = canvas.height = S;
+        canvas.width = canvas.height = 256;
         const ctx = canvas.getContext("2d");
-        const rand = seededRandom(777);
-        const R = S * 0.36;
-        const cx = S / 2, cy = S / 2;
-        // halo exterior
-        const halo = ctx.createRadialGradient(cx, cy, R * 0.9, cx, cy, S / 2);
-        halo.addColorStop(0, "rgba(190, 210, 255, 0.35)");
-        halo.addColorStop(0.35, "rgba(150, 175, 240, 0.1)");
-        halo.addColorStop(1, "rgba(120, 150, 230, 0)");
-        ctx.fillStyle = halo;
-        ctx.fillRect(0, 0, S, S);
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, R, 0, Math.PI * 2);
-        ctx.clip();
-        const base = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.25, R * 0.1, cx, cy, R);
-        base.addColorStop(0, "#fbf8ef");
-        base.addColorStop(0.7, "#e9e4d6");
-        base.addColorStop(1, "#c9c3b4");
-        ctx.fillStyle = base;
-        ctx.fillRect(0, 0, S, S);
-        // mares (zonas oscuras) inspirados en la cara visible
-        const maria = [[-0.28, -0.3, 0.32], [0.12, -0.36, 0.22], [0.3, -0.05, 0.2], [-0.05, -0.02, 0.24], [-0.38, 0.12, 0.2], [0.05, 0.3, 0.16], [0.35, 0.28, 0.12]];
-        for (const [mx, my, mr] of maria) {
-          for (let k = 0; k < 14; k += 1) {
-            const g = ctx.createRadialGradient(
-              cx + (mx + (rand() - 0.5) * mr * 0.8) * R, cy + (my + (rand() - 0.5) * mr * 0.8) * R, 0,
-              cx + mx * R, cy + my * R, mr * R * (0.7 + rand() * 0.5)
-            );
-            g.addColorStop(0, "rgba(130, 128, 124, 0.1)");
-            g.addColorStop(1, "rgba(120, 118, 115, 0)");
-            ctx.fillStyle = g;
-            ctx.fillRect(0, 0, S, S);
-          }
-        }
-        // cráteres
-        for (let i = 0; i < 140; i += 1) {
-          const a = rand() * Math.PI * 2;
-          const d = Math.sqrt(rand()) * R * 0.95;
-          const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d;
-          const r = 1 + Math.pow(rand(), 3) * 14;
-          ctx.fillStyle = `rgba(110, 108, 104, ${0.05 + rand() * 0.07})`;
-          ctx.beginPath();
-          ctx.arc(x, y, r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "rgba(255, 255, 250, 0.18)";
-          ctx.beginPath();
-          ctx.arc(x - r * 0.25, y - r * 0.25, r * 0.6, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        // Tycho con sus rayos
-        ctx.strokeStyle = "rgba(255,255,250,0.12)";
-        ctx.lineWidth = 2;
-        for (let i = 0; i < 18; i += 1) {
-          const a = rand() * Math.PI * 2;
-          ctx.beginPath();
-          ctx.moveTo(cx - R * 0.08, cy + R * 0.62);
-          ctx.lineTo(cx - R * 0.08 + Math.cos(a) * R * 0.6, cy + R * 0.62 + Math.sin(a) * R * 0.6);
-          ctx.stroke();
-        }
-        // oscurecimiento del borde
-        const limb = ctx.createRadialGradient(cx, cy, R * 0.6, cx, cy, R);
-        limb.addColorStop(0, "rgba(0,0,0,0)");
-        limb.addColorStop(1, "rgba(20,25,45,0.35)");
-        ctx.fillStyle = limb;
-        ctx.fillRect(0, 0, S, S);
-        ctx.restore();
-        const tex = new THREE.CanvasTexture(canvas);
-        tex.colorSpace = THREE.SRGBColorSpace;
-        return tex;
+        const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+        g.addColorStop(0, "rgba(200, 215, 255, 0.55)");
+        g.addColorStop(0.22, "rgba(170, 190, 245, 0.22)");
+        g.addColorStop(0.5, "rgba(130, 155, 225, 0.06)");
+        g.addColorStop(1, "rgba(110, 135, 210, 0)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 256, 256);
+        const haloTexture = new THREE.CanvasTexture(canvas);
+        haloTexture.colorSpace = THREE.SRGBColorSpace;
+        const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTexture, fog: false, depthWrite: false, transparent: true, blending: THREE.AdditiveBlending }));
+        halo.scale.setScalar(120);
+        halo.renderOrder = -8;
+        moon.add(halo);
       }
-      const moon = new THREE.Sprite(
-        new THREE.SpriteMaterial({ map: createMoonTexture(), fog: false, depthWrite: false, transparent: true, color: new THREE.Color(2.4, 2.4, 2.5) })
-      );
-      moon.scale.setScalar(52);
+      moon.position.copy(moonSkyDir).multiplyScalar(MOON_DIST);
+      moon.lookAt(0, 0, 0);
       moon.renderOrder = -7;
-      moon.position.copy(moonSkyDir).multiplyScalar(300);
       skyGroup.add(moon);
 
       // ---------- LUCES ----------
       scene.add(new THREE.HemisphereLight(0x5f7ec4, 0x1a2a1a, 0.95));
       const moonLight = new THREE.DirectionalLight(0xb9cdff, 1.35);
-      moonLight.castShadow = true;
-      moonLight.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
+      moonLight.castShadow = TIER.shadows;
+      moonLight.shadow.mapSize.set(2048, 2048);
       moonLight.shadow.camera.left = -16;
       moonLight.shadow.camera.right = 16;
       moonLight.shadow.camera.top = 16;
@@ -1527,41 +1454,66 @@
 
       // ---------- MATERIALES: VIENTO Y LUZ DE FAROLES ----------
       const windUniforms = { uTime: { value: 0 } };
-      const MAX_LAMPS = 96;
-      const lampUniforms = {
-        uLamps: { value: Array.from({ length: MAX_LAMPS }, () => new THREE.Vector4(0, -100, 0, 0)) },
-        uLampCount: { value: 0 }
-      };
-      const LAMP_GLSL = `
-        uniform vec4 uLamps[${MAX_LAMPS}];
-        uniform int uLampCount;
-        vec3 lampGlow(vec3 p) {
-          vec3 sum = vec3(0.0);
-          for (int i = 0; i < ${MAX_LAMPS}; i++) {
-            if (i >= uLampCount) break;
-            vec3 d = p - uLamps[i].xyz;
-            float dist2 = dot(d, d);
-            sum += vec3(1.0, 0.62, 0.3) * (uLamps[i].w / (1.0 + dist2 * 0.9)) * smoothstep(42.0, 6.0, dist2);
-          }
-          return sum;
+      // Ramo central: balanceo por planta y crecimiento inicial, calculados en la GPU
+      const plantUniforms = { uSway: { value: 0 }, uBloomTime: { value: 0 } };
+      const LAMP_COLOR = new THREE.Vector3(1.0, 0.62, 0.3);
+      // Los faroles no se mueven, así que su luz sobre cada planta se calcula una
+      // sola vez (atributo aGlow) en vez de recorrer todos los faroles en cada píxel.
+      const lampPositions = [];
+      const LAMP_HEIGHT = 2.35;
+      const LAMP_POWER = 1.35;
+      function lampGlowAt(x, y, z) {
+        let sum = 0;
+        for (const p of lampPositions) {
+          const dx = x - p.x, dz = z - p.z;
+          const h2 = dx * dx + dz * dz;
+          if (h2 > 42) continue;
+          const dy = y - LAMP_HEIGHT;
+          const d2 = h2 + dy * dy;
+          if (d2 > 42) continue;
+          const t = THREE.MathUtils.clamp((42 - d2) / 36, 0, 1);
+          sum += (LAMP_POWER / (1 + d2 * 0.9)) * t * t * (3 - 2 * t);
         }
-      `;
+        return sum;
+      }
+      // Posición de los faroles (se necesita antes de calcular su luz sobre las plantas)
+      {
+        const add = (x, z) => lampPositions.push(new THREE.Vector3(x, 0, z));
+        // alrededor del sendero central, entre los parterres
+        for (let i = 0; i < 6; i += 1) {
+          const a = SECTOR / 2 + i * SECTOR + SECTOR / 2;
+          if (Math.abs(Math.cos(a)) < 0.2) continue;
+          add(Math.cos(a) * (GARDEN.pathOuter + 0.25), Math.sin(a) * (GARDEN.pathOuter + 0.25));
+        }
+        // a los lados de las entradas del seto
+        for (const zs of [-1, 1]) for (const xs of [-1, 1]) add(xs * 1.0, zs * (GARDEN.hedge + 0.6));
+        // anillos de paseo
+        for (const [ring, count] of [[GARDEN.ring1[1] + 0.35, 12], [GARDEN.ring2[1] + 0.35, 24]]) {
+          for (let i = 0; i < count; i += 1) {
+            const a = (i + 0.5) * ((Math.PI * 2) / count);
+            add(Math.cos(a) * ring, Math.sin(a) * ring);
+          }
+        }
+        // avenidas en cruz, alternando lados
+        for (let d = 17; d < GARDEN.edge; d += 7) {
+          if (Math.abs(d - (GARDEN.ring2[0] + GARDEN.ring2[1]) / 2) < 3) continue;
+          const side = Math.round(d / 7) % 2 ? 1 : -1;
+          const off = GARDEN.avenueHalf + 0.35;
+          add(side * off, d); add(-side * off, -d);
+          add(d, side * off); add(-d, -side * off);
+        }
+      }
       // Inyecta viento (balanceo en el vértice) y/o luz cálida de los faroles cercanos.
-      function enhance(material, { wind = null, lamps = true } = {}) {
+      function enhance(material, { wind = null, lamps = true, anchored = false } = {}) {
         material.onBeforeCompile = (shader) => {
           shader.uniforms.uTime = windUniforms.uTime;
-          shader.uniforms.uLamps = lampUniforms.uLamps;
-          shader.uniforms.uLampCount = lampUniforms.uLampCount;
+          shader.uniforms.uSway = plantUniforms.uSway;
+          shader.uniforms.uBloomTime = plantUniforms.uBloomTime;
           shader.uniforms.uAmp = { value: wind ? wind.amp : 0 };
           shader.uniforms.uHeight = { value: wind ? wind.height : 1 };
-          shader.vertexShader = shader.vertexShader
-            .replace(
-              "#include <common>",
-              "#include <common>\nuniform float uTime; uniform float uAmp; uniform float uHeight; varying vec3 vLampW;"
-            )
-            .replace(
-              "#include <begin_vertex>",
-              `#include <begin_vertex>
+          let begin = "#include <begin_vertex>";
+          if (wind) {
+            begin += `
               #ifdef USE_INSTANCING
                 vec3 ip = instanceMatrix[3].xyz;
               #else
@@ -1574,34 +1526,65 @@
               float bend = (sway * (0.35 + gust) + gust * 0.6) * uAmp * hN * hN;
               transformed.x += bend;
               transformed.z += bend * 0.45;
-              transformed.y -= abs(bend) * 0.25 * hN;`
-            )
+              transformed.y -= abs(bend) * 0.25 * hN;`;
+          }
+          if (anchored) {
+            // cada planta crece desde su base y se mece alrededor de ella
+            begin += `
+              vec3 rel = transformed - vec3(aAnchor.x, 0.0, aAnchor.y);
+              float bp = clamp((uBloomTime - aBloom.x) * aBloom.y, 0.0, 1.0);
+              float be = 1.0 - pow(1.0 - bp, 3.0);
+              rel *= vec3(0.6 + be * 0.4, max(0.0001, be), 0.6 + be * 0.4);
+              float ph = aAnchor.z + aAnchor.x * 0.35;
+              float rz = sin(uTime * 1.1 + ph) * uSway * aAnchor.w;
+              float rx = cos(uTime * 0.8 + ph * 1.3) * uSway * 0.7 * aAnchor.w;
+              rel = vec3(rel.x - rel.y * rz, rel.y + rel.x * rz - rel.z * rx, rel.z + rel.y * rx);
+              transformed = vec3(aAnchor.x, 0.0, aAnchor.y) + rel;`;
+          }
+          shader.vertexShader = shader.vertexShader
             .replace(
-              "#include <project_vertex>",
-              `#include <project_vertex>
-              #ifdef USE_INSTANCING
-                vLampW = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;
-              #else
-                vLampW = (modelMatrix * vec4(transformed, 1.0)).xyz;
-              #endif`
-            );
+              "#include <common>",
+              `#include <common>
+              uniform float uTime; uniform float uAmp; uniform float uHeight;
+              uniform float uSway; uniform float uBloomTime;
+              attribute float aGlow; varying float vGlow;
+              ${anchored ? "attribute vec4 aAnchor; attribute vec2 aBloom;" : ""}`
+            )
+            .replace("#include <begin_vertex>", begin + "\nvGlow = aGlow;");
           shader.fragmentShader = shader.fragmentShader
-            .replace("#include <common>", `#include <common>\nvarying vec3 vLampW;\n${LAMP_GLSL}`)
+            .replace("#include <common>", "#include <common>\nvarying float vGlow;")
             .replace(
               "#include <emissivemap_fragment>",
               lamps
-                ? "#include <emissivemap_fragment>\ntotalEmissiveRadiance += diffuseColor.rgb * lampGlow(vLampW);"
+                ? "#include <emissivemap_fragment>\ntotalEmissiveRadiance += diffuseColor.rgb * vGlow * vec3(1.0, 0.62, 0.3);"
                 : "#include <emissivemap_fragment>"
             );
         };
-        material.customProgramCacheKey = () => `enhance-${wind ? 1 : 0}-${lamps ? 1 : 0}`;
+        material.customProgramCacheKey = () => `enhance-${wind ? 1 : 0}-${lamps ? 1 : 0}-${anchored ? 1 : 0}`;
         return material;
       }
       const addWind = (material, amp, height) => enhance(material, { wind: { amp, height } });
 
+      // Copia ligera de una geometría (comparte los buffers) con la luz de faroles por instancia
+      function withInstanceGlow(base, glow) {
+        const g = new THREE.BufferGeometry();
+        g.setIndex(base.index);
+        for (const name of Object.keys(base.attributes)) g.setAttribute(name, base.attributes[name]);
+        g.setAttribute("aGlow", new THREE.InstancedBufferAttribute(glow, 1));
+        return g;
+      }
+      function withVertexGlow(geometry, glowFn) {
+        const pos = geometry.attributes.position;
+        const glow = new Float32Array(pos.count);
+        for (let i = 0; i < pos.count; i += 1) glow[i] = glowFn(pos.getX(i), pos.getY(i), pos.getZ(i));
+        geometry.setAttribute("aGlow", new THREE.BufferAttribute(glow, 1));
+        return geometry;
+      }
+
       // Divide instancias por zonas para que el navegador solo dibuje lo que se ve.
+      // Con `far`, las zonas lejanas usan una versión simplificada (nivel de detalle).
       const chunkedMeshes = [];
-      function chunkedInstances(geometry, material, items, { chunk = 14, castShadow = false } = {}) {
+      function chunkedInstances(geometry, material, items, { chunk = 14, castShadow = false, glowY = 0.6, far = null, cull = "flower" } = {}) {
         const buckets = new Map();
         for (const item of items) {
           const key = Math.floor(item.x / chunk) + "," + Math.floor(item.z / chunk);
@@ -1615,7 +1598,9 @@
         const p = new THREE.Vector3();
         const sc = new THREE.Vector3();
         for (const list of buckets.values()) {
-          const mesh = new THREE.InstancedMesh(geometry, material, list.length);
+          const glow = new Float32Array(list.length);
+          list.forEach((item, i) => { glow[i] = lampGlowAt(item.x, (item.y || 0) + glowY, item.z); });
+          const mesh = new THREE.InstancedMesh(withInstanceGlow(geometry, glow), material, list.length);
           let cx = 0, cz = 0;
           list.forEach((item, i) => {
             e.set(item.tiltX || 0, item.yaw || 0, item.tiltZ || 0, "YXZ");
@@ -1631,17 +1616,31 @@
             cz += item.z;
           });
           mesh.computeBoundingSphere();
-          mesh.castShadow = castShadow;
-          mesh.receiveShadow = true;
-          mesh.userData.center = new THREE.Vector3(cx / list.length, 0, cz / list.length);
+          mesh.castShadow = castShadow && TIER.shadows;
+          mesh.receiveShadow = TIER.shadows;
+          const entry = { mesh, farMesh: null, center: new THREE.Vector3(cx / list.length, 0, cz / list.length), cull, radius: chunk * 0.7 };
           scene.add(mesh);
-          chunkedMeshes.push(mesh);
+          if (far) {
+            const farMesh = new THREE.InstancedMesh(withInstanceGlow(far, glow), material, list.length);
+            farMesh.instanceMatrix = mesh.instanceMatrix;
+            farMesh.instanceColor = mesh.instanceColor;
+            farMesh.computeBoundingSphere();
+            farMesh.receiveShadow = TIER.shadows;
+            farMesh.visible = false;
+            scene.add(farMesh);
+            entry.farMesh = farMesh;
+          }
+          chunkedMeshes.push(entry);
         }
       }
 
-      // ---------- SUELO PROCEDURAL ----------
+      // ---------- SUELO ----------
+      // El dibujo del suelo (césped, tierra de parterres, grava de senderos) y el
+      // charco de luz de cada farol se pintan UNA vez en una textura grande.
+      // Cada cuadro solo lee esa textura más una textura pequeña de detalle.
       const groundSize = 300;
-      const groundSegments = lowPower ? 150 : 240;
+      const BAKE_SIZE = 160; // metros cubiertos por la textura (todo el jardín)
+      const groundSegments = lowPower ? 120 : 220;
       const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, groundSegments, groundSegments);
       groundGeometry.rotateX(-Math.PI / 2);
       {
@@ -1652,20 +1651,40 @@
         groundGeometry.computeVertexNormals();
       }
       const f2 = (v) => v.toFixed(2);
-      const groundMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, metalness: 0 });
-      groundMaterial.onBeforeCompile = (shader) => {
-        shader.uniforms.uLamps = lampUniforms.uLamps;
-        shader.uniforms.uLampCount = lampUniforms.uLampCount;
-        shader.vertexShader = shader.vertexShader
-          .replace("#include <common>", "#include <common>\nvarying vec3 vGW;")
-          .replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nvGW = (modelMatrix * vec4(transformed, 1.0)).xyz;");
-        shader.fragmentShader = shader.fragmentShader
-          .replace("#include <common>", `#include <common>\nvarying vec3 vGW;\n${NOISE_GLSL}\n${LAMP_GLSL}\nfloat gRough = 1.0;`)
-          .replace(
-            "#include <color_fragment>",
-            `#include <color_fragment>
-            {
-              vec2 p = vGW.xz;
+      const groundRT = new THREE.WebGLRenderTarget(2048, 2048, {
+        generateMipmaps: true,
+        minFilter: THREE.LinearMipmapLinearFilter,
+        magFilter: THREE.LinearFilter,
+        depthBuffer: false
+      });
+      groundRT.texture.colorSpace = THREE.SRGBColorSpace;
+      groundRT.texture.anisotropy = Math.min(lowPower ? 2 : 8, renderer.capabilities.getMaxAnisotropy());
+      groundRT.texture.repeat.setScalar(groundSize / BAKE_SIZE);
+      groundRT.texture.offset.setScalar(-(groundSize / 2 - BAKE_SIZE / 2) / BAKE_SIZE);
+      function bakeGround() {
+        const lamps = lampPositions.slice(0, 160);
+        const material = new THREE.ShaderMaterial({
+          uniforms: {
+            uLamps: { value: lamps.map((p) => new THREE.Vector4(p.x, LAMP_HEIGHT, p.z, LAMP_POWER)).concat(Array.from({ length: 160 - lamps.length }, () => new THREE.Vector4(0, -100, 0, 0))) },
+            uLampCount: { value: lamps.length }
+          },
+          depthTest: false,
+          depthWrite: false,
+          vertexShader: `
+            varying vec2 vW;
+            void main() {
+              // uv (0..1) -> metros del jardín, igual que el mapeo del suelo
+              vW = vec2((uv.x - 0.5) * ${f2(BAKE_SIZE)}, -(uv.y - 0.5) * ${f2(BAKE_SIZE)});
+              gl_Position = vec4(position.xy, 0.0, 1.0);
+            }
+          `,
+          fragmentShader: `
+            uniform vec4 uLamps[160];
+            uniform int uLampCount;
+            varying vec2 vW;
+            ${NOISE_GLSL}
+            void main() {
+              vec2 p = vW;
               float r = length(p);
               float th = atan(p.y, p.x);
               float nBig = gFbm(p * 0.22);
@@ -1724,24 +1743,96 @@
               float path = clamp(max(max(ring, spoke), max(max(ring1, ring2), avenues)), 0.0, 1.0);
               float pebble = gNoise(p * 55.0);
               float pebble2 = gNoise(p * 23.0 + 4.0);
-              vec3 gravel = mix(pow(vec3(0.5, 0.46, 0.4), vec3(2.2)), pow(vec3(0.74, 0.69, 0.6), vec3(2.2)), pebble);
+              vec3 gravel = mix(pow(vec3(0.42, 0.39, 0.34), vec3(2.2)), pow(vec3(0.62, 0.58, 0.5), vec3(2.2)), pebble);
               gravel *= 0.82 + pebble2 * 0.3;
               gravel = mix(gravel, pow(vec3(0.36, 0.32, 0.27), vec3(2.2)), smoothstep(0.78, 0.95, gNoise(p * 70.0)) * 0.6);
               col = mix(col, gravel, path);
               rough = mix(rough, 0.88, path);
 
-              diffuseColor.rgb = col;
-              gRough = rough;
-            }`
+
+              float glow = 0.0;
+              for (int i = 0; i < 160; i++) {
+                if (i >= uLampCount) break;
+                vec3 d = vec3(p.x, 0.0, p.y) - uLamps[i].xyz;
+                float dist2 = dot(d, d);
+                glow += (uLamps[i].w / (1.0 + dist2 * 0.9)) * smoothstep(42.0, 6.0, dist2);
+              }
+              gl_FragColor = vec4(col, clamp(glow * 0.5, 0.0, 1.0));
+              #include <colorspace_fragment>
+            }
+          `
+        });
+        const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+        const bakeScene = new THREE.Scene();
+        bakeScene.add(quad);
+        const cam = new THREE.Camera();
+        renderer.setRenderTarget(groundRT);
+        renderer.render(bakeScene, cam);
+        renderer.setRenderTarget(null);
+        quad.geometry.dispose();
+        material.dispose();
+      }
+      bakeGround();
+      // textura de detalle repetible (granos de grava, matas de césped)
+      function createDetailTexture() {
+        const N = 256;
+        const data = new Uint8Array(N * N * 4);
+        const rnd = seededRandom(4242);
+        const lattice = (period) => {
+          const g = new Float32Array(period * period);
+          for (let i = 0; i < g.length; i += 1) g[i] = rnd();
+          return (x, y) => {
+            const fx = x * period, fy = y * period;
+            const ix = Math.floor(fx), iy = Math.floor(fy);
+            const tx = fx - ix, ty = fy - iy;
+            const ux = tx * tx * (3 - 2 * tx), uy = ty * ty * (3 - 2 * ty);
+            const at = (a, b) => g[((a % period) + period) % period + (((b % period) + period) % period) * period];
+            const a = at(ix, iy), b = at(ix + 1, iy), c = at(ix, iy + 1), d = at(ix + 1, iy + 1);
+            return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
+          };
+        };
+        const o1 = lattice(8), o2 = lattice(32), o3 = lattice(64), o4 = lattice(128);
+        for (let y = 0; y < N; y += 1) {
+          for (let x = 0; x < N; x += 1) {
+            const u = x / N, v = y / N;
+            const n = o1(u, v) * 0.25 + o2(u, v) * 0.3 + o3(u, v) * 0.25 + o4(u, v) * 0.2;
+            const k = (y * N + x) * 4;
+            data[k] = data[k + 1] = data[k + 2] = Math.round(THREE.MathUtils.clamp(n, 0, 1) * 255);
+            data[k + 3] = 255;
+          }
+        }
+        const t = new THREE.DataTexture(data, N, N);
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.magFilter = THREE.LinearFilter;
+        t.minFilter = THREE.LinearMipmapLinearFilter;
+        t.generateMipmaps = true;
+        t.needsUpdate = true;
+        return t;
+      }
+      const groundDetail = { value: createDetailTexture() };
+      const groundMaterial = lit({ color: 0xffffff, map: groundRT.texture, roughness: 0.95, metalness: 0 });
+      groundMaterial.onBeforeCompile = (shader) => {
+        shader.uniforms.uDetail = groundDetail;
+        shader.vertexShader = shader.vertexShader
+          .replace("#include <common>", "#include <common>\nvarying vec2 vGW;")
+          .replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nvGW = (modelMatrix * vec4(transformed, 1.0)).xz;");
+        shader.fragmentShader = shader.fragmentShader
+          .replace("#include <common>", "#include <common>\nvarying vec2 vGW;\nuniform sampler2D uDetail;\nfloat gGlow = 0.0;")
+          .replace(
+            "#include <map_fragment>",
+            `vec4 bk = texture2D(map, vMapUv);
+            diffuseColor.rgb *= bk.rgb;
+            gGlow = bk.a * 2.0;
+            float det = texture2D(uDetail, vGW * 0.45).r * 0.6 + texture2D(uDetail, vGW * 0.11 + 0.31).r * 0.4;
+            diffuseColor.rgb *= 0.62 + det * 0.76;`
           )
-          .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = gRough;")
           .replace(
             "#include <emissivemap_fragment>",
-            "#include <emissivemap_fragment>\ntotalEmissiveRadiance += diffuseColor.rgb * lampGlow(vGW) * 1.3;"
+            "#include <emissivemap_fragment>\ntotalEmissiveRadiance += diffuseColor.rgb * vec3(1.0, 0.62, 0.3) * gGlow * 0.95;"
           );
       };
       const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-      ground.receiveShadow = true;
+      ground.receiveShadow = TIER.shadows;
       scene.add(ground);
 
       // ---------- ÁRBOLES Y ARBUSTOS ----------
@@ -1762,145 +1853,206 @@
         return g;
       }
 
-      // Árboles del fondo pintados como siluetas a contraluz: miles de hojas
-      // pequeñas con borde dorado donde las toca el sol.
-      function createTreeTexture(kind, seed) {
+      // Bosque alrededor del jardín: siluetas de árboles contra el cielo nocturno,
+      // pintadas una vez en una franja panorámica (una sola pieza por capa).
+      function createTreelineTexture(seed, W, H, density) {
         const rand = seededRandom(seed);
-        const W = 256, H = 384;
         const canvas = document.createElement("canvas");
         canvas.width = W;
         canvas.height = H;
         const ctx = canvas.getContext("2d");
-        const trunkTop = kind === "poplar" ? H * 0.3 : H * 0.45;
-        // tronco y ramas
-        ctx.strokeStyle = "#2a1d15";
-        ctx.lineCap = "round";
-        ctx.lineWidth = kind === "oak" ? 16 : 11;
-        ctx.beginPath();
-        ctx.moveTo(W / 2, H);
-        ctx.quadraticCurveTo(W / 2 + (rand() - 0.5) * 20, H * 0.75, W / 2 + (rand() - 0.5) * 14, trunkTop);
-        ctx.stroke();
-        ctx.lineWidth = 5;
-        for (let b = 0; b < 5; b += 1) {
-          const y = H - (H - trunkTop) * (0.45 + rand() * 0.5);
-          const dir = rand() < 0.5 ? -1 : 1;
+        ctx.fillStyle = "#fff";
+        const leafy = (cx, cy, rx, ry, n) => {
           ctx.beginPath();
-          ctx.moveTo(W / 2, y);
-          ctx.quadraticCurveTo(W / 2 + dir * 30, y - 30, W / 2 + dir * (40 + rand() * 40), y - 60 - rand() * 50);
-          ctx.stroke();
-        }
-        // masas de follaje
-        const clusters = [];
-        const count = kind === "poplar" ? 7 : 9;
-        for (let c = 0; c < count; c += 1) {
-          let cx, cy, rx, ry;
-          if (kind === "poplar") {
-            cy = H * 0.08 + (c / count) * H * 0.62;
-            cx = W / 2 + (rand() - 0.5) * 30;
-            rx = 34 + Math.sin((c / count) * Math.PI) * 26;
-            ry = 46;
-          } else {
-            const a = rand() * Math.PI * 2;
-            const spread = kind === "oak" ? 0.36 : 0.28;
-            cx = W / 2 + Math.cos(a) * W * spread * rand();
-            cy = H * (kind === "oak" ? 0.3 : 0.27) + Math.sin(a) * H * 0.17 * rand();
-            rx = 44 + rand() * 30;
-            ry = 38 + rand() * 24;
-          }
-          clusters.push({ cx, cy, rx, ry });
-        }
-        const leaves = kind === "poplar" ? 2600 : 3400;
-        for (let l = 0; l < leaves; l += 1) {
-          const c = clusters[Math.floor(rand() * clusters.length)];
-          const a = rand() * Math.PI * 2;
-          const d = Math.sqrt(rand());
-          const x = c.cx + Math.cos(a) * c.rx * d;
-          const y = c.cy + Math.sin(a) * c.ry * d;
-          // borde superior/izquierdo iluminado por el sol bajo
-          const rim = Math.max(0, -Math.cos(a) * 0.5 - Math.sin(a) * 0.7) * d;
-          const light = 12 + rim * 26 + rand() * 7;
-          const hue = 78 + rand() * 30 - rim * 25;
-          ctx.fillStyle = `hsl(${hue}, ${30 + rim * 30}%, ${light}%)`;
-          ctx.beginPath();
-          ctx.ellipse(x, y, 2.4 + rand() * 3.2, 1.8 + rand() * 2.2, rand() * Math.PI, 0, Math.PI * 2);
+          ctx.ellipse(cx, cy, rx * 0.82, ry * 0.82, 0, 0, Math.PI * 2);
           ctx.fill();
+          for (let i = 0; i < n; i += 1) {
+            const a = rand() * Math.PI * 2;
+            const d = 0.7 + rand() * 0.35;
+            ctx.beginPath();
+            ctx.arc(cx + Math.cos(a) * rx * d, cy + Math.sin(a) * ry * d, 1.5 + rand() * (rx * 0.16), 0, Math.PI * 2);
+            ctx.fill();
+          }
+        };
+        const drawTree = (x) => {
+          const kind = rand();
+          const h = H * (0.42 + rand() * 0.5);
+          const base = H;
+          ctx.fillRect(x - 2, base - h * 0.45, 4, h * 0.45);
+          if (kind < 0.35) {
+            // conífera: capas dentadas
+            const w = h * (0.28 + rand() * 0.1);
+            const layers = 9;
+            for (let l = 0; l < layers; l += 1) {
+              const t = l / layers;
+              const y = base - h * (0.12 + t * 0.88);
+              const ww = w * (1 - t) * (0.85 + rand() * 0.3);
+              ctx.beginPath();
+              ctx.moveTo(x - ww, y + h * 0.09);
+              ctx.lineTo(x, y - h * 0.06);
+              ctx.lineTo(x + ww, y + h * 0.09);
+              ctx.fill();
+            }
+          } else if (kind < 0.5) {
+            // álamo: copa alta y estrecha
+            const rx = h * 0.13, ry = h * 0.42;
+            for (let k = 0; k < 4; k += 1) leafy(x + (rand() - 0.5) * rx * 0.5, base - h * (0.4 + k * 0.14), rx, ry * 0.4, 30);
+          } else {
+            // frondoso: varias masas redondeadas
+            const rx = h * (0.22 + rand() * 0.14);
+            const cy = base - h * 0.68;
+            const lobes = 3 + Math.floor(rand() * 3);
+            for (let k = 0; k < lobes; k += 1) {
+              leafy(x + (rand() - 0.5) * rx * 1.2, cy + (rand() - 0.5) * h * 0.25, rx * (0.6 + rand() * 0.4), rx * (0.5 + rand() * 0.35), 40);
+            }
+          }
+        };
+        // copia envuelta en los bordes para que la franja no tenga cortes
+        const xs = [];
+        for (let x = 0; x < W; x += (W / density) * (0.4 + rand() * 1.2)) xs.push(x);
+        for (const x of xs) {
+          drawTree(x);
+          if (x < W * 0.08) drawTree(x + W);
+          if (x > W * 0.92) drawTree(x - W);
         }
+        // sotobosque continuo
+        ctx.fillRect(0, H * 0.86, W, H * 0.14);
+        for (let x = 0; x < W; x += 6) leafy(x, H * 0.86, 10 + rand() * 12, 6 + rand() * 8, 6);
         const texture = new THREE.CanvasTexture(canvas);
-        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.repeat.x = 3;
+        texture.anisotropy = 4;
         return texture;
       }
-
       {
-        const kinds = [
-          { kind: "round", aspect: 0.72 },
-          { kind: "oak", aspect: 0.8 },
-          { kind: "poplar", aspect: 0.5 },
-          { kind: "round", aspect: 0.72 }
+        const layers = [
+          { radius: 104, height: 30, y: -1, color: 0x18233f, seed: 31, density: 46 },
+          { radius: 78, height: 21, y: -4, color: 0x0a1020, seed: 17, density: 58 }
         ];
-        const materials = kinds.map(
-          (k, i) =>
-            new THREE.SpriteMaterial({
-              map: createTreeTexture(k.kind, 101 + i * 37),
-              alphaTest: 0.35,
-              fog: true,
-              color: 0x3a4660
-            })
-        );
-        const treeCount = Math.round(260 * (lowPower ? 0.5 : 1));
-        const sunAngle = Math.atan2(moonSkyDir.z, moonSkyDir.x);
-        for (let i = 0; i < treeCount; i += 1) {
-          const a = random() * Math.PI * 2;
-          // claro bajo la luna para que siempre se vea
-          const behindSun = Math.max(0, Math.cos(a - sunAngle));
-          const r = 68 + Math.pow(random(), 0.8) * 45 + behindSun * behindSun * 40;
-          const x = Math.cos(a) * r;
-          const z = Math.sin(a) * r;
-          const k = Math.floor(random() * kinds.length);
-          const sprite = new THREE.Sprite(materials[k]);
-          const h = 9 + random() * 8;
-          sprite.center.set(0.5, 0.02);
-          sprite.scale.set(h * kinds[k].aspect * (0.9 + random() * 0.2), h, 1);
-          sprite.position.set(x, groundHeight(x, z) - 0.3, z);
-          scene.add(sprite);
-        }
+        layers.forEach((layer, i) => {
+          const geometry = new THREE.CylinderGeometry(layer.radius, layer.radius, layer.height, 160, 1, true);
+          geometry.translate(0, layer.height / 2 + layer.y, 0);
+          const material = new THREE.MeshBasicMaterial({
+            map: createTreelineTexture(layer.seed, lowPower ? 2048 : 4096, lowPower ? 256 : 512, layer.density),
+            color: layer.color,
+            alphaTest: 0.5,
+            side: THREE.BackSide,
+            fog: false
+          });
+          const band = new THREE.Mesh(geometry, material);
+          band.rotation.y = i * 1.3;
+          scene.add(band);
+        });
       }
 
-      // Seto bajo de boj que rodea el jardín (con dos entradas)
-      {
-        const blob = blobGeometry(2, 0.35, 8.4);
-        const hedgeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
-        const step = 0.2;
-        const circumference = Math.PI * 2 * GARDEN.hedge;
-        const total = Math.floor(circumference / step);
-        const items = [];
-        for (let i = 0; i < total; i += 1) {
-          const a = (i / total) * Math.PI * 2;
-          const x = Math.cos(a) * GARDEN.hedge;
-          const z = Math.sin(a) * GARDEN.hedge;
-          if (Math.abs(x) < 0.9) continue; // entradas
-          items.push({ x, z });
-          items.push({ x: x + (random() - 0.5) * 0.2, z: z + (random() - 0.5) * 0.2, top: true });
+      // Seto de boj recortado que rodea el jardín (con dos entradas)
+      function createLeafTexture() {
+        const S = 256;
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = S;
+        const ctx = canvas.getContext("2d");
+        const rand = seededRandom(909);
+        ctx.fillStyle = "#1c2b17";
+        ctx.fillRect(0, 0, S, S);
+        for (let i = 0; i < 2600; i += 1) {
+          const x = rand() * S, y = rand() * S;
+          const l = 14 + rand() * 22;
+          ctx.fillStyle = `hsl(${88 + rand() * 30}, ${30 + rand() * 25}%, ${l}%)`;
+          const r1 = 2.5 + rand() * 3.5, r2 = 1.4 + rand() * 1.8, rot = rand() * Math.PI;
+          for (const ox of [-S, 0, S]) {
+            for (const oy of [-S, 0, S]) {
+              if (x + ox < -8 || x + ox > S + 8 || y + oy < -8 || y + oy > S + 8) continue;
+              ctx.beginPath();
+              ctx.ellipse(x + ox, y + oy, r1, r2, rot, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
         }
-        const hedge = new THREE.InstancedMesh(blob, hedgeMaterial, items.length);
-        const m = new THREE.Matrix4();
-        const q = new THREE.Quaternion();
-        const color = new THREE.Color();
-        items.forEach((item, i) => {
-          const s = 0.27 + random() * 0.07;
-          q.setFromEuler(new THREE.Euler(random() * 3, random() * 3, random() * 3));
-          m.compose(new THREE.Vector3(item.x, item.top ? 0.5 : 0.26, item.z), q, new THREE.Vector3(s, s * 0.9, s));
-          hedge.setMatrixAt(i, m);
-          hedge.setColorAt(i, color.setHSL(0.27 + random() * 0.03, 0.45, 0.13 + random() * 0.05));
-        });
-        hedge.castShadow = true;
-        hedge.receiveShadow = true;
+        const t = new THREE.CanvasTexture(canvas);
+        t.colorSpace = THREE.SRGBColorSpace;
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.anisotropy = 4;
+        return t;
+      }
+      {
+        const W = 0.72, Hh = 0.82, rc = 0.2;
+        const profile = [];
+        profile.push([-W / 2, -0.06]);
+        profile.push([-W / 2, Hh * 0.45]);
+        for (let k = 0; k <= 4; k += 1) {
+          const a = Math.PI - (k / 4) * (Math.PI / 2);
+          profile.push([-W / 2 + rc + Math.cos(a) * rc, Hh - rc + Math.sin(a) * rc]);
+        }
+        for (let k = 0; k <= 4; k += 1) {
+          const a = Math.PI / 2 - (k / 4) * (Math.PI / 2);
+          profile.push([W / 2 - rc + Math.cos(a) * rc, Hh - rc + Math.sin(a) * rc]);
+        }
+        profile.push([W / 2, Hh * 0.45]);
+        profile.push([W / 2, -0.06]);
+        const vLen = [0];
+        for (let k = 1; k < profile.length; k += 1) {
+          vLen.push(vLen[k - 1] + Math.hypot(profile[k][0] - profile[k - 1][0], profile[k][1] - profile[k - 1][1]));
+        }
+        const gap = Math.asin(0.9 / GARDEN.hedge);
+        const arcs = [[-Math.PI / 2 + gap, Math.PI / 2 - gap], [Math.PI / 2 + gap, (Math.PI * 3) / 2 - gap]];
+        const positions = [], colors = [], uvs = [], indices = [];
+        const step = lowPower ? 0.22 : 0.12;
+        let base = 0;
+        for (const [a0, a1] of arcs) {
+          const len = (a1 - a0) * GARDEN.hedge;
+          const n = Math.ceil(len / step);
+          for (let i = 0; i <= n; i += 1) {
+            const s = (i / n) * len;
+            const a = a0 + (s / len) * (a1 - a0);
+            // extremos redondeados en las entradas
+            const endD = Math.min(s, len - s);
+            const f = Math.sqrt(1 - Math.pow(1 - Math.min(1, endD / 0.38), 2));
+            const ca = Math.cos(a), sa = Math.sin(a);
+            profile.forEach(([d, y], k) => {
+              const taper = 1 - 0.08 * Math.max(0, y) / Hh;
+              const yy = y < 0 ? y : y * (0.5 + 0.5 * f);
+              const dd = d * taper * Math.max(f, 0.05);
+              const r = GARDEN.hedge + dd;
+              let x = ca * r, z = sa * r;
+              // superficie recortada pero viva, con pequeñas irregularidades
+              const bump = (fbm(x * 1.6 + 3, z * 1.6 + yy * 2) - 0.5) * 0.09 + (fbm(x * 5, z * 5 - yy * 3) - 0.5) * 0.035;
+              const nx = Math.abs(d) > W / 2 - rc ? Math.sign(d) : 0;
+              x += ca * nx * bump;
+              z += sa * nx * bump;
+              const top = yy > Hh * 0.6 ? bump : 0;
+              positions.push(x, Math.max(yy + top, -0.06), z);
+              const ao = 0.42 + 0.58 * THREE.MathUtils.smoothstep(yy, -0.05, Hh * 0.9);
+              colors.push(ao, ao, ao);
+              uvs.push(s / 0.9, vLen[k] / 0.9);
+            });
+            if (i < n) {
+              const row = profile.length;
+              for (let k = 0; k < row - 1; k += 1) {
+                const p0 = base + i * row + k, p1 = p0 + 1, p2 = p0 + row, p3 = p2 + 1;
+                indices.push(p0, p2, p1, p1, p2, p3);
+              }
+            }
+          }
+          base += (n + 1) * profile.length;
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+        geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+        geometry.setIndex(indices);
+        geometry.computeVertexNormals();
+        withVertexGlow(geometry, (x, y, z) => lampGlowAt(x, y, z));
+        const hedgeMaterial = enhance(lit({ map: createLeafTexture(), vertexColors: true, color: 0xb8c8a8, roughness: 0.92, side: THREE.DoubleSide }));
+        const hedge = new THREE.Mesh(geometry, hedgeMaterial);
+        hedge.castShadow = TIER.shadows;
+        hedge.receiveShadow = TIER.shadows;
         scene.add(hedge);
       }
 
       // Piedras que bordean el sendero
       {
         const stoneGeometry = blobGeometry(1, 0.4, 1.7);
-        const stoneMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85 });
+        const stoneMaterial = enhance(lit({ color: 0xffffff, roughness: 0.85 }));
         const items = [];
         for (const radius of [GARDEN.pathInner - 0.06, GARDEN.pathOuter + 0.06]) {
           const count = Math.floor((Math.PI * 2 * radius) / 0.24);
@@ -1918,7 +2070,8 @@
             items.push({ x: side * 0.57, z: -d, a: Math.PI / 2 });
           }
         }
-        const stones = new THREE.InstancedMesh(stoneGeometry, stoneMaterial, items.length);
+        const stoneGlow = new Float32Array(items.map((it) => lampGlowAt(it.x, 0.1, it.z)));
+        const stones = new THREE.InstancedMesh(withInstanceGlow(stoneGeometry, stoneGlow), stoneMaterial, items.length);
         const m = new THREE.Matrix4();
         const q = new THREE.Quaternion();
         const color = new THREE.Color();
@@ -1930,15 +2083,13 @@
           const g = 0.3 + random() * 0.16;
           stones.setColorAt(i, color.setRGB(g, g * 0.96, g * 0.9));
         });
-        stones.receiveShadow = true;
+        stones.receiveShadow = TIER.shadows;
         scene.add(stones);
       }
 
       // ---------- CÉSPED (briznas instanciadas que se mecen) ----------
-      function createGrassClumpGeometry() {
+      function createGrassClumpGeometry(blades = 6, segs = 3) {
         const positions = [], normals = [], colors = [], indices = [];
-        const blades = 6;
-        const segs = 3;
         let base = 0;
         const rand = seededRandom(77);
         for (let b = 0; b < blades; b += 1) {
@@ -1962,9 +2113,9 @@
               normals.push(0, 1, 0);
               const k = 0.35 + 0.65 * t;
               colors.push(
-                0.1 + 0.17 * k + tipTint * 0.06 * t,
-                0.19 + 0.27 * k,
-                0.05 + 0.07 * k
+                0.09 + 0.13 * k + tipTint * 0.05 * t,
+                0.17 + 0.22 * k,
+                0.05 + 0.06 * k
               );
             }
             if (s < segs) {
@@ -1982,7 +2133,7 @@
         return g;
       }
       {
-        const grassMaterial = enhance(new THREE.MeshStandardMaterial({
+        const grassMaterial = enhance(lit({
           vertexColors: true,
           roughness: 0.82,
           side: THREE.DoubleSide
@@ -2005,7 +2156,7 @@
           const v = 0.75 + random() * 0.35;
           items.push({ x, z, y: groundHeight(x, z), s, sy: s * (0.85 + random() * 0.4), yaw: random() * Math.PI * 2, shade: v });
         }
-        chunkedInstances(createGrassClumpGeometry(), grassMaterial, items, { chunk: 12 });
+        chunkedInstances(lowPower ? createGrassClumpGeometry(4, 2) : createGrassClumpGeometry(), grassMaterial, items, { chunk: 10, glowY: 0.15, cull: "grass" });
       }
 
       // ---------- TULIPANES ----------
@@ -2103,9 +2254,14 @@
       const innerPetalGeometry = createTulipPetalGeometry(false);
       const tulipLeafGeometry = createTulipLeafGeometry();
       // versiones ligeras para los campos grandes
-      const lowOuterPetal = createTulipPetalGeometry(true, 7, 4);
-      const lowInnerPetal = createTulipPetalGeometry(false, 6, 3);
-      const lowLeaf = createTulipLeafGeometry(8, 2);
+      const lowOuterPetal = createTulipPetalGeometry(true, 6, 3);
+      const lowInnerPetal = createTulipPetalGeometry(false, 5, 2);
+      const lowLeaf = createTulipLeafGeometry(6, 2);
+      // versiones mínimas para lo que se ve de lejos
+      const farOuterPetal = createTulipPetalGeometry(true, 3, 2);
+      const farLeaf = createTulipLeafGeometry(3, 1);
+      const lowCalyx = new THREE.SphereGeometry(0.075, 6, 4);
+      const lowTulipInner = new THREE.SphereGeometry(0.17, 6, 4);
       const tulipFilamentGeometry = new THREE.CylinderGeometry(0.008, 0.01, 0.4, 5);
       tulipFilamentGeometry.rotateX(Math.PI / 2);
       tulipFilamentGeometry.translate(0, 0, 0.2);
@@ -2127,16 +2283,19 @@
       const tulipAntherPaint = paint(0x2b1b2a);
       const tulipPistilPaint = paint(0xb8c860);
 
-      const flowerMaterial = new THREE.MeshPhysicalMaterial({
-        vertexColors: true,
-        roughness: 0.62,
-        metalness: 0,
-        sheen: 0.55,
-        sheenRoughness: 0.55,
-        sheenColor: new THREE.Color(0xffffff),
-        side: THREE.DoubleSide
-      });
-      enhance(flowerMaterial);
+      // Pétalos con brillo aterciopelado en computador; en celular, sombreado simple.
+      const makeFlowerMaterial = () => lowPower
+        ? new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide })
+        : new THREE.MeshPhysicalMaterial({
+          vertexColors: true,
+          roughness: 0.62,
+          metalness: 0,
+          sheen: 0.55,
+          sheenRoughness: 0.55,
+          sheenColor: new THREE.Color(0xffffff),
+          side: THREE.DoubleSide
+        });
+      const flowerMaterial = enhance(makeFlowerMaterial(), { anchored: true });
 
       function bakePlant(group) {
         group.updateMatrixWorld(true);
@@ -2168,8 +2327,6 @@
         });
         const merged = mergeGeometries(parts, false);
         const mesh = new THREE.Mesh(merged, flowerMaterial);
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
         const baked = new THREE.Group();
         baked.position.copy(group.position);
         baked.add(mesh);
@@ -2225,11 +2382,12 @@
           new THREE.Vector3(config.bendX, config.height, config.bendZ)
         ]);
         const lp = !!config.lowPoly;
-        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, lp ? 5 : 14, 0.045 * config.scale, lp ? 4 : 6, false), tulipStemPaint));
+        const far = !!config.far;
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, far ? 2 : lp ? 4 : 14, 0.045 * config.scale * (far ? 1.4 : 1), far ? 3 : lp ? 4 : 6, false), tulipStemPaint));
 
-        const leafCount = 2 + (rnd(1) > 0.5 ? 1 : 0);
+        const leafCount = far ? 1 : 2 + (rnd(1) > 0.5 ? 1 : 0);
         for (let i = 0; i < leafCount; i++) {
-          const leaf = new THREE.Mesh(lp ? lowLeaf : tulipLeafGeometry, tulipLeafPaint);
+          const leaf = new THREE.Mesh(far ? farLeaf : lp ? lowLeaf : tulipLeafGeometry, tulipLeafPaint);
           leaf.position.set(0, 0.01 + i * 0.04 * config.height, 0);
           leaf.rotation.y = config.seed * 6.28 + i * ((Math.PI * 2) / leafCount) + (rnd(i + 1) - 0.5) * 0.5;
           leaf.rotation.x = (rnd(i + 7) - 0.5) * 0.15;
@@ -2244,13 +2402,19 @@
         head.scale.setScalar(config.scale);
         const petalPaint = paint(config.color);
         const open = config.open !== undefined ? config.open : 0.2 + rnd(11) * 0.3;
-        const calyx = new THREE.Mesh(calyxGeometry, tulipStemPaint);
+        if (far) {
+          // de lejos basta la copa de tres pétalos
+          addTepals(head, petalPaint, farOuterPetal, rnd(21) * 0.2, 0.02 + open * 0.2, rnd);
+          group.add(head);
+          return bakePlant(group);
+        }
+        const calyx = new THREE.Mesh(lp ? lowCalyx : calyxGeometry, tulipStemPaint);
         calyx.scale.set(1, 1, 0.8);
         calyx.position.z = -0.01;
         head.add(calyx);
         addTepals(head, petalPaint, lp ? lowOuterPetal : outerPetalGeometry, rnd(21) * 0.2, 0.05 + open * 0.28, rnd);
         addTepals(head, petalPaint, lp ? lowInnerPetal : innerPetalGeometry, Math.PI / 3 + rnd(22) * 0.2, 0.01 + open * 0.16, rnd);
-        const inner = new THREE.Mesh(tulipInnerGeometry, tulipCenterPaint);
+        const inner = new THREE.Mesh(lp ? lowTulipInner : tulipInnerGeometry, tulipCenterPaint);
         inner.scale.set(1, 1, 0.55);
         inner.position.z = 0.03;
         head.add(inner);
@@ -2288,7 +2452,8 @@
         return geometry;
       }
       const spiderPetalGeometry = createSpiderPetalGeometry();
-      const lowSpiderPetal = createSpiderPetalGeometry(3);
+      const lowSpiderPetal = createSpiderPetalGeometry(2);
+      const farSpiderPetal = createSpiderPetalGeometry(1);
       const spiderStamenCurve = new THREE.CatmullRomCurve3([
         new THREE.Vector3(0, 0, 0),
         new THREE.Vector3(0, 0.34, 0.1),
@@ -2297,7 +2462,7 @@
         new THREE.Vector3(0, 0.88, 1.06)
       ]);
       const spiderStamenGeometry = new THREE.TubeGeometry(spiderStamenCurve, 10, 0.011, 4, false);
-      const lowStamen = new THREE.TubeGeometry(spiderStamenCurve, 5, 0.013, 3, false);
+      const lowStamen = new THREE.TubeGeometry(spiderStamenCurve, 3, 0.016, 2, false);
       const spiderAntherGeometry = new THREE.SphereGeometry(0.035, 6, 4);
       const spiderCenterGeometry = new THREE.SphereGeometry(0.085, 8, 6);
       const LYCORIS_COLORS = [0xd0182b, 0xe02a2d, 0xb8121f];
@@ -2316,7 +2481,8 @@
           new THREE.Vector3(config.bendX, config.height, config.bendZ)
         ]);
         const lp = !!config.lowPoly;
-        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, lp ? 5 : 12, 0.03 * config.scale, lp ? 4 : 6, false), spiderStemPaint));
+        const far = !!config.far;
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, far ? 2 : lp ? 4 : 12, 0.03 * config.scale * (far ? 1.5 : 1), far ? 3 : 4, false), spiderStemPaint));
         const head = new THREE.Group();
         head.position.copy(curve.getPoint(1));
         head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
@@ -2324,8 +2490,8 @@
         const petalPaint = paint(config.color);
         // Umbela: 5–6 florecillas que miran hacia afuera, cada una con 6 tépalos
         // estrechos que se curvan hacia atrás y estambres largos que sobresalen.
-        const florets = lp ? 4 : 5 + (config.seed > 0.5 ? 1 : 0);
-        head.add(new THREE.Mesh(spiderCenterGeometry, spiderCenterPaint));
+        const florets = far ? 3 : lp ? 4 : 5 + (config.seed > 0.5 ? 1 : 0);
+        if (!lp && !far) head.add(new THREE.Mesh(spiderCenterGeometry, spiderCenterPaint));
         for (let f = 0; f < florets; f += 1) {
           const floret = new THREE.Group();
           floret.rotation.z = (f / florets) * Math.PI * 2 + config.seed;
@@ -2336,13 +2502,13 @@
           for (let i = 0; i < 6; i += 1) {
             const holder = new THREE.Group();
             holder.rotation.z = (i / 6) * Math.PI * 2 + f;
-            const petal = new THREE.Mesh(lp ? lowSpiderPetal : spiderPetalGeometry, petalPaint);
+            const petal = new THREE.Mesh(far ? farSpiderPetal : lp ? lowSpiderPetal : spiderPetalGeometry, petalPaint);
             petal.rotation.x = 0.55 + ((i * 7 + f) % 3) * 0.08;
             petal.scale.set(0.9, 0.95, 1);
             holder.add(petal);
             inner.add(holder);
           }
-          const stamens = lp ? 3 : 6;
+          const stamens = far ? 0 : lp ? 3 : 6;
           for (let i = 0; i < stamens; i += 1) {
             const holder = new THREE.Group();
             holder.rotation.z = Math.PI / 6 + (i / stamens) * Math.PI * 2;
@@ -2350,6 +2516,10 @@
             stamen.rotation.x = -0.35;
             stamen.scale.setScalar(1.55);
             holder.add(stamen);
+            if (lp) {
+              inner.add(holder);
+              continue;
+            }
             const anther = new THREE.Mesh(spiderAntherGeometry, spiderAntherPaint);
             anther.position.copy(spiderStamenCurve.getPoint(1)).multiplyScalar(1.55).applyAxisAngle(new THREE.Vector3(1, 0, 0), -0.35);
             holder.add(anther);
@@ -2362,27 +2532,6 @@
         return bakePlant(group);
       }
 
-
-      // ---------- PLANTAS INSTANCIADAS ----------
-      function plantInstances(geometry, material, items, opts = {}) {
-        const mesh = new THREE.InstancedMesh(geometry, material, items.length);
-        const m = new THREE.Matrix4();
-        const q = new THREE.Quaternion();
-        const e = new THREE.Euler();
-        const color = new THREE.Color();
-        items.forEach((item, i) => {
-          e.set(item.tiltX || 0, item.yaw || 0, item.tiltZ || 0, "YXZ");
-          q.setFromEuler(e);
-          m.compose(new THREE.Vector3(item.x, item.y || 0, item.z), q, new THREE.Vector3(item.s, item.sy || item.s, item.s));
-          mesh.setMatrixAt(i, m);
-          const v = item.shade || 1;
-          mesh.setColorAt(i, color.setRGB(v, v, v));
-        });
-        mesh.castShadow = opts.castShadow ?? false;
-        mesh.receiveShadow = true;
-        scene.add(mesh);
-        return mesh;
-      }
 
       // ---------- DISTRIBUCIÓN DE PLANTAS ----------
       function scatterInArea(count, spacing, test, rMin, rMax, avoid = []) {
@@ -2409,18 +2558,43 @@
         return placed;
       }
 
-      const plants = [];
-      function registerPlant(group, phase, sway) {
-        group.scale.setScalar(0.0001);
-        scene.add(group);
-        plants.push({
-          group,
-          phase,
-          sway,
-          bloomProgress: 0,
-          bloomDelay: Math.hypot(group.position.x, group.position.z) * 0.12 + random() * 0.6,
-          bloomSpeed: 0.45 + random() * 0.35
-        });
+      // Las flores del centro y de los parterres se juntan en pocas piezas grandes
+      // (una por parterre): cientos de flores, pocas llamadas de dibujo.
+      const plantBuckets = new Map();
+      function registerPlant(group, phase, sway, bucket = "center") {
+        const geometry = group.children[0].geometry;
+        const { x, z } = group.position;
+        geometry.translate(x, 0, z);
+        const n = geometry.attributes.position.count;
+        const anchor = new Float32Array(n * 4);
+        const bloom = new Float32Array(n * 2);
+        const glow = new Float32Array(n);
+        const delay = Math.hypot(x, z) * 0.12 + random() * 0.6;
+        const speed = 0.45 + random() * 0.35;
+        const glowBase = lampGlowAt(x, 0.3, z);
+        const glowHead = lampGlowAt(x, 1.2, z);
+        const posY = geometry.attributes.position;
+        for (let i = 0; i < n; i += 1) {
+          anchor.set([x, z, phase, sway], i * 4);
+          bloom[i * 2] = delay;
+          bloom[i * 2 + 1] = speed;
+          glow[i] = THREE.MathUtils.lerp(glowBase, glowHead, THREE.MathUtils.clamp(posY.getY(i) / 1.2, 0, 1));
+        }
+        geometry.setAttribute("aAnchor", new THREE.BufferAttribute(anchor, 4));
+        geometry.setAttribute("aBloom", new THREE.BufferAttribute(bloom, 2));
+        geometry.setAttribute("aGlow", new THREE.BufferAttribute(glow, 1));
+        if (!plantBuckets.has(bucket)) plantBuckets.set(bucket, []);
+        plantBuckets.get(bucket).push(geometry);
+      }
+      function flushPlants() {
+        for (const parts of plantBuckets.values()) {
+          const mesh = new THREE.Mesh(mergeGeometries(parts, false), flowerMaterial);
+          mesh.castShadow = TIER.shadows;
+          mesh.receiveShadow = TIER.shadows;
+          scene.add(mesh);
+          parts.forEach((g) => g.dispose());
+        }
+        plantBuckets.clear();
       }
 
       // Macizo central: anillos de color, del rojo intenso al amarillo.
@@ -2455,6 +2629,7 @@
             color: TULIP_COLORS[colorName],
             seed,
             detail: !lowPower && ring.rMin < 1,
+            lowPoly: lowPower,
             open: 0.15 + random() * 0.35
           });
           registerPlant(group, seed * Math.PI * 2, 1);
@@ -2486,10 +2661,12 @@
               spin: random() * Math.PI * 2,
               color: TULIP_COLORS[colorName],
               seed,
-              detail: false
+              detail: false,
+              lowPoly: lowPower
             }),
             seed * Math.PI * 2,
-            1.1
+            1.1,
+            "bed" + index
           );
         }
       }
@@ -2511,16 +2688,18 @@
               bendZ: (random() - 0.5) * 0.35,
               spin: random() * Math.PI * 2,
               color: LYCORIS_COLORS[Math.floor(random() * LYCORIS_COLORS.length)],
-              seed
+              seed,
+              lowPoly: lowPower
             }),
             seed * Math.PI * 2,
-            1.25
+            1.25,
+            "bed" + index
           );
         }
       }
 
       const grassClumpGeometry = createGrassClumpGeometry();
-      const coverMaterial = enhance(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, side: THREE.DoubleSide }), { wind: { amp: 0.05, height: 0.45 } });
+      const coverMaterial = enhance(lit({ vertexColors: true, roughness: 0.85, side: THREE.DoubleSide }), { wind: { amp: 0.05, height: 0.45 } });
 
       lycorisBed(0);
       tulipBed(1, ["yellow", "apricot", "orange", "scarlet"]);
@@ -2528,6 +2707,7 @@
       tulipBed(3, ["white", "cream", "blush", "pink"]);
       lycorisBed(4);
       tulipBed(5, ["lilac", "purple", "night", "pink"]);
+      flushPlants();
 
       // Cobertura verde baja entre las flores para que los parterres se vean llenos
       {
@@ -2538,15 +2718,14 @@
           0,
           GARDEN.bedOuter
         ).map((p) => ({ x: p.x, z: p.z, s: 1.2 + random() * 0.6, sy: 0.9 + random() * 0.4, yaw: random() * 6, shade: 0.6 + random() * 0.25 }));
-        plantInstances(grassClumpGeometry, coverMaterial, cover);
+        chunkedInstances(grassClumpGeometry, coverMaterial, cover, { chunk: 9, glowY: 0.2, cull: "grass" });
       }
 
 
       // ---------- CAMPOS GRANDES (instanciados) ----------
       // Variantes horneadas de cada flor; cada campo usa miles de copias.
-      const fieldFlowerMaterial = enhance(flowerMaterial.clone(), { wind: { amp: 0.05, height: 1.3 } });
-      fieldFlowerMaterial.side = THREE.DoubleSide;
-      function tulipVariant(colorHex, seed) {
+      const fieldFlowerMaterial = enhance(makeFlowerMaterial(), { wind: { amp: 0.05, height: 1.3 } });
+      function tulipVariant(colorHex, seed, far = false) {
         const rnd = seededRandom(Math.floor(seed * 100000) + 7);
         return createTulip({
           x: 0, z: 0,
@@ -2560,10 +2739,11 @@
           seed,
           detail: false,
           lowPoly: true,
+          far,
           open: 0.15 + rnd() * 0.3
         }).children[0].geometry;
       }
-      function lilyVariant(colorHex, seed) {
+      function lilyVariant(colorHex, seed, far = false) {
         const rnd = seededRandom(Math.floor(seed * 100000) + 11);
         return createSpiderLily({
           x: 0, z: 0,
@@ -2575,7 +2755,8 @@
           spin: rnd() * Math.PI * 2,
           color: colorHex,
           seed,
-          lowPoly: true
+          lowPoly: true,
+          far
         }).children[0].geometry;
       }
 
@@ -2584,7 +2765,10 @@
       {
         const variants = {};
         for (const name of STRIPE_PALETTE) {
-          variants[name] = [0, 1, 2].map((k) => tulipVariant(TULIP_COLORS[name], 0.13 + k * 0.29 + name.length * 0.01));
+          variants[name] = [0, 1, 2].map((k) => {
+            const seed = 0.13 + k * 0.29 + name.length * 0.01;
+            return { near: tulipVariant(TULIP_COLORS[name], seed), far: tulipVariant(TULIP_COLORS[name], seed, true) };
+          });
         }
         const items = {};
         const stepX = lowPower ? 0.5 : 0.36;
@@ -2622,12 +2806,14 @@
             }
           }
         }
-        for (const entry of Object.values(items)) chunkedInstances(entry.geometry, fieldFlowerMaterial, entry.list, { chunk: 12 });
+        for (const entry of Object.values(items)) {
+          chunkedInstances(entry.geometry.near, fieldFlowerMaterial, entry.list, { chunk: 16, far: entry.geometry.far, glowY: 0.9 });
+        }
       }
 
       // Praderas de lirios araña: manchas naturales entre el césped
       {
-        const variants = LYCORIS_COLORS.flatMap((c, i) => [lilyVariant(c, 0.2 + i * 0.17), lilyVariant(c, 0.61 + i * 0.11)]);
+        const variants = LYCORIS_COLORS.flatMap((c, i) => [0.2 + i * 0.17, 0.61 + i * 0.11].map((seed) => ({ near: lilyVariant(c, seed), far: lilyVariant(c, seed, true) })));
         const lists = variants.map(() => []);
         const target = Math.round(2600 * Q);
         let placed = 0;
@@ -2654,100 +2840,105 @@
           });
           placed += 1;
         }
-        variants.forEach((g, k) => chunkedInstances(g, fieldFlowerMaterial, lists[k], { chunk: 14 }));
+        variants.forEach((g, k) => chunkedInstances(g.near, fieldFlowerMaterial, lists[k], { chunk: 18, far: g.far, glowY: 0.9 }));
       }
 
       // ---------- FAROLES ----------
-      const lampPositions = [];
+      const lampGlowUniforms = { uScale: { value: 400 }, uFogFar: { value: TIER.fog[1] } };
       {
-        const add = (x, z) => lampPositions.push(new THREE.Vector3(x, 0, z));
-        // alrededor del sendero central, entre los parterres
-        for (let i = 0; i < 6; i += 1) {
-          const a = SECTOR / 2 + i * SECTOR + SECTOR / 2;
-          if (Math.abs(Math.cos(a)) < 0.2) continue;
-          add(Math.cos(a) * (GARDEN.pathOuter + 0.25), Math.sin(a) * (GARDEN.pathOuter + 0.25));
-        }
-        // a los lados de las entradas del seto
-        for (const zs of [-1, 1]) for (const xs of [-1, 1]) add(xs * 1.0, zs * (GARDEN.hedge + 0.6));
-        // anillos de paseo
-        for (const [ring, count] of [[GARDEN.ring1[1] + 0.35, 12], [GARDEN.ring2[1] + 0.35, 24]]) {
-          for (let i = 0; i < count; i += 1) {
-            const a = (i + 0.5) * ((Math.PI * 2) / count);
-            add(Math.cos(a) * ring, Math.sin(a) * ring);
-          }
-        }
-        // avenidas en cruz, alternando lados
-        for (let d = 17; d < GARDEN.edge; d += 7) {
-          if (Math.abs(d - (GARDEN.ring2[0] + GARDEN.ring2[1]) / 2) < 3) continue;
-          const side = Math.round(d / 7) % 2 ? 1 : -1;
-          const off = GARDEN.avenueHalf + 0.35;
-          add(side * off, d); add(-side * off, -d);
-          add(d, side * off); add(-d, -side * off);
-        }
-      }
-      lampUniforms.uLampCount.value = Math.min(MAX_LAMPS, lampPositions.length);
-      const LAMP_HEIGHT = 2.35;
-      lampPositions.slice(0, MAX_LAMPS).forEach((p, i) => {
-        lampUniforms.uLamps.value[i].set(p.x, LAMP_HEIGHT, p.z, 1.35);
-      });
-      {
-        // farol clásico: base, poste, linterna de vidrio y tejadillo
+        // farol victoriano de parque: zócalo, poste con anillos, linterna con
+        // marco de hierro y cristal esmerilado, tejadillo y remate
         const metal = [];
-        const base = new THREE.CylinderGeometry(0.12, 0.16, 0.25, 8);
-        base.translate(0, 0.125, 0);
-        const pole = new THREE.CylinderGeometry(0.035, 0.05, LAMP_HEIGHT - 0.2, 8);
-        pole.translate(0, (LAMP_HEIGHT - 0.2) / 2 + 0.2, 0);
-        const ring = new THREE.TorusGeometry(0.08, 0.02, 6, 12);
-        ring.rotateX(Math.PI / 2);
-        ring.translate(0, LAMP_HEIGHT - 0.22, 0);
-        const cap = new THREE.ConeGeometry(0.2, 0.18, 4);
-        cap.rotateY(Math.PI / 4);
-        cap.translate(0, LAMP_HEIGHT + 0.27, 0);
-        const finial = new THREE.SphereGeometry(0.035, 8, 6);
-        finial.translate(0, LAMP_HEIGHT + 0.39, 0);
-        for (const g of [base, pole, ring, cap, finial]) {
-          g.deleteAttribute("uv");
-          metal.push(g.index ? g.toNonIndexed() : g);
+        const add = (g, y = 0) => { g.translate(0, y, 0); metal.push(g); };
+        add(new THREE.CylinderGeometry(0.15, 0.2, 0.3, 8), 0.15);
+        add(new THREE.CylinderGeometry(0.11, 0.15, 0.08, 8), 0.34);
+        add(new THREE.CylinderGeometry(0.038, 0.055, LAMP_HEIGHT - 0.6, 8), (LAMP_HEIGHT - 0.6) / 2 + 0.36);
+        for (const y of [0.62, 1.55]) add(new THREE.CylinderGeometry(0.065, 0.065, 0.05, 8), y);
+        add(new THREE.CylinderGeometry(0.14, 0.045, 0.16, 8), LAMP_HEIGHT - 0.3);
+        add(new THREE.BoxGeometry(0.3, 0.035, 0.3), LAMP_HEIGHT - 0.2);
+        add(new THREE.BoxGeometry(0.38, 0.035, 0.38), LAMP_HEIGHT + 0.2);
+        for (const [cx, cz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+          const post = new THREE.BoxGeometry(0.022, 0.42, 0.022);
+          post.translate(cx * 0.14, LAMP_HEIGHT, cz * 0.14);
+          metal.push(post);
         }
-        const metalGeometry = mergeGeometries(metal, false);
-        const glassGeometry = new THREE.CylinderGeometry(0.15, 0.1, 0.36, 4, 1);
+        const roof = new THREE.ConeGeometry(0.27, 0.2, 4);
+        roof.rotateY(Math.PI / 4);
+        add(roof, LAMP_HEIGHT + 0.32);
+        add(new THREE.CylinderGeometry(0.03, 0.05, 0.08, 6), LAMP_HEIGHT + 0.45);
+        add(new THREE.SphereGeometry(0.04, 6, 4), LAMP_HEIGHT + 0.52);
+        const metalGeometry = mergeGeometries(metal.map((g) => {
+          g.deleteAttribute("uv");
+          return g.index ? g.toNonIndexed() : g;
+        }), false);
+        // cristal: más caliente y brillante en el centro, donde está la bombilla
+        const glassGeometry = new THREE.CylinderGeometry(0.175, 0.13, 0.38, 4, 2, true);
         glassGeometry.rotateY(Math.PI / 4);
         glassGeometry.translate(0, LAMP_HEIGHT, 0);
-        const metalMaterial = new THREE.MeshStandardMaterial({ color: 0x1c1f24, roughness: 0.45, metalness: 0.7 });
-        const glassMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.35, 0.55), fog: true });
-        const items = lampPositions.map((p) => ({ x: p.x, z: p.z, s: 1, yaw: Math.atan2(p.x, p.z) }));
-        chunkedInstances(metalGeometry, metalMaterial, items, { chunk: 20, castShadow: true });
-        chunkedInstances(glassGeometry, glassMaterial, items, { chunk: 20 });
-
-        // halo de luz alrededor de cada linterna
-        const canvas = document.createElement("canvas");
-        canvas.width = canvas.height = 128;
-        const ctx = canvas.getContext("2d");
-        const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-        g.addColorStop(0, "rgba(255, 220, 160, 0.9)");
-        g.addColorStop(0.2, "rgba(255, 180, 100, 0.35)");
-        g.addColorStop(1, "rgba(255, 150, 60, 0)");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, 128, 128);
-        const glowTexture = new THREE.CanvasTexture(canvas);
-        glowTexture.colorSpace = THREE.SRGBColorSpace;
-        const glowMaterial = new THREE.SpriteMaterial({ map: glowTexture, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true });
-        for (const p of lampPositions) {
-          const s = new THREE.Sprite(glowMaterial);
-          s.position.set(p.x, LAMP_HEIGHT, p.z);
-          s.scale.setScalar(1.7);
-          scene.add(s);
+        {
+          const pos = glassGeometry.attributes.position;
+          const colors = [];
+          for (let i = 0; i < pos.count; i += 1) {
+            const t = 1 - Math.abs(pos.getY(i) - LAMP_HEIGHT) / 0.19;
+            colors.push(0.72 + t * 0.45, 0.3 + t * 0.22, 0.07 + t * 0.04);
+          }
+          glassGeometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
         }
+        const metalMaterial = enhance(lit({ color: 0x1b1e23, roughness: 0.4, metalness: 0.65 }));
+        const glassMaterial = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide, fog: true });
+        const items = lampPositions.map((p) => ({ x: p.x, z: p.z, s: 1, yaw: Math.atan2(p.x, p.z) }));
+        chunkedInstances(metalGeometry, metalMaterial, items, { chunk: 20, castShadow: true, glowY: 1.2, cull: "lamp" });
+        chunkedInstances(glassGeometry, glassMaterial, items, { chunk: 20, cull: "lamp" });
+
+        // Resplandor de todas las linternas en UNA sola pieza (puntos con halo)
+        const positions = new Float32Array(lampPositions.length * 3);
+        lampPositions.forEach((p, i) => positions.set([p.x, LAMP_HEIGHT, p.z], i * 3));
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        const material = new THREE.ShaderMaterial({
+          uniforms: lampGlowUniforms,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          vertexShader: `
+            uniform float uScale; uniform float uFogFar;
+            varying float vFade;
+            void main() {
+              vec4 mv = modelViewMatrix * vec4(position, 1.0);
+              float d = -mv.z;
+              // las lejanas siguen viéndose como puntitos de luz entre la bruma
+              vFade = mix(1.0, 0.45, smoothstep(10.0, uFogFar, d));
+              gl_PointSize = clamp(1.9 * uScale / d, 3.0, 380.0);
+              gl_Position = projectionMatrix * mv;
+            }
+          `,
+          fragmentShader: `
+            varying float vFade;
+            void main() {
+              float d = length(gl_PointCoord - 0.5) * 2.0;
+              float core = exp(-d * d * 28.0);
+              float halo = exp(-d * d * 5.0) * 0.32 + max(0.0, 1.0 - d) * 0.05;
+              vec3 col = vec3(1.0, 0.7, 0.38) * core * 0.55 + vec3(1.0, 0.55, 0.22) * halo;
+              gl_FragColor = vec4(col * vFade, 1.0);
+              #include <tonemapping_fragment>
+              #include <colorspace_fragment>
+            }
+          `
+        });
+        const glows = new THREE.Points(geometry, material);
+        glows.frustumCulled = false;
+        scene.add(glows);
       }
-      // Luces reales solo en los faroles más cercanos (las demás se simulan en el suelo)
+      // En computador, luces reales en los faroles más cercanos (en celular su luz ya está precalculada)
       const lampLights = [];
-      for (let i = 0; i < (lowPower ? 3 : 6); i += 1) {
-        const light = new THREE.PointLight(0xffb46a, 7, 10, 1.8);
+      for (let i = 0; i < TIER.lampLights; i += 1) {
+        const light = new THREE.PointLight(0xffb46a, 4, 8, 1.8);
         light.position.set(0, -50, 0);
         scene.add(light);
         lampLights.push(light);
       }
       function updateLampLights(center) {
+        if (!lampLights.length) return;
         const sorted = lampPositions
           .map((p) => ({ p, d: (p.x - center.x) ** 2 + (p.z - center.z) ** 2 }))
           .sort((a, b) => a.d - b.d);
@@ -2846,8 +3037,6 @@
       controls.target.set(0, 1.9, 0);
       controls.autoRotateSpeed = 0.3;
       controls.update();
-      const START_TARGET = controls.target.clone();
-      const START_CAMERA = camera.position.clone();
 
       let isPaused = reduceMotion;
       let idleTimer = null;
@@ -2920,14 +3109,6 @@
         joystick.addEventListener("pointercancel", release);
       }
 
-      // Volver a la entrada del jardín con un vuelo suave
-      let flyHome = null;
-      if (homeButton) {
-        homeButton.addEventListener("click", () => {
-          flyHome = { t: 0, fromT: controls.target.clone(), fromC: camera.position.clone() };
-        });
-      }
-
       const forward = new THREE.Vector3();
       const right = new THREE.Vector3();
       const step = new THREE.Vector3();
@@ -2966,8 +3147,9 @@
         camera.aspect = aspect;
         camera.fov = aspect < 1 ? Math.min(80, 50 * Math.pow(1 / aspect, 0.45)) : 50;
         camera.updateProjectionMatrix();
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
+        renderer.setPixelRatio(pixelRatio);
         renderer.setSize(width, height);
+        lampGlowUniforms.uScale.value = (height * pixelRatio) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
         particleUniforms.uPixelRatio.value = renderer.getPixelRatio();
         starUniforms.uPixelRatio.value = renderer.getPixelRatio();
         if (composer) {
@@ -2987,6 +3169,46 @@
       let cullTimer = 0;
       const lastLampCenter = new THREE.Vector3(1e9, 0, 0);
 
+      // Calidad adaptable: mide los FPS reales y ajusta la resolución (y si hace
+      // falta, la distancia de detalle) para que nunca se trabe.
+      let detailScale = 1;
+      const perf = { time: 0, frames: 0, good: 0, warm: 2.5 };
+      function adaptQuality(delta) {
+        const dt = clock.lastRaw || delta;
+        if (dt > 0.5) { perf.time = 0; perf.frames = 0; return; } // pestaña oculta o reproductor abierto
+        perf.time += dt;
+        perf.frames += 1;
+        if (perf.time < 1.2) return;
+        const fps = perf.frames / perf.time;
+        perf.time = 0;
+        perf.frames = 0;
+        if (perf.warm > 0) { perf.warm -= 1.2; return; } // ignora los primeros segundos
+        if (fps < 45) {
+          perf.good = 0;
+          if (pixelRatio > minPixelRatio + 0.01) {
+            pixelRatio = Math.max(minPixelRatio, pixelRatio - (fps < 30 ? 0.2 : 0.1));
+            resize();
+          } else if (detailScale > 0.55) {
+            detailScale = Math.max(0.55, detailScale - 0.15);
+            cullTimer = 0;
+          }
+        } else if (fps > 57) {
+          perf.good += 1;
+          if (perf.good >= 3) {
+            perf.good = 0;
+            if (detailScale < 1) {
+              detailScale = Math.min(1, detailScale + 0.15);
+              cullTimer = 0;
+            } else if (pixelRatio < maxPixelRatio - 0.01) {
+              pixelRatio = Math.min(maxPixelRatio, pixelRatio + 0.1);
+              resize();
+            }
+          }
+        } else {
+          perf.good = 0;
+        }
+      }
+
       function animate() {
         requestAnimationFrame(animate);
 
@@ -2994,7 +3216,9 @@
         const isOverlayActive =
           document.getElementById("playlistOverlay")?.classList.contains("active") ||
           document.getElementById("musicOverlay")?.classList.contains("active");
-        const delta = Math.min(clock.getDelta(), 0.05);
+        const rawDelta = clock.getDelta();
+        clock.lastRaw = rawDelta;
+        const delta = Math.min(rawDelta, 0.05);
         if (isOverlayActive) return;
 
         if (!isPaused) elapsed += delta;
@@ -3005,29 +3229,10 @@
         starUniforms.uTime.value = elapsed;
 
         walk(delta);
-        if (flyHome) {
-          flyHome.t = Math.min(1, flyHome.t + delta * 0.6);
-          const e = flyHome.t * flyHome.t * (3 - 2 * flyHome.t);
-          controls.target.lerpVectors(flyHome.fromT, START_TARGET, e);
-          camera.position.lerpVectors(flyHome.fromC, START_CAMERA, e);
-          if (flyHome.t >= 1) flyHome = null;
-        }
 
         const wind = Math.sin(elapsed * 0.18) * 0.5 + 0.5;
-        const windAmplitude = (0.018 + 0.016 * wind) * (isPaused ? 0 : 1);
-        for (const plant of plants) {
-          const phase = plant.phase + plant.group.position.x * 0.35;
-          plant.group.rotation.z = Math.sin(elapsed * 1.1 + phase) * windAmplitude * plant.sway;
-          plant.group.rotation.x = Math.cos(elapsed * 0.8 + phase * 1.3) * windAmplitude * 0.7 * plant.sway;
-          if (plant.bloomProgress < 1) {
-            const t = bloomClock - plant.bloomDelay;
-            if (t > 0) {
-              plant.bloomProgress = Math.min(1, plant.bloomProgress + delta * plant.bloomSpeed);
-              const ease = 1 - Math.pow(1 - plant.bloomProgress, 3);
-              plant.group.scale.set(0.6 + ease * 0.4, Math.max(0.0001, ease), 0.6 + ease * 0.4);
-            }
-          }
-        }
+        plantUniforms.uSway.value = (0.018 + 0.016 * wind) * (isPaused ? 0 : 1);
+        plantUniforms.uBloomTime.value = bloomClock;
 
         controls.update();
         // la cámara nunca baja del suelo
@@ -3050,15 +3255,27 @@
         cullTimer -= delta;
         if (cullTimer <= 0) {
           cullTimer = 0.25;
-          for (const mesh of chunkedMeshes) {
-            mesh.visible = mesh.userData.center.distanceToSquared(camera.position) < 85 * 85;
+          const cullFor = { flower: TIER.flowerCull * detailScale, grass: TIER.grassCull * detailScale, lamp: 140 };
+          const lod = TIER.lodNear * detailScale;
+          for (const entry of chunkedMeshes) {
+            const d = Math.hypot(entry.center.x - camera.position.x, entry.center.z - camera.position.z) - entry.radius;
+            const visible = d < cullFor[entry.cull];
+            if (entry.farMesh) {
+              const near = d < lod;
+              entry.mesh.visible = visible && near;
+              entry.farMesh.visible = visible && !near;
+            } else {
+              entry.mesh.visible = visible;
+            }
           }
         }
+        adaptQuality(delta);
 
         if (composer) composer.render();
         else renderer.render(scene, camera);
       }
-      requestAnimationFrame(() => setTimeout(hideSplash, 900));
+      // la pantalla de inicio se queda al menos un momento para que se vea
+      requestAnimationFrame(() => setTimeout(hideSplash, Math.max(500, 2400 - performance.now())));
 
       // Music Player Logic
       const playlist = [
@@ -3826,177 +4043,280 @@
         }
       ];
 
-      let currentSongIndex = 0;
-      let isPlaying = false;
-        let isShuffle = false;
-        let isLoop = false;
-        
-        const shuffleBtn = document.getElementById('shuffleBtn');
-        const loopBtn = document.getElementById('loopBtn');
-        
-        if (shuffleBtn) {
-          shuffleBtn.addEventListener('click', () => {
-            isShuffle = !isShuffle;
-            shuffleBtn.style.opacity = isShuffle ? '1' : '0.5';
-            shuffleBtn.style.color = isShuffle ? 'var(--gold)' : 'var(--cream)';
-          });
-        }
-        
-        if (loopBtn) {
-          loopBtn.addEventListener('click', () => {
-            isLoop = !isLoop;
-            loopBtn.style.opacity = isLoop ? '1' : '0.5';
-            loopBtn.style.color = isLoop ? 'var(--gold)' : 'var(--cream)';
-          });
-        }
-
-      const audioPlayer = document.getElementById('audioPlayer');
-      const playBtn = document.getElementById('playBtn');
-      const playIcon = document.getElementById('playIcon');
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const albumArt = document.getElementById('albumArt');
-      const dynamicBg = document.getElementById('dynamicBg');
-      const songTitle = document.getElementById('songTitle');
-      const songArtist = document.getElementById('songArtist');
-      const progressContainer = document.getElementById('progressContainer');
-      const progressBar = document.getElementById('progressBar');
-      const currentTimeEl = document.getElementById('currentTime');
-      const durationTimeEl = document.getElementById('durationTime');
-      const playlistItemsContainer = document.getElementById('playlistItems');
-      const playlistSearch = document.getElementById('playlistSearch');
-      const playlistCount = document.getElementById('playlistCount');
-      const nowPlayingBtn = document.getElementById('nowPlayingBtn');
-      const nowPlayingCover = document.getElementById('nowPlayingCover');
-      const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+      // ---------- REPRODUCTOR ----------
+      const $ = (id) => document.getElementById(id);
+      const audioPlayer = $('audioPlayer');
+      const playBtn = $('playBtn');
+      const playIcon = $('playIcon');
+      const prevBtn = $('prevBtn');
+      const nextBtn = $('nextBtn');
+      const shuffleBtn = $('shuffleBtn');
+      const loopBtn = $('loopBtn');
+      const albumArt = $('albumArt');
+      const dynamicBg = $('dynamicBg');
+      const playlistBg = $('playlistBg');
+      const songTitle = $('songTitle');
+      const songArtist = $('songArtist');
+      const progressContainer = $('progressContainer');
+      const progressBar = $('progressBar');
+      const currentTimeEl = $('currentTime');
+      const durationTimeEl = $('durationTime');
+      const loadingSpinner = $('loadingSpinner');
+      const playlistItemsContainer = $('playlistItems');
+      const playlistSearch = $('playlistSearch');
+      const playlistCount = $('playlistCount');
+      const nowPlayingBtn = $('nowPlayingBtn');
+      const nowPlayingCover = $('nowPlayingCover');
+      const nowPlayingTitle = $('nowPlayingTitle');
+      const musicOverlay = $('musicOverlay');
+      const playlistOverlay = $('playlistOverlay');
       const STORAGE_KEY = 'jardin-musica';
+      const META_KEY = 'jardin-oembed-v1';
 
-      // Recordar la última canción y el punto donde iba (si el navegador lo permite)
+      let currentSongIndex = 0;
+      let isShuffle = false;
+      let isLoop = false;
+      let seeking = false;
+      let userPicked = false;
+
+      // Cada canción se identifica por el video de YouTube del que viene su audio
+      for (const song of playlist) {
+        const m = song.src.match(/([A-Za-z0-9_-]{11})\.m4a$/);
+        song.id = m ? m[1] : null;
+      }
+
+      // ----- Títulos reales desde la API oEmbed de YouTube -----
+      // El audio de cada canción es el de su video, así que el título que devuelve
+      // YouTube para ese video es el correcto. Se guarda para no pedirlo otra vez.
+      let metaCache = {};
+      try { metaCache = JSON.parse(localStorage.getItem(META_KEY) || '{}') || {}; } catch (e) {}
+      const saveMeta = (() => {
+        let t = null;
+        return () => {
+          clearTimeout(t);
+          t = setTimeout(() => { try { localStorage.setItem(META_KEY, JSON.stringify(metaCache)); } catch (e) {} }, 800);
+        };
+      })();
+      function cleanArtist(author) {
+        return (author || '').replace(/\s*-\s*Topic$/i, '').replace(/VEVO$/i, '').replace(/\s*(official|oficial)$/i, '').trim();
+      }
+      function cleanTitle(title, artist) {
+        let t = ' ' + title + ' ';
+        // etiquetas que no son parte del nombre de la canción
+        t = t.replace(/[\(\[][^\)\]]*(oficial|official|video|vídeo|audio|lyric|letra|visuali[sz]er|4k|hd|prod\.?|en vivo)[^\)\]]*[\)\]]/gi, ' ');
+        t = t.replace(/\b(video|vídeo)\s+(oficial|official)\b/gi, ' ').replace(/\bofficial\s+(music\s+)?video\b/gi, ' ');
+        t = t.replace(/[|｜].*$/, ' ');
+        // "Penyair - Canción" -> "Canción"
+        if (artist) {
+          const esc = artist.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          t = t.replace(new RegExp('^\\s*' + esc + '\\s*[-–—:]\\s*', 'i'), ' ');
+        }
+        t = t.replace(/^\s*penyair\s*[-–—:]\s*/i, ' ').replace(/\s*[-–—]\s*penyair\s*$/i, ' ');
+        t = t.replace(/\s{2,}/g, ' ').replace(/^[\s\-–—:]+|[\s\-–—:]+$/g, '');
+        return t || title.trim();
+      }
+      function applyMeta(song) {
+        const meta = song.id && metaCache[song.id];
+        if (!meta || !meta.title) return false;
+        const artist = cleanArtist(meta.author) || song.artist;
+        song.title = cleanTitle(meta.title, artist);
+        song.artist = artist;
+        return true;
+      }
+      playlist.forEach(applyMeta);
+
+      function timeoutSignal(ms) {
+        if (window.AbortSignal && AbortSignal.timeout) return AbortSignal.timeout(ms);
+        return undefined;
+      }
+      async function fetchMeta(id) {
+        const target = encodeURIComponent('https://www.youtube.com/watch?v=' + id);
+        const sources = [];
+        if (location.protocol.startsWith('http')) sources.push('/api/oembed/' + id);
+        sources.push('https://www.youtube.com/oembed?url=' + target + '&format=json');
+        sources.push('https://noembed.com/embed?url=' + target);
+        for (const url of sources) {
+          try {
+            const res = await fetch(url, { signal: timeoutSignal(7000) });
+            if (!res.ok) continue;
+            const data = await res.json();
+            if (data && data.title) return { title: data.title, author: data.author_name || '', t: Date.now() };
+          } catch (e) {}
+        }
+        return null;
+      }
+      let metaStarted = false;
+      async function refreshAllMeta() {
+        if (metaStarted) return;
+        metaStarted = true;
+        const WEEK = 7 * 24 * 3600 * 1000;
+        const order = [currentSongIndex, ...playlist.keys()];
+        const pending = [...new Set(order)].filter((i) => {
+          const m = playlist[i].id && metaCache[playlist[i].id];
+          return playlist[i].id && (!m || Date.now() - (m.t || 0) > WEEK);
+        });
+        let failures = 0;
+        const worker = async () => {
+          while (pending.length && failures < 6) {
+            const i = pending.shift();
+            const song = playlist[i];
+            const meta = await fetchMeta(song.id);
+            if (!meta) { failures += 1; continue; }
+            failures = 0;
+            metaCache[song.id] = meta;
+            saveMeta();
+            if (applyMeta(song)) refreshSongViews(i);
+          }
+        };
+        await Promise.all([worker(), worker(), worker(), worker()]);
+      }
+      function refreshSongViews(index) {
+        const song = playlist[index];
+        const li = playlistItemsContainer && playlistItemsContainer.querySelector('[data-index="' + index + '"]');
+        if (li) {
+          li.querySelector('.playlist-item-title').textContent = song.title;
+          li.querySelector('.playlist-item-artist').textContent = song.artist;
+        }
+        if (index === currentSongIndex) {
+          songTitle.textContent = song.title;
+          songArtist.textContent = song.artist;
+          updateNowPlaying();
+          updateMediaSession();
+        }
+      }
+
+      // ----- Estado guardado -----
       function saveState() {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({ src: playlist[currentSongIndex].src, time: audioPlayer.currentTime || 0 }));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ src: playlist[currentSongIndex].src, time: audioPlayer.currentTime || 0, shuffle: isShuffle, loop: isLoop }));
         } catch (e) {}
       }
       function readState() {
-        try {
-          return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-        } catch (e) {
-          return null;
-        }
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) { return null; }
       }
       // Búsqueda sin importar tildes ni mayúsculas
-      const normalize = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const normalize = (text) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+      const coverUrl = (song) => 'url("' + song.cover + '")';
+      const fmt = (t) => {
+        if (!isFinite(t) || t < 0) return '0:00';
+        const m = Math.floor(t / 60);
+        const sec = Math.floor(t % 60);
+        return m + ':' + (sec < 10 ? '0' : '') + sec;
+      };
 
       function updateNowPlaying() {
         if (!nowPlayingBtn) return;
         const song = playlist[currentSongIndex];
         nowPlayingTitle.textContent = song.title;
-        nowPlayingCover.style.backgroundImage = 'url("' + song.cover + '")';
-        const started = !audioPlayer.paused || audioPlayer.currentTime > 0;
+        nowPlayingCover.style.backgroundImage = coverUrl(song);
+        const started = userPicked || !audioPlayer.paused || audioPlayer.currentTime > 0;
         nowPlayingBtn.classList.toggle('visible', started);
         nowPlayingBtn.classList.toggle('playing', !audioPlayer.paused);
       }
-
-      const musicOverlay = document.getElementById('musicOverlay');
-      const closeMusicBtn = document.getElementById('closeMusicBtn');
-      const openMusicBtn = document.getElementById('openMusicBtn'); 
-
-      
-        const playlistOverlay = document.getElementById('playlistOverlay');
-        const closePlaylistBtn = document.getElementById('closePlaylistBtn');
-
-        if(openMusicBtn) {
-          openMusicBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            playlistOverlay.classList.add('active');
-            if (document.getElementById('topMenuPanel')) document.getElementById('topMenuPanel').classList.remove('active'); 
-          });
-        }
-        if(closePlaylistBtn) {
-          closePlaylistBtn.addEventListener('click', () => {
-            playlistOverlay.classList.remove('active');
-          });
-        }
-        if(closeMusicBtn) {
-          closeMusicBtn.addEventListener('click', () => {
-            musicOverlay.classList.remove('active');
-            playlistOverlay.classList.add('active');
-          });
-        }
-function loadSong(index) {
-          if(loadingSpinner) loadingSpinner.classList.add("active");
-          currentSongIndex = index;
-          const song = playlist[currentSongIndex];
-          songTitle.textContent = song.title;
-          songArtist.textContent = song.artist;
-          audioPlayer.src = song.src;
-          albumArt.style.backgroundImage = 'url("' + song.cover + '")';
-          dynamicBg.style.backgroundImage = 'url("' + song.cover + '")';
-          
-        if ('mediaSession' in navigator) {
+      function updateMediaSession() {
+        if (!('mediaSession' in navigator)) return;
+        const song = playlist[currentSongIndex];
+        try {
           navigator.mediaSession.metadata = new MediaMetadata({
             title: song.title,
             artist: song.artist,
-            album: 'Catálogo Penyair',
-            artwork: [
-              { src: song.cover, sizes: '512x512', type: 'image/jpeg' }
-            ]
+            album: 'Para ti',
+            artwork: [{ src: song.cover, sizes: '480x360', type: 'image/jpeg' }]
           });
-
-          navigator.mediaSession.setActionHandler('play', function() { playAudio(); });
-          navigator.mediaSession.setActionHandler('pause', function() { audioPlayer.pause(); });
-          navigator.mediaSession.setActionHandler('previoustrack', function() { prevSong(); });
-          navigator.mediaSession.setActionHandler('nexttrack', function() { nextSong(false); });
+        } catch (e) {}
+      }
+      if ('mediaSession' in navigator) {
+        const handlers = {
+          play: () => playAudio(),
+          pause: () => audioPlayer.pause(),
+          previoustrack: () => prevSong(),
+          nexttrack: () => nextSong(false),
+          seekbackward: () => { audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 10); },
+          seekforward: () => { audioPlayer.currentTime = Math.min(audioPlayer.duration || 0, audioPlayer.currentTime + 10); }
+        };
+        for (const [action, fn] of Object.entries(handlers)) {
+          try { navigator.mediaSession.setActionHandler(action, fn); } catch (e) {}
         }
+      }
+
+      // ----- Abrir y cerrar pantallas -----
+      function openOverlay(overlay) {
+        for (const o of [playlistOverlay, musicOverlay]) o.classList.toggle('active', o === overlay);
+        const menu = $('topMenuPanel');
+        if (menu) menu.classList.remove('active');
+      }
+      function closeOverlays() {
+        playlistOverlay.classList.remove('active');
+        musicOverlay.classList.remove('active');
+      }
+      const openMusicBtn = $('openMusicBtn');
+      if (openMusicBtn) {
+        openMusicBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          openOverlay(playlistOverlay);
+          refreshAllMeta();
+          const active = playlistItemsContainer.querySelector('.active-song');
+          if (active) active.scrollIntoView({ block: 'center' });
+        });
+      }
+      $('closePlaylistBtn').addEventListener('click', closeOverlays);
+      $('closeMusicBtn').addEventListener('click', () => openOverlay(playlistOverlay));
+      $('hidePlayerBtn').addEventListener('click', closeOverlays);
+      if (nowPlayingBtn) nowPlayingBtn.addEventListener('click', () => openOverlay(musicOverlay));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && (playlistOverlay.classList.contains('active') || musicOverlay.classList.contains('active'))) closeOverlays();
+      });
+
+      // ----- Reproducción -----
+      function loadSong(index) {
+        currentSongIndex = index;
+        const song = playlist[index];
+        songTitle.textContent = song.title;
+        songArtist.textContent = song.artist;
+        audioPlayer.src = song.src;
+        albumArt.style.backgroundImage = coverUrl(song);
+        dynamicBg.style.backgroundImage = coverUrl(song);
+        if (playlistBg) playlistBg.style.backgroundImage = coverUrl(song);
+        progressBar.style.width = '0%';
+        currentTimeEl.textContent = '0:00';
+        durationTimeEl.textContent = '0:00';
+        updateMediaSession();
         updateActivePlaylistSong();
-        }
-
-        function updateActivePlaylistSong() {
-          const items = document.querySelectorAll('#playlistItems .playlist-item');
-          items.forEach(item => {
-            if (parseInt(item.dataset.index) === currentSongIndex) {
-              item.classList.add('active-song');
-            } else {
-              item.classList.remove('active-song');
-            }
-          });
-        }
-
+        updateNowPlaying();
+      }
+      function updateActivePlaylistSong() {
+        playlistItemsContainer.querySelectorAll('.playlist-item').forEach((item) => {
+          const active = Number(item.dataset.index) === currentSongIndex;
+          item.classList.toggle('active-song', active);
+          item.classList.toggle('is-playing', active && !audioPlayer.paused);
+        });
+      }
       function playAudio() {
         // play() devuelve una promesa que falla si el navegador bloquea el audio
         const attempt = audioPlayer.play();
         if (attempt && attempt.catch) attempt.catch(() => updatePlayState());
       }
-
       function togglePlay() {
-        if (audioPlayer.paused) {
-          playAudio();
-        } else {
-          audioPlayer.pause();
-        }
+        if (audioPlayer.paused) playAudio();
+        else audioPlayer.pause();
       }
-
+      const PLAY_PATH = '<path d="M7 4.5v15l13-7.5z"/>';
+      const PAUSE_PATH = '<path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z"/>';
       function updatePlayState() {
-        if (audioPlayer.paused) {
-          isPlaying = false;
-          playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
-          albumArt.classList.remove('playing');
-        } else {
-          isPlaying = true;
-          playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
-          albumArt.classList.add('playing');
-        }
+        const playing = !audioPlayer.paused;
+        playIcon.innerHTML = playing ? PAUSE_PATH : PLAY_PATH;
+        playBtn.setAttribute('aria-label', playing ? 'Pausar' : 'Reproducir');
+        albumArt.classList.toggle('playing', playing);
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
+        updateActivePlaylistSong();
         updateNowPlaying();
         saveState();
       }
-
       function prevSong() {
-        const idx = (currentSongIndex - 1 + playlist.length) % playlist.length;
         const wasPlaying = !audioPlayer.paused;
-        loadSong(idx);
+        loadSong((currentSongIndex - 1 + playlist.length) % playlist.length);
         if (wasPlaying) playAudio();
       }
-
       function nextSong(fromEnded) {
         // Repetir solo aplica cuando la canción termina sola; el botón siempre avanza.
         if (isLoop && fromEnded === true) {
@@ -4006,145 +4326,55 @@ function loadSong(index) {
         }
         // Al terminar, el navegador ya marcó el audio como pausado: hay que seguir sonando.
         const wasPlaying = fromEnded === true || !audioPlayer.paused;
-        let idx;
-        if (isShuffle) {
-          idx = Math.floor(Math.random() * playlist.length);
-          if (idx === currentSongIndex && playlist.length > 1) {
-            idx = (idx + 1) % playlist.length;
-          }
-        } else {
-          idx = (currentSongIndex + 1) % playlist.length;
+        let idx = (currentSongIndex + 1) % playlist.length;
+        if (isShuffle && playlist.length > 1) {
+          idx = Math.floor(Math.random() * (playlist.length - 1));
+          if (idx >= currentSongIndex) idx += 1;
         }
         loadSong(idx);
         if (wasPlaying) playAudio();
       }
-
-      function updateProgress(e) {
-        const duration = e.target.duration;
-        const currentTime = e.target.currentTime;
-        if(isNaN(duration)) return;
-        if (!seeking) progressBar.style.width = (currentTime / duration) * 100 + '%';
-
-        let currentMins = Math.floor(currentTime / 60);
-        let currentSecs = Math.floor(currentTime % 60);
-        if (currentSecs < 10) currentSecs = '0' + currentSecs;
-        currentTimeEl.textContent = currentMins + ':' + currentSecs;
-        
-        let durationMins = Math.floor(duration / 60);
-        let durationSecs = Math.floor(duration % 60);
-        if (durationSecs < 10) durationSecs = '0' + durationSecs;
-        durationTimeEl.textContent = durationMins + ':' + durationSecs;
+      function setToggle(button, on) {
+        button.classList.toggle('on', on);
+        button.setAttribute('aria-pressed', on ? 'true' : 'false');
       }
+      shuffleBtn.addEventListener('click', () => { isShuffle = !isShuffle; setToggle(shuffleBtn, isShuffle); saveState(); });
+      loopBtn.addEventListener('click', () => { isLoop = !isLoop; setToggle(loopBtn, isLoop); saveState(); });
+      playBtn.addEventListener('click', togglePlay);
 
-      // Tocar o arrastrar la barra (también con el dedo) para mover la canción
-      let seeking = false;
+      // ----- Barra de progreso: tocar o arrastrar -----
+      function showProgress() {
+        const d = audioPlayer.duration;
+        if (!seeking && isFinite(d) && d > 0) progressBar.style.width = (audioPlayer.currentTime / d) * 100 + '%';
+        currentTimeEl.textContent = fmt(audioPlayer.currentTime);
+        if (isFinite(d)) durationTimeEl.textContent = fmt(d);
+      }
       function seekTo(clientX) {
         const rect = progressContainer.getBoundingClientRect();
         const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
         progressBar.style.width = ratio * 100 + '%';
-        if (isFinite(audioPlayer.duration)) audioPlayer.currentTime = ratio * audioPlayer.duration;
-      }
-
-      function renderPlaylist(filter) {
-        filter = filter || "";
-        if(!playlistItemsContainer) return;
-        playlistItemsContainer.innerHTML = '';
-        const query = normalize(filter.trim());
-        let shown = 0;
-        playlist.forEach((song, index) => {
-          if (normalize(song.title).includes(query) || normalize(song.artist).includes(query)) {
-            shown += 1;
-            const li = document.createElement('li');
-            li.className = 'playlist-item ' + (index === currentSongIndex ? 'active-song' : '');
-              li.dataset.index = index;
-            const img = document.createElement('div');
-            img.className = 'playlist-item-img';
-            img.style.backgroundImage = 'url("' + song.cover + '")';
-            const info = document.createElement('div');
-            info.className = 'playlist-item-info';
-            const titleEl = document.createElement('p');
-            titleEl.className = 'playlist-item-title';
-            titleEl.textContent = song.title;
-            const artistEl = document.createElement('p');
-            artistEl.className = 'playlist-item-artist';
-            artistEl.textContent = song.artist;
-            info.append(titleEl, artistEl);
-            li.append(img, info);
-            li.addEventListener('click', () => {
-                if (index !== currentSongIndex || audioPlayer.paused) {
-                  if (index !== currentSongIndex) {
-                    loadSong(index);
-                  }
-                  playAudio();
-                }
-                document.getElementById('playlistOverlay').classList.remove('active');
-                document.getElementById('musicOverlay').classList.add('active');
-              });
-            playlistItemsContainer.appendChild(li);
-          }
-        });
-        if (playlistCount) {
-          playlistCount.textContent = query ? shown + ' de ' + playlist.length + ' canciones' : playlist.length + ' canciones';
-        }
-        if (shown === 0) {
-          const empty = document.createElement('li');
-          empty.className = 'playlist-empty';
-          empty.textContent = 'No encontré esa canción';
-          playlistItemsContainer.appendChild(empty);
+        if (isFinite(audioPlayer.duration)) {
+          audioPlayer.currentTime = ratio * audioPlayer.duration;
+          currentTimeEl.textContent = fmt(audioPlayer.currentTime);
         }
       }
+      progressContainer.addEventListener('pointerdown', (e) => {
+        seeking = true;
+        progressContainer.setPointerCapture(e.pointerId);
+        seekTo(e.clientX);
+      });
+      progressContainer.addEventListener('pointermove', (e) => { if (seeking) seekTo(e.clientX); });
+      const endSeek = () => { if (!seeking) return; seeking = false; saveState(); };
+      progressContainer.addEventListener('pointerup', endSeek);
+      progressContainer.addEventListener('pointercancel', endSeek);
 
-      
-
-      if(playlistSearch) {
-        playlistSearch.addEventListener('input', (e) => {
-          renderPlaylist(e.target.value);
-        });
-      }
-
-      if(playBtn) playBtn.addEventListener('click', togglePlay);
-      
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        
-        if (audioPlayer) {
-          audioPlayer.addEventListener('waiting', () => {
-            if (loadingSpinner) loadingSpinner.classList.add('active');
-          });
-          audioPlayer.addEventListener('playing', () => {
-            if (loadingSpinner) loadingSpinner.classList.remove('active');
-          });
-          audioPlayer.addEventListener('canplay', () => {
-            if (loadingSpinner) loadingSpinner.classList.remove('active');
-          });
-          audioPlayer.addEventListener('loadedmetadata', () => {
-            if (loadingSpinner && audioPlayer.paused) loadingSpinner.classList.remove('active');
-          });
-          audioPlayer.addEventListener('error', () => {
-            if (loadingSpinner) loadingSpinner.classList.remove('active');
-          });
-        }
-
-        if(audioPlayer) {
-        audioPlayer.addEventListener('play', updatePlayState);
-        audioPlayer.addEventListener('pause', updatePlayState);
-        audioPlayer.addEventListener('timeupdate', updateProgress);
-        audioPlayer.addEventListener('ended', () => nextSong(true));
-        audioPlayer.addEventListener('loadedmetadata', () => {
-          let durationMins = Math.floor(audioPlayer.duration / 60);
-          let durationSecs = Math.floor(audioPlayer.duration % 60);
-          if (durationSecs < 10) durationSecs = '0' + durationSecs;
-          if(!isNaN(durationMins)) {
-            durationTimeEl.textContent = durationMins + ':' + durationSecs;
-          }
-        });
-      }
       // Toque corto: cambia de canción. Mantener presionado: retrocede o adelanta
       // la canción mientras el dedo siga en el botón; al soltar, se detiene.
       function holdButton(button, onTap, direction) {
-        if (!button) return;
         let holdTimer = null;
         let seekTimer = null;
         let held = false;
+        let down = false;
         const stop = () => {
           clearTimeout(holdTimer);
           clearInterval(seekTimer);
@@ -4152,24 +4382,34 @@ function loadSong(index) {
           button.classList.remove('holding');
         };
         button.addEventListener('pointerdown', (e) => {
+          if (e.button !== undefined && e.button !== 0) return;
+          down = true;
           held = false;
-          button.setPointerCapture(e.pointerId);
+          try { button.setPointerCapture(e.pointerId); } catch (err) {}
           holdTimer = setTimeout(() => {
             held = true;
             button.classList.add('holding');
-            seekTimer = setInterval(() => {
+            if (navigator.vibrate) navigator.vibrate(10);
+            const tick = () => {
               if (!isFinite(audioPlayer.duration)) return;
               audioPlayer.currentTime = Math.min(Math.max(0, audioPlayer.currentTime + direction * 3), audioPlayer.duration - 0.5);
-            }, 150);
-          }, 420);
+              showProgress();
+            };
+            tick();
+            seekTimer = setInterval(tick, 150);
+          }, 400);
         });
         button.addEventListener('pointerup', () => {
+          if (!down) return;
+          down = false;
           const wasHeld = held;
           stop();
           if (!wasHeld) onTap();
           else saveState();
         });
-        button.addEventListener('pointercancel', stop);
+        const cancel = () => { down = false; stop(); };
+        button.addEventListener('pointercancel', cancel);
+        button.addEventListener('lostpointercapture', () => { if (down) { down = false; const wasHeld = held; stop(); if (wasHeld) saveState(); } });
         button.addEventListener('contextmenu', (e) => e.preventDefault());
         // teclado: Enter / Espacio siguen funcionando como un toque
         button.addEventListener('keydown', (e) => {
@@ -4178,23 +4418,69 @@ function loadSong(index) {
       }
       holdButton(prevBtn, () => {
         // como en cualquier reproductor: si ya avanzó, vuelve al inicio de la canción
-        if (audioPlayer.currentTime > 4) { audioPlayer.currentTime = 0; return; }
+        if (audioPlayer.currentTime > 4) { audioPlayer.currentTime = 0; showProgress(); return; }
         prevSong();
       }, -1);
       holdButton(nextBtn, () => nextSong(false), 1);
-      if (progressContainer) {
-        progressContainer.addEventListener('pointerdown', (e) => {
-          seeking = true;
-          progressContainer.setPointerCapture(e.pointerId);
-          seekTo(e.clientX);
+
+      // ----- Lista -----
+      function renderPlaylist(filter) {
+        filter = filter || '';
+        playlistItemsContainer.innerHTML = '';
+        const query = normalize(filter.trim());
+        const fragment = document.createDocumentFragment();
+        let shown = 0;
+        playlist.forEach((song, index) => {
+          if (query && !normalize(song.title).includes(query) && !normalize(song.artist).includes(query)) return;
+          shown += 1;
+          const li = document.createElement('li');
+          li.className = 'playlist-item';
+          li.dataset.index = index;
+          const img = document.createElement('div');
+          img.className = 'playlist-item-img';
+          img.style.backgroundImage = coverUrl(song);
+          const info = document.createElement('div');
+          info.className = 'playlist-item-info';
+          const titleEl = document.createElement('p');
+          titleEl.className = 'playlist-item-title';
+          titleEl.textContent = song.title;
+          const artistEl = document.createElement('p');
+          artistEl.className = 'playlist-item-artist';
+          artistEl.textContent = song.artist;
+          info.append(titleEl, artistEl);
+          const eq = document.createElement('span');
+          eq.className = 'playlist-item-eq';
+          eq.innerHTML = '<i></i><i></i><i></i>';
+          li.append(img, info, eq);
+          li.addEventListener('click', () => {
+            userPicked = true;
+            if (index !== currentSongIndex) loadSong(index);
+            if (audioPlayer.paused) playAudio();
+            openOverlay(musicOverlay);
+          });
+          fragment.appendChild(li);
         });
-        progressContainer.addEventListener('pointermove', (e) => { if (seeking) seekTo(e.clientX); });
-        const endSeek = () => { seeking = false; saveState(); };
-        progressContainer.addEventListener('pointerup', endSeek);
-        progressContainer.addEventListener('pointercancel', endSeek);
+        playlistItemsContainer.appendChild(fragment);
+        playlistCount.textContent = query ? shown + ' de ' + playlist.length + ' canciones' : playlist.length + ' canciones';
+        if (shown === 0) {
+          const empty = document.createElement('li');
+          empty.className = 'playlist-empty';
+          empty.textContent = 'No encontré esa canción';
+          playlistItemsContainer.appendChild(empty);
+        }
+        updateActivePlaylistSong();
       }
-      if (nowPlayingBtn) {
-        nowPlayingBtn.addEventListener('click', () => musicOverlay.classList.add('active'));
+      playlistSearch.addEventListener('input', (e) => renderPlaylist(e.target.value));
+
+      // ----- Eventos del audio -----
+      audioPlayer.addEventListener('play', updatePlayState);
+      audioPlayer.addEventListener('pause', updatePlayState);
+      audioPlayer.addEventListener('timeupdate', showProgress);
+      audioPlayer.addEventListener('loadedmetadata', showProgress);
+      audioPlayer.addEventListener('ended', () => nextSong(true));
+      audioPlayer.addEventListener('waiting', () => loadingSpinner.classList.add('active'));
+      for (const ev of ['playing', 'canplay', 'pause', 'error']) {
+        audioPlayer.addEventListener(ev, () => loadingSpinner.classList.remove('active'));
       }
       // Barra espaciadora: reproducir/pausar mientras el reproductor está abierto
       document.addEventListener('keydown', (e) => {
@@ -4207,19 +4493,29 @@ function loadSong(index) {
       audioPlayer.addEventListener('timeupdate', () => {
         if (Date.now() - lastSaved > 5000) { lastSaved = Date.now(); saveState(); }
       });
-      
-      
-      renderPlaylist("");
+
+      renderPlaylist('');
       // Retoma la última canción escuchada, en el mismo punto
       const saved = readState();
       const savedIndex = saved ? playlist.findIndex((song) => song.src === saved.src) : -1;
+      if (saved) {
+        isShuffle = !!saved.shuffle;
+        isLoop = !!saved.loop;
+        setToggle(shuffleBtn, isShuffle);
+        setToggle(loopBtn, isLoop);
+      }
       loadSong(savedIndex >= 0 ? savedIndex : 0);
       if (savedIndex >= 0 && saved.time > 0) {
         audioPlayer.addEventListener('loadedmetadata', () => {
-          if (audioPlayer.currentTime === 0 && saved.time < audioPlayer.duration) audioPlayer.currentTime = saved.time;
+          if (audioPlayer.currentTime === 0 && saved.time < audioPlayer.duration) {
+            audioPlayer.currentTime = saved.time;
+            showProgress();
+          }
         }, { once: true });
       }
-      updateNowPlaying();
+      updatePlayState();
+      // Los títulos reales se actualizan en segundo plano, sin frenar el jardín
+      setTimeout(refreshAllMeta, 4000);
 
       animate();
     </script>

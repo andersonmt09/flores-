@@ -10,15 +10,15 @@ Abre `index.html` en un navegador moderno con conexión a Internet. La escena ca
 
 - **Mirar:** arrastra con el dedo o el ratón; pellizca o usa la rueda para acercarte.
 - **Caminar:** en computador usa W A S D o las flechas (Shift para ir más rápido); en el celular, el círculo de abajo a la izquierda.
-- **Volver a la entrada:** botón de la casita. El botón de pausa detiene el viento y las luciérnagas.
+- **Pausa:** el botón de abajo a la derecha detiene el viento y las luciérnagas.
 
 ## Detalles
 
 - Jardín nocturno grande: macizo central de tulipanes, seis parterres de tulipanes y lirios araña con seto, dos anillos de paseo, avenidas en cruz, campos de tulipanes en franjas de colores y praderas de lirios araña.
-- Faroles encendidos a lo largo de los senderos, luna llena, estrellas que titilan, Vía Láctea y constelaciones reales (Orión, Osa Mayor, Casiopea, Cisne, Cruz del Sur, Escorpión y Lira).
+- Faroles victorianos encendidos a lo largo de los senderos, luna llena con el mapa real de su superficie, bosque de siluetas alrededor, estrellas que titilan, Vía Láctea y constelaciones reales (Orión, Osa Mayor, Casiopea, Cisne, Cruz del Sur, Escorpión y Lira).
 - Luciérnagas, césped y flores que se mecen con el viento.
-- Reproductor: 127 canciones de Penyair, cada una con su audio; recuerda la última canción, barra arrastrable, búsqueda sin tildes, mantener presionado ⏮/⏭ para retroceder o adelantar, y acceso rápido desde el jardín.
-- En móvil se reduce la cantidad de plantas y efectos para que siga fluido.
+- Reproductor: 127 canciones de Penyair, cada una con su audio. Los títulos se leen de la API oEmbed de YouTube (`/api/oembed/{id}` en el servidor, con respaldo directo desde el navegador) y se guardan en el teléfono. Recuerda la última canción, barra arrastrable, búsqueda sin tildes, mantener presionado ⏮/⏭ para retroceder o adelantar, y acceso rápido desde el jardín.
+- Rendimiento: el cielo, el dibujo del suelo y la luz de los faroles se precalculan una sola vez; las flores lejanas usan versiones simplificadas y las del centro se dibujan en pocas piezas. En celulares no hay sombras ni luces en tiempo real, y la resolución se ajusta sola según los FPS para que no se trabe en ningún teléfono.
 - Respeta `prefers-reduced-motion`.
 
 ---
