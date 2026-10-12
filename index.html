@@ -203,6 +203,31 @@
         pointer-events: auto;
       }
 
+      .playlist-count { text-align: center; color: var(--muted); font-size: 0.85rem; margin: 0 0 1.4rem; letter-spacing: 0.04em; }
+      .playlist-empty { text-align: center; color: var(--muted); padding: 2rem 0; }
+      .now-playing {
+        display: none;
+        align-items: center;
+        gap: 0.55rem;
+        max-width: min(15rem, 48vw);
+        height: 2.45rem;
+        padding: 0 0.9rem 0 0.35rem;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--glass);
+        color: var(--cream);
+        font: inherit;
+        font-size: 0.78rem;
+        cursor: pointer;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .now-playing.visible { display: inline-flex; }
+      .now-playing-cover { flex: 0 0 auto; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: #233 center/cover; }
+      .now-playing.playing .now-playing-cover { animation: spin 8s linear infinite; }
+      .now-playing-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .progress-container { touch-action: none; }
       .round-button {
         display: inline-grid;
         width: 2.45rem;
@@ -728,6 +753,10 @@
           <span>Arrastra para explorar · pellizca para acercar</span>
         </div>
         <div class="controls">
+          <button class="now-playing" id="nowPlayingBtn" type="button" aria-label="Abrir reproductor">
+            <span class="now-playing-cover" id="nowPlayingCover"></span>
+            <span class="now-playing-title" id="nowPlayingTitle"></span>
+          </button>
           <button class="round-button" id="motionToggle" type="button" aria-label="Pausar movimiento" title="Pausar movimiento">
             <svg id="pauseIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M8 5v14M16 5v14"/>
@@ -761,8 +790,9 @@
         </button>
       </nav>
       <div class="playlist-full-container">
-        <h1 style="color: var(--gold); text-align: center; font-family: 'Iowan Old Style', serif; font-size: clamp(2rem, 5vw, 2.5rem); margin: 0 auto 2rem; width: 100%;">Catálogo de Penyair</h1>
-        <input type="text" class="playlist-search" id="playlistSearch" placeholder="Buscar canción..." style="max-width: 600px; margin: 0 auto 2rem; display: block; width: 90%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1rem; border-radius: 20px; color: white;">
+        <h1 style="color: var(--gold); text-align: center; font-family: 'Iowan Old Style', serif; font-size: clamp(2rem, 5vw, 2.5rem); margin: 0 auto 0.4rem; width: 100%;">Catálogo de Penyair</h1>
+        <p class="playlist-count" id="playlistCount"></p>
+        <input type="text" class="playlist-search" id="playlistSearch" placeholder="Buscar canción..." autocomplete="off" style="max-width: 600px; margin: 0 auto 2rem; display: block; width: 90%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1rem; border-radius: 20px; color: white;">
         <ul class="playlist-items" id="playlistItems" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.5rem; padding: 0 1rem; list-style: none;">
         </ul>
       </div>
@@ -1811,86 +1841,7 @@
         return bakePlant(group);
       }
 
-      // ---------- LAVANDA Y MARGARITAS (instanciadas) ----------
-      function colorize(geometry, rgb) {
-        const g = geometry.index ? geometry.toNonIndexed() : geometry;
-        g.deleteAttribute("uv");
-        const colors = new Float32Array(g.attributes.position.count * 3);
-        for (let i = 0; i < colors.length; i += 3) {
-          colors[i] = rgb[0];
-          colors[i + 1] = rgb[1];
-          colors[i + 2] = rgb[2];
-        }
-        g.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-        return g;
-      }
-      const srgb = (hex) => {
-        const c = new THREE.Color(hex);
-        return [c.r, c.g, c.b];
-      };
-
-      function createLavenderSpikeGeometry() {
-        const parts = [];
-        const height = 0.85;
-        const stem = new THREE.CylinderGeometry(0.006, 0.01, height, 4, 1, true);
-        stem.translate(0, height / 2, 0);
-        parts.push(colorize(stem, srgb(0x6f8a52)));
-        const floret = new THREE.OctahedronGeometry(0.024, 0);
-        const whorls = 9;
-        for (let w = 0; w < whorls; w += 1) {
-          const t = w / (whorls - 1);
-          const y = height * (0.66 + t * 0.34);
-          const ring = w === whorls - 1 ? 1 : 4;
-          const r = 0.022 * (1 - t * 0.5);
-          for (let k = 0; k < ring; k += 1) {
-            const a = (k / ring) * Math.PI * 2 + w * 0.7;
-            const f = floret.clone();
-            f.scale(1 - t * 0.35, 1.25, 1 - t * 0.35);
-            f.translate(Math.cos(a) * r, y, Math.sin(a) * r);
-            const shade = 0.75 + ((w * 7 + k * 3) % 5) * 0.06;
-            const base = srgb(0x9a7cc9);
-            parts.push(colorize(f, [base[0] * shade, base[1] * shade, base[2] * shade]));
-          }
-        }
-        return mergeGeometries(parts, false);
-      }
-
-      function createDaisyGeometry(petalHex, centerHex, petalCount) {
-        const parts = [];
-        const height = 0.55;
-        const stem = new THREE.CylinderGeometry(0.006, 0.008, height, 4, 1, true);
-        stem.translate(0, height / 2, 0);
-        parts.push(colorize(stem, srgb(0x55803a)));
-        const petal = new THREE.PlaneGeometry(0.026, 0.095, 1, 2);
-        {
-          const p = petal.attributes.position;
-          for (let i = 0; i < p.count; i += 1) {
-            const y = p.getY(i) + 0.0475;
-            p.setY(i, y);
-            p.setZ(i, -y * y * 1.2);
-          }
-        }
-        petal.translate(0, 0.032, 0);
-        petal.rotateX(-Math.PI / 2 + 0.18);
-        for (let k = 0; k < petalCount; k += 1) {
-          const f = petal.clone();
-          f.rotateY((k / petalCount) * Math.PI * 2 + (k % 2) * 0.08);
-          f.translate(0, height, 0);
-          parts.push(colorize(f, srgb(petalHex)));
-        }
-        const center = new THREE.SphereGeometry(0.032, 8, 4, 0, Math.PI * 2, 0, Math.PI / 2);
-        center.scale(1, 0.55, 1);
-        center.translate(0, height, 0);
-        parts.push(colorize(center, srgb(centerHex)));
-        const merged = mergeGeometries(parts, false);
-        // normales suaves hacia arriba: evita pétalos oscuros por la cara posterior
-        const n = merged.attributes.normal;
-        for (let i = 0; i < n.count; i += 1) {
-          if (merged.attributes.position.getY(i) > height - 0.05) n.setXYZ(i, 0, 1, 0);
-        }
-        return merged;
-      }
-
+      // ---------- PLANTAS INSTANCIADAS ----------
       function plantInstances(geometry, material, items, opts = {}) {
         const mesh = new THREE.InstancedMesh(geometry, material, items.length);
         const m = new THREE.Matrix4();
@@ -1989,7 +1940,7 @@
       }
 
       // Parterres exteriores, uno por especie.
-      // 0: lirios rojos · 1: lavanda · 2: tulipanes cálidos · 3: margaritas · 4: tulipanes morados · 5: lavanda + asteres
+      // Alternan lirios araña rojos con tulipanes en manchas de color: cálidos, claros y morados.
       const bedTest = (index) => (x, z) => inBed(x, z, 0.12) === index;
 
       function tulipBed(index, palette) {
@@ -2046,81 +1997,16 @@
         }
       }
 
-      const instancedMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75, side: THREE.DoubleSide });
-      const lavenderMaterial = instancedMaterial.clone();
-      addWind(lavenderMaterial, 0.09, 0.85);
-      const daisyMaterial = instancedMaterial.clone();
-      addWind(daisyMaterial, 0.07, 0.55);
-
-      const lavenderGeometry = createLavenderSpikeGeometry();
       const grassClumpGeometry = createGrassClumpGeometry();
-      // follaje gris plateado de la lavanda
-      const lavenderLeafMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, color: 0xb9c7ae, roughness: 0.9, side: THREE.DoubleSide });
-      addWind(lavenderLeafMaterial, 0.04, 0.3);
-
-      function lavenderBed(index, density = 1, area = { rMin: GARDEN.bedInner, rMax: GARDEN.bedOuter }) {
-        const clumps = scatterInArea(Math.round(20 * Q * density), 0.85, bedTest(index), area.rMin, area.rMax);
-        const spikes = [];
-        const mounds = [];
-        const spikesPerClump = lowPower ? 18 : 30;
-        for (const c of clumps) {
-          const size = 0.85 + random() * 0.35;
-          mounds.push({ x: c.x, z: c.z, s: 1.9 * size, sy: 1.5 * size, yaw: random() * 6, shade: 0.75 + random() * 0.15 });
-          for (let k = 0; k < spikesPerClump; k += 1) {
-            const a = random() * Math.PI * 2;
-            const d = Math.sqrt(random()) * 0.3 * size;
-            const ox = Math.cos(a) * d;
-            const oz = Math.sin(a) * d;
-            const lean = (d / (0.3 * size)) * 0.45;
-            spikes.push({
-              x: c.x + ox,
-              z: c.z + oz,
-              y: 0.04,
-              s: (0.85 + random() * 0.35) * size,
-              yaw: random() * Math.PI * 2,
-              // inclinación hacia afuera para la forma de cojín
-              tiltX: Math.sin(a) * lean,
-              tiltZ: -Math.cos(a) * lean,
-              shade: 0.8 + random() * 0.35
-            });
-          }
-        }
-        // Rotación en orden YXZ: la inclinación se calcula en ejes del mundo con yaw 0
-        spikes.forEach((s) => { s.yaw = 0; });
-        plantInstances(grassClumpGeometry, lavenderLeafMaterial, mounds);
-        plantInstances(lavenderGeometry, lavenderMaterial, spikes);
-      }
-
-      function daisyBed(index, geometry, count, spacing) {
-        const pts = scatterInArea(Math.round(count * Q), spacing, bedTest(index), GARDEN.bedInner, GARDEN.bedOuter);
-        const items = pts.map((p) => ({
-          x: p.x,
-          z: p.z,
-          s: 0.85 + random() * 0.55,
-          yaw: random() * Math.PI * 2,
-          tiltX: (random() - 0.5) * 0.25,
-          tiltZ: (random() - 0.5) * 0.25,
-          shade: 0.85 + random() * 0.2
-        }));
-        // cada margarita con su propio follaje bajo
-        const leafy = pts.map((p) => ({ x: p.x, z: p.z, s: 0.9 + random() * 0.5, yaw: random() * 6, shade: 0.8 + random() * 0.3 }));
-        plantInstances(grassClumpGeometry, daisyLeafMaterial, leafy);
-        return plantInstances(geometry, daisyMaterial, items);
-      }
-      const daisyLeafMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, side: THREE.DoubleSide });
-      addWind(daisyLeafMaterial, 0.05, 0.45);
-
-      const whiteDaisy = createDaisyGeometry(0xf7f4ec, 0xf0b81e, 16);
-      const asterDaisy = createDaisyGeometry(0xc69ad8, 0xf2c03a, 20);
-      const pinkCosmos = createDaisyGeometry(0xf19ab8, 0xf4c84a, 8);
+      const coverMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, side: THREE.DoubleSide });
+      addWind(coverMaterial, 0.05, 0.45);
 
       lycorisBed(0);
-      lavenderBed(1);
-      tulipBed(2, ["yellow", "apricot", "orange", "scarlet"]);
-      daisyBed(3, whiteDaisy, 340, 0.17);
-      tulipBed(4, ["lilac", "purple", "night", "pink"]);
-      daisyBed(5, asterDaisy, 170, 0.22);
-      daisyBed(5, pinkCosmos, 150, 0.22);
+      tulipBed(1, ["yellow", "apricot", "orange", "scarlet"]);
+      lycorisBed(2);
+      tulipBed(3, ["white", "cream", "blush", "pink"]);
+      lycorisBed(4);
+      tulipBed(5, ["lilac", "purple", "night", "pink"]);
 
       // Cobertura verde baja entre las flores para que los parterres se vean llenos
       {
@@ -2131,35 +2017,7 @@
           0,
           GARDEN.bedOuter
         ).map((p) => ({ x: p.x, z: p.z, s: 1.2 + random() * 0.6, sy: 0.9 + random() * 0.4, yaw: random() * 6, shade: 0.6 + random() * 0.25 }));
-        plantInstances(grassClumpGeometry, daisyLeafMaterial, cover);
-      }
-
-      // Prado exterior con flores silvestres sueltas
-      {
-        const meadowTest = (x, z) => {
-          const r = Math.hypot(x, z);
-          return !onPath(x, z) && r > GARDEN.hedge + 1 && r < 26;
-        };
-        const wild = scatterInArea(Math.round(520 * Q), 0.3, meadowTest, GARDEN.hedge + 1, 26);
-        const whites = [];
-        const pinks = [];
-        wild.forEach((p) => {
-          const patch = fbm(p.x * 0.25, p.z * 0.25);
-          if (patch < 0.42) return;
-          const item = {
-            x: p.x,
-            z: p.z,
-            y: groundHeight(p.x, p.z),
-            s: 0.9 + random() * 0.5,
-            yaw: random() * 6,
-            tiltX: (random() - 0.5) * 0.3,
-            tiltZ: (random() - 0.5) * 0.3,
-            shade: 0.85 + random() * 0.2
-          };
-          (patch > 0.58 ? pinks : whites).push(item);
-        });
-        plantInstances(whiteDaisy, daisyMaterial, whites);
-        plantInstances(pinkCosmos, daisyMaterial, pinks);
+        plantInstances(grassClumpGeometry, coverMaterial, cover);
       }
 
       // ---------- POLEN Y POLVO EN EL AIRE ----------
@@ -2548,20 +2406,8 @@
   {
     title: "Saber Amar",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/69F3NYS9W-Q/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/69F3NYS9W-Q/hqdefault.jpg",
     src: "assets/music/69F3NYS9W-Q.m4a"
-  },
-  {
-    title: "1% (ft. el RedCode)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/UI40eF5MbbI/hqdefault.jpg",
-    src: "assets/music/UI40eF5MbbI.m4a"
-  },
-  {
-    title: "2000 Siempre24/7 (ft. Ziferk)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
-    src: "assets/music/vFQ_0jRTUt0.m4a"
   },
   {
     title: "3 De Septiembre",
@@ -2572,247 +2418,157 @@
   {
     title: "369 (ft. Reboll333)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/CgtULIbzQmM/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/CgtULIbzQmM/hqdefault.jpg",
     src: "assets/music/CgtULIbzQmM.m4a"
-  },
-  {
-    title: "A las afueras",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
-  },
-  {
-    title: "A mi modo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/69F3NYS9W-Q/hqdefault.jpg",
-    src: "assets/music/69F3NYS9W-Q.m4a"
   },
   {
     title: "Al Son De La Neurona",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/x1JLel7OmTY/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/x1JLel7OmTY/hqdefault.jpg",
     src: "assets/music/x1JLel7OmTY.m4a"
   },
   {
     title: "Almas Benditas (ft. Achepe)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/qeJKadkYX40/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/qeJKadkYX40/hqdefault.jpg",
     src: "assets/music/qeJKadkYX40.m4a"
-  },
-  {
-    title: "Almas perdidas",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/qeJKadkYX40/hqdefault.jpg",
-    src: "assets/music/qeJKadkYX40.m4a"
-  },
-  {
-    title: "Antes de que acabe el día",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
     title: "Aquí",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/61hpBuw10l0/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/61hpBuw10l0/hqdefault.jpg",
     src: "assets/music/61hpBuw10l0.m4a"
   },
   {
     title: "Aunque (ft. Joes Yawar Cru)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/NdRA1EymW7s/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/NdRA1EymW7s/hqdefault.jpg",
     src: "assets/music/NdRA1EymW7s.m4a"
-  },
-  {
-    title: "Ausencia",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/_2fNpGHig6s/hqdefault.jpg",
-    src: "assets/music/_2fNpGHig6s.m4a"
   },
   {
     title: "Ayer (ft. Black Jhons One)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/DY2n2TtrEeQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/DY2n2TtrEeQ/hqdefault.jpg",
     src: "assets/music/DY2n2TtrEeQ.m4a"
-  },
-  {
-    title: "Bajo cero",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/lfCDiBAqH6s/hqdefault.jpg",
-    src: "assets/music/lfCDiBAqH6s.m4a"
   },
   {
     title: "Bambú",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/-LtINl7lFss/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/-LtINl7lFss/hqdefault.jpg",
     src: "assets/music/-LtINl7lFss.m4a"
-  },
-  {
-    title: "Bambú (COLORS / COQE)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/-LtINl7lFss/hqdefault.jpg",
-    src: "assets/music/-LtINl7lFss.m4a"
-  },
-  {
-    title: "Bipolar",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/69F3NYS9W-Q/hqdefault.jpg",
-    src: "assets/music/69F3NYS9W-Q.m4a"
   },
   {
     title: "Cada Uno a Lo Suyo (ft. El Chojin & Almanegra)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BH7fwwL2WXE/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/BH7fwwL2WXE/hqdefault.jpg",
     src: "assets/music/BH7fwwL2WXE.m4a"
   },
   {
     title: "Calle Escondida (ft. Error 999 & Mismo Perro)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/APV0rbNX1LM/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/APV0rbNX1LM/hqdefault.jpg",
     src: "assets/music/APV0rbNX1LM.m4a"
-  },
-  {
-    title: "Caminando (ft. Ziferk)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
-    src: "assets/music/vFQ_0jRTUt0.m4a"
   },
   {
     title: "Capítulo 7",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/1_NpskHPn0w/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/1_NpskHPn0w/hqdefault.jpg",
     src: "assets/music/1_NpskHPn0w.m4a"
   },
   {
     title: "Cenizas",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/V0VpYYoSN9Q/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/V0VpYYoSN9Q/hqdefault.jpg",
     src: "assets/music/V0VpYYoSN9Q.m4a"
   },
   {
     title: "Chimba De Día",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/w7ycW8-FVKo/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/w7ycW8-FVKo/hqdefault.jpg",
     src: "assets/music/w7ycW8-FVKo.m4a"
-  },
-  {
-    title: "Cicatrices (ft. Ziferk)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/d8nRUJOSdkQ/hqdefault.jpg",
-    src: "assets/music/d8nRUJOSdkQ.m4a"
   },
   {
     title: "Codigoz (ft. Guellaz & deejay Santacruz)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/9RBbP4h9Nkw/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/9RBbP4h9Nkw/hqdefault.jpg",
     src: "assets/music/9RBbP4h9Nkw.m4a"
   },
   {
     title: "Comentarios (ft. Eddy Mugre)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/SfOg_p8wJlc/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/SfOg_p8wJlc/hqdefault.jpg",
     src: "assets/music/SfOg_p8wJlc.m4a"
   },
   {
     title: "Como La Luna ft. Selene",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/JruiMsnZT-E/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/JruiMsnZT-E/hqdefault.jpg",
     src: "assets/music/JruiMsnZT-E.m4a"
   },
   {
     title: "Como Yotas",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/9erDmE2i2ws/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/9erDmE2i2ws/hqdefault.jpg",
     src: "assets/music/9erDmE2i2ws.m4a"
   },
   {
     title: "Compasión",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/d8nRUJOSdkQ/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/d8nRUJOSdkQ/hqdefault.jpg",
     src: "assets/music/d8nRUJOSdkQ.m4a"
   },
   {
     title: "Condena (ft. Achepe, Sipo One & T-Killa)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/kI3564k-AmQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/kI3564k-AmQ/hqdefault.jpg",
     src: "assets/music/kI3564k-AmQ.m4a"
   },
   {
     title: "Cuando Sea Mañana (ft. Hi-Kymon)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/KS-TxFd6uLs/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/KS-TxFd6uLs/hqdefault.jpg",
     src: "assets/music/KS-TxFd6uLs.m4a"
-  },
-  {
-    title: "Cuando ya este muerto",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
-    src: "assets/music/CFbTHc0OaEQ.m4a"
   },
   {
     title: "Cuando Ya Esté Muerto - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/CFbTHc0OaEQ/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
     src: "assets/music/CFbTHc0OaEQ.m4a"
-  },
-  {
-    title: "Cuestión de tiempo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Flp8MX2Zem0/hqdefault.jpg",
-    src: "assets/music/Flp8MX2Zem0.m4a"
   },
   {
     title: "Cura",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/E3g9izI6Rww/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/E3g9izI6Rww/hqdefault.jpg",
     src: "assets/music/E3g9izI6Rww.m4a"
   },
   {
     title: "Cuántos",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-HJxAijznMo/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/-HJxAijznMo/hqdefault.jpg",
     src: "assets/music/-HJxAijznMo.m4a"
-  },
-  {
-    title: "De pie",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/oCI-LvnibUg/hqdefault.jpg",
-    src: "assets/music/oCI-LvnibUg.m4a"
-  },
-  {
-    title: "Desahogo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/lMFRq6rzPME/hqdefault.jpg",
-    src: "assets/music/lMFRq6rzPME.m4a"
   },
   {
     title: "Desde Abajo",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/M3rW8X5otwc/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/M3rW8X5otwc/hqdefault.jpg",
     src: "assets/music/M3rW8X5otwc.m4a"
   },
   {
     title: "Efímero",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/lMFRq6rzPME/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/lMFRq6rzPME/hqdefault.jpg",
     src: "assets/music/lMFRq6rzPME.m4a"
   },
   {
     title: "El Costal",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/R4HqzKnLffI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/R4HqzKnLffI/hqdefault.jpg",
     src: "assets/music/R4HqzKnLffI.m4a"
-  },
-  {
-    title: "El de Siempre",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
     title: "El Diablo",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/PEVztafebuk/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/PEVztafebuk/hqdefault.jpg",
     src: "assets/music/PEVztafebuk.m4a"
   },
   {
@@ -2824,157 +2580,121 @@
   {
     title: "El Final Del Cuento",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/8HSTiZWJo9U/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/8HSTiZWJo9U/hqdefault.jpg",
     src: "assets/music/8HSTiZWJo9U.m4a"
   },
   {
     title: "El Final Del Cuento (Sesión)",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/w_hMtFoFtU4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/w_hMtFoFtU4/hqdefault.jpg",
     src: "assets/music/w_hMtFoFtU4.m4a"
   },
   {
     title: "El Final Del Cuento - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/BF7smY9vh3U/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/BF7smY9vh3U/hqdefault.jpg",
     src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
     title: "El Que Duro Se Para",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/JmA4g3CFUUo/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/JmA4g3CFUUo/hqdefault.jpg",
     src: "assets/music/JmA4g3CFUUo.m4a"
   },
   {
     title: "El Redcode",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/UI40eF5MbbI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/UI40eF5MbbI/hqdefault.jpg",
     src: "assets/music/UI40eF5MbbI.m4a"
-  },
-  {
-    title: "El vacío",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Flp8MX2Zem0/hqdefault.jpg",
-    src: "assets/music/Flp8MX2Zem0.m4a"
-  },
-  {
-    title: "El vuelo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/lMFRq6rzPME/hqdefault.jpg",
-    src: "assets/music/lMFRq6rzPME.m4a"
   },
   {
     title: "En Casa Nadie Lo Espera",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/3BtkOApjHaA/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/3BtkOApjHaA/hqdefault.jpg",
     src: "assets/music/3BtkOApjHaA.m4a"
   },
   {
     title: "Entre humo y letras",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/NSc4oDPJiEw/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/NSc4oDPJiEw/hqdefault.jpg",
     src: "assets/music/NSc4oDPJiEw.m4a"
-  },
-  {
-    title: "Espejos",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XVvXuK4hZ_c/hqdefault.jpg",
-    src: "assets/music/XVvXuK4hZ_c.m4a"
   },
   {
     title: "Esperar",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/7Q5Mud5YgU0/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/7Q5Mud5YgU0/hqdefault.jpg",
     src: "assets/music/7Q5Mud5YgU0.m4a"
   },
   {
     title: "Fantasmas (ft. Lianna)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/X48zbOA3I8I/hqdefault.jpg",
     src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
     title: "Felicidad",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/DDok_Ut69iE/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/DDok_Ut69iE/hqdefault.jpg",
     src: "assets/music/DDok_Ut69iE.m4a"
-  },
-  {
-    title: "Flores muertas",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
-    src: "assets/music/CFbTHc0OaEQ.m4a"
-  },
-  {
-    title: "Fuego",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/-WPPMOE2jeE/hqdefault.jpg",
-    src: "assets/music/-WPPMOE2jeE.m4a"
-  },
-  {
-    title: "Girasoles",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/d8nRUJOSdkQ/hqdefault.jpg",
-    src: "assets/music/d8nRUJOSdkQ.m4a"
   },
   {
     title: "Guayacanes y Hortensias (ft. Oblivion's Mighty Trash & Cheche Cole)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/3W0sJrXRFYI/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/3W0sJrXRFYI/hqdefault.jpg",
     src: "assets/music/3W0sJrXRFYI.m4a"
   },
   {
     title: "Hablar Con Actos",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/GGRiH-zBrcI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/GGRiH-zBrcI/hqdefault.jpg",
     src: "assets/music/GGRiH-zBrcI.m4a"
   },
   {
     title: "Hasta Las Yemas - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/ybxVczv73Ac/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/ybxVczv73Ac/hqdefault.jpg",
     src: "assets/music/ybxVczv73Ac.m4a"
   },
   {
     title: "I Don't Know",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/9IHmdI8eKIc/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/9IHmdI8eKIc/hqdefault.jpg",
     src: "assets/music/9IHmdI8eKIc.m4a"
   },
   {
     title: "Igual",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/-cG1v34b62c/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/-cG1v34b62c/hqdefault.jpg",
     src: "assets/music/-cG1v34b62c.m4a"
   },
   {
     title: "Infierno",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/VPquW0K-goQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/VPquW0K-goQ/hqdefault.jpg",
     src: "assets/music/VPquW0K-goQ.m4a"
   },
   {
     title: "Inquebrantable",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/-sVab-CQ7kE/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/-sVab-CQ7kE/hqdefault.jpg",
     src: "assets/music/-sVab-CQ7kE.m4a"
   },
   {
     title: "Intuición",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/751tzWp2X08/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/751tzWp2X08/hqdefault.jpg",
     src: "assets/music/751tzWp2X08.m4a"
   },
   {
     title: "Karma",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XPrirTJ1_A4/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/XPrirTJ1_A4/hqdefault.jpg",
     src: "assets/music/XPrirTJ1_A4.m4a"
   },
   {
     title: "La 70 (ft. Deuxer, Dexta Small & DaStreetGenie)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/nBw0-Xu2nxQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/nBw0-Xu2nxQ/hqdefault.jpg",
     src: "assets/music/nBw0-Xu2nxQ.m4a"
   },
   {
@@ -2984,22 +2704,10 @@
     src: "assets/music/9rqgrKpUmuA.m4a"
   },
   {
-    title: "La ciudad del humo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Ls1cOqGf7oI/hqdefault.jpg",
-    src: "assets/music/Ls1cOqGf7oI.m4a"
-  },
-  {
     title: "La culpa",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/3axEOIr1OmU/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/3axEOIr1OmU/hqdefault.jpg",
     src: "assets/music/3axEOIr1OmU.m4a"
-  },
-  {
-    title: "La Cura",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/E3g9izI6Rww/hqdefault.jpg",
-    src: "assets/music/E3g9izI6Rww.m4a"
   },
   {
     title: "La Intuición",
@@ -3010,38 +2718,32 @@
   {
     title: "La Luz",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Ls1cOqGf7oI/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Ls1cOqGf7oI/hqdefault.jpg",
     src: "assets/music/Ls1cOqGf7oI.m4a"
   },
   {
     title: "La Misma Cara",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/ak9GNPBxK94/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/ak9GNPBxK94/hqdefault.jpg",
     src: "assets/music/ak9GNPBxK94.m4a"
   },
   {
     title: "La Moral (ft. Pielroja & Alka Produce)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/6l8m-nj8eZM/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/6l8m-nj8eZM/hqdefault.jpg",
     src: "assets/music/6l8m-nj8eZM.m4a"
   },
   {
     title: "La Música",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Um-T2wsssag/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Um-T2wsssag/hqdefault.jpg",
     src: "assets/music/Um-T2wsssag.m4a"
   },
   {
     title: "La Papa Y La Leña",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/7u2zY4WVwD4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/7u2zY4WVwD4/hqdefault.jpg",
     src: "assets/music/7u2zY4WVwD4.m4a"
-  },
-  {
-    title: "Laberinto",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BZw-GbuR4UI/hqdefault.jpg",
-    src: "assets/music/BZw-GbuR4UI.m4a"
   },
   {
     title: "Las Calles Son Clases",
@@ -3052,98 +2754,62 @@
   {
     title: "Las Ganas",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/PHA_N_LXjyc/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/PHA_N_LXjyc/hqdefault.jpg",
     src: "assets/music/PHA_N_LXjyc.m4a"
   },
   {
     title: "Le Decían Que No Podía",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/eXRfRwkYZEs/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/eXRfRwkYZEs/hqdefault.jpg",
     src: "assets/music/eXRfRwkYZEs.m4a"
-  },
-  {
-    title: "Lejos de casa",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/x77asaCh5V8/hqdefault.jpg",
-    src: "assets/music/x77asaCh5V8.m4a"
   },
   {
     title: "Lejos De Falsos",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/x77asaCh5V8/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/x77asaCh5V8/hqdefault.jpg",
     src: "assets/music/x77asaCh5V8.m4a"
   },
   {
     title: "Llegan Se Van",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/90UfJKzBBOA/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/90UfJKzBBOA/hqdefault.jpg",
     src: "assets/music/90UfJKzBBOA.m4a"
   },
   {
     title: "Lobos (ft. Diavlitx)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/toaKAHcAa1o/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/toaKAHcAa1o/hqdefault.jpg",
     src: "assets/music/toaKAHcAa1o.m4a"
   },
   {
     title: "Los Dueños",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/CUZA9tM1x9c/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/CUZA9tM1x9c/hqdefault.jpg",
     src: "assets/music/CUZA9tM1x9c.m4a"
   },
   {
     title: "Los Petit Fellas",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/w_P2krK9z4U/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/w_P2krK9z4U/hqdefault.jpg",
     src: "assets/music/w_P2krK9z4U.m4a"
-  },
-  {
-    title: "Luna llena",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/JruiMsnZT-E/hqdefault.jpg",
-    src: "assets/music/JruiMsnZT-E.m4a"
-  },
-  {
-    title: "Lágrimas",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
-    src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
     title: "Madrugadas ft. Gona",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/Xysz1kxL5qQ/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/Xysz1kxL5qQ/hqdefault.jpg",
     src: "assets/music/Xysz1kxL5qQ.m4a"
-  },
-  {
-    title: "Mala fama",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
     title: "Maldito Siglo Xxi",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/gcVNFjhaIdI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/gcVNFjhaIdI/hqdefault.jpg",
     src: "assets/music/gcVNFjhaIdI.m4a"
   },
   {
     title: "María / Aroma de Jardín (ft. Charles Ans & BCN)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/gCRfJuJGdcw/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/gCRfJuJGdcw/hqdefault.jpg",
     src: "assets/music/gCRfJuJGdcw.m4a"
-  },
-  {
-    title: "Melancolía",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
-    src: "assets/music/X48zbOA3I8I.m4a"
-  },
-  {
-    title: "Memorias",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/VnznSUg2rT4/hqdefault.jpg",
-    src: "assets/music/VnznSUg2rT4.m4a"
   },
   {
     title: "Menos Plata Más Amor",
@@ -3154,121 +2820,85 @@
   {
     title: "Mi Loma Natal",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/n8S4xAAQ27w/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/n8S4xAAQ27w/hqdefault.jpg",
     src: "assets/music/n8S4xAAQ27w.m4a"
-  },
-  {
-    title: "Mi Rap",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/UY11Lczb2MA/hqdefault.jpg",
-    src: "assets/music/UY11Lczb2MA.m4a"
   },
   {
     title: "Mi Rap - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/UY11Lczb2MA/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/UY11Lczb2MA/hqdefault.jpg",
     src: "assets/music/UY11Lczb2MA.m4a"
   },
   {
     title: "Mujer Sin Nombre",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/yOX7cfNhdzQ/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/yOX7cfNhdzQ/hqdefault.jpg",
     src: "assets/music/yOX7cfNhdzQ.m4a"
   },
   {
     title: "Mujeres",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/PIQJl1y5WMg/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/PIQJl1y5WMg/hqdefault.jpg",
     src: "assets/music/PIQJl1y5WMg.m4a"
   },
   {
     title: "Máscaras",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/HIxEaIBSiTI/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/HIxEaIBSiTI/hqdefault.jpg",
     src: "assets/music/HIxEaIBSiTI.m4a"
   },
   {
     title: "Nada",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/XQWKBRuUWw4/maxresdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
-  },
-  {
-    title: "Nada es para siempre",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/XQWKBRuUWw4/hqdefault.jpg",
     src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
     title: "No Copy",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/B8sAqa7dEq8/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/B8sAqa7dEq8/hqdefault.jpg",
     src: "assets/music/B8sAqa7dEq8.m4a"
   },
   {
     title: "No Critique A Los Demás",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/epQfTYf9Q2c/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/epQfTYf9Q2c/hqdefault.jpg",
     src: "assets/music/epQfTYf9Q2c.m4a"
-  },
-  {
-    title: "No hay regreso",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/90UfJKzBBOA/hqdefault.jpg",
-    src: "assets/music/90UfJKzBBOA.m4a"
   },
   {
     title: "No Sabía Que Sabía",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/RpfWsx45Rgo/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/RpfWsx45Rgo/hqdefault.jpg",
     src: "assets/music/RpfWsx45Rgo.m4a"
   },
   {
     title: "No Somos Iguales",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/lfCDiBAqH6s/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/lfCDiBAqH6s/hqdefault.jpg",
     src: "assets/music/lfCDiBAqH6s.m4a"
-  },
-  {
-    title: "Nostalgia",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Flp8MX2Zem0/hqdefault.jpg",
-    src: "assets/music/Flp8MX2Zem0.m4a"
-  },
-  {
-    title: "Nunca jamás (ft. Alka Produce)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
-  },
-  {
-    title: "Ojos rojos",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/6l8m-nj8eZM/hqdefault.jpg",
-    src: "assets/music/6l8m-nj8eZM.m4a"
   },
   {
     title: "Osama",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BWvIHzlaH8o/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/BWvIHzlaH8o/hqdefault.jpg",
     src: "assets/music/BWvIHzlaH8o.m4a"
   },
   {
     title: "Oscuridad",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/gNPJMEoP6KI/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/gNPJMEoP6KI/hqdefault.jpg",
     src: "assets/music/gNPJMEoP6KI.m4a"
   },
   {
     title: "Otoño",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/IzSdLJxsfmc/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/IzSdLJxsfmc/hqdefault.jpg",
     src: "assets/music/IzSdLJxsfmc.m4a"
   },
   {
     title: "Otra noche",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/UUUoEUUfp8s/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/UUUoEUUfp8s/hqdefault.jpg",
     src: "assets/music/UUUoEUUfp8s.m4a"
   },
   {
@@ -3286,158 +2916,116 @@
   {
     title: "Perder",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/oCI-LvnibUg/maxresdefault.jpg",
-    src: "assets/music/oCI-LvnibUg.m4a"
-  },
-  {
-    title: "Perdón",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/oCI-LvnibUg/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/oCI-LvnibUg/hqdefault.jpg",
     src: "assets/music/oCI-LvnibUg.m4a"
   },
   {
     title: "Perro Fino",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/fVolstaflyo/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/fVolstaflyo/hqdefault.jpg",
     src: "assets/music/fVolstaflyo.m4a"
   },
   {
     title: "Pon Fin - Antes Del Alba",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Kq-CIz4-FR8/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Kq-CIz4-FR8/hqdefault.jpg",
     src: "assets/music/Kq-CIz4-FR8.m4a"
   },
   {
     title: "Por Si Los Días No Vuelven ft. Sharif",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/Zv4I8_Fg2G4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/Zv4I8_Fg2G4/hqdefault.jpg",
     src: "assets/music/Zv4I8_Fg2G4.m4a"
   },
   {
     title: "Que den la vuelta (ft. Jam Block Jr & Hi-Kymon)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/9yBUd8iS5uc/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/9yBUd8iS5uc/hqdefault.jpg",
     src: "assets/music/9yBUd8iS5uc.m4a"
   },
   {
     title: "Que Nada Te Aplaste",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/-WPPMOE2jeE/hqdefault.jpg",
     src: "assets/music/-WPPMOE2jeE.m4a"
   },
   {
     title: "Quimera",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/3N9Q8XIqhUo/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/3N9Q8XIqhUo/hqdefault.jpg",
     src: "assets/music/3N9Q8XIqhUo.m4a"
   },
   {
     title: "Qué Más Da (ft. Melodico & La Loquera)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/WdGZ4LOn0lQ/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/WdGZ4LOn0lQ/hqdefault.jpg",
     src: "assets/music/WdGZ4LOn0lQ.m4a"
   },
   {
     title: "Rapero Porque Quiero",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/BbTgoluQyu4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/BbTgoluQyu4/hqdefault.jpg",
     src: "assets/music/BbTgoluQyu4.m4a"
   },
   {
     title: "Ratas y Ladys (ft. Eddy Mugre)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/7TpeooPW_0Q/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/7TpeooPW_0Q/hqdefault.jpg",
     src: "assets/music/7TpeooPW_0Q.m4a"
   },
   {
     title: "Realidad Mental - Lo Que Más Importa",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/VnznSUg2rT4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/VnznSUg2rT4/hqdefault.jpg",
     src: "assets/music/VnznSUg2rT4.m4a"
   },
   {
     title: "Realidad Mental - Vivir El Tiempo",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/WJnumOjQEn8/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/WJnumOjQEn8/hqdefault.jpg",
     src: "assets/music/WJnumOjQEn8.m4a"
   },
   {
     title: "Realidad Mental - Ya Verás",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/kiTKGKjjS2I/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/kiTKGKjjS2I/hqdefault.jpg",
     src: "assets/music/kiTKGKjjS2I.m4a"
-  },
-  {
-    title: "Renacer",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/fVolstaflyo/hqdefault.jpg",
-    src: "assets/music/fVolstaflyo.m4a"
-  },
-  {
-    title: "Ruido",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
-    src: "assets/music/vFQ_0jRTUt0.m4a"
   },
   {
     title: "Sabor",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/Iv_hbcKlH4E/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Iv_hbcKlH4E/hqdefault.jpg",
     src: "assets/music/Iv_hbcKlH4E.m4a"
   },
   {
     title: "Salmo",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/DdylyF4gWPc/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/DdylyF4gWPc/hqdefault.jpg",
     src: "assets/music/DdylyF4gWPc.m4a"
   },
   {
     title: "Ser feliz es gratis",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/KHQuqfbcII0/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/KHQuqfbcII0/hqdefault.jpg",
     src: "assets/music/KHQuqfbcII0.m4a"
   },
   {
     title: "Si No Estas",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/qAsy_UP0GoI/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/qAsy_UP0GoI/hqdefault.jpg",
     src: "assets/music/qAsy_UP0GoI.m4a"
-  },
-  {
-    title: "Si te vas",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
-    src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
     title: "Sigo aquí (ft. Ali A.K.A Mind)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/giOWXLeBMbg/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/giOWXLeBMbg/hqdefault.jpg",
     src: "assets/music/giOWXLeBMbg.m4a"
-  },
-  {
-    title: "Sin anestesia",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
     title: "Sin Excusas (ft. Santa RM & Alka Produce)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BYBYorRK_h8/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/BYBYorRK_h8/hqdefault.jpg",
     src: "assets/music/BYBYorRK_h8.m4a"
-  },
-  {
-    title: "Sin miedo (ft. Kazu)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/OpJmg6eVGAs/hqdefault.jpg",
-    src: "assets/music/OpJmg6eVGAs.m4a"
-  },
-  {
-    title: "Sin mirar atrás",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/CFbTHc0OaEQ/hqdefault.jpg",
-    src: "assets/music/CFbTHc0OaEQ.m4a"
   },
   {
     title: "Sin Visajes",
@@ -3448,20 +3036,14 @@
   {
     title: "Solitario Soldado",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/-RDWIsrVt0s/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/-RDWIsrVt0s/hqdefault.jpg",
     src: "assets/music/-RDWIsrVt0s.m4a"
   },
   {
     title: "Solo Es Una",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/XVvXuK4hZ_c/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/XVvXuK4hZ_c/hqdefault.jpg",
     src: "assets/music/XVvXuK4hZ_c.m4a"
-  },
-  {
-    title: "Sombras (ft. Anyi)",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/yOX7cfNhdzQ/hqdefault.jpg",
-    src: "assets/music/yOX7cfNhdzQ.m4a"
   },
   {
     title: "Sus Mentiras",
@@ -3472,105 +3054,70 @@
   {
     title: "Tarde Que Temprano",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/GIS450UJbMQ/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/GIS450UJbMQ/hqdefault.jpg",
     src: "assets/music/GIS450UJbMQ.m4a"
   },
   {
     title: "Tema Explícito ft. Joes Ywc",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/vFQ_0jRTUt0/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/vFQ_0jRTUt0/hqdefault.jpg",
     src: "assets/music/vFQ_0jRTUt0.m4a"
-  },
-  {
-    title: "Tiempo",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/WJnumOjQEn8/hqdefault.jpg",
-    src: "assets/music/WJnumOjQEn8.m4a"
   },
   {
     title: "Tierra Santa",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/BZw-GbuR4UI/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/BZw-GbuR4UI/hqdefault.jpg",
     src: "assets/music/BZw-GbuR4UI.m4a"
-  },
-  {
-    title: "Todo es prestado",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
-  },
-  {
-    title: "Todo o nada",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
   },
   {
     title: "Tío Armando",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/lAoj2JTQtbQ/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/lAoj2JTQtbQ/hqdefault.jpg",
     src: "assets/music/lAoj2JTQtbQ.m4a"
   },
   {
     title: "Tú Tienes El Son",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/_2fNpGHig6s/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/_2fNpGHig6s/hqdefault.jpg",
     src: "assets/music/_2fNpGHig6s.m4a"
   },
   {
     title: "Tú Tienes El Son ft. Charles",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi/0c4j9hoMYWA/maxresdefault.jpg",
+    cover: "https://i.ytimg.com/vi/0c4j9hoMYWA/hqdefault.jpg",
     src: "assets/music/0c4j9hoMYWA.m4a"
-  },
-  {
-    title: "Un día a la vez",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/XQWKBRuUWw4/hqdefault.jpg",
-    src: "assets/music/XQWKBRuUWw4.m4a"
-  },
-  {
-    title: "Un minuto",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/BF7smY9vh3U/hqdefault.jpg",
-    src: "assets/music/BF7smY9vh3U.m4a"
   },
   {
     title: "Un Pelito Y Un Tamal",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/A1eu6Spaz3g/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/A1eu6Spaz3g/hqdefault.jpg",
     src: "assets/music/A1eu6Spaz3g.m4a"
   },
   {
     title: "Vivir el Tiempo",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/Ay9h07Z2vcI/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/Ay9h07Z2vcI/hqdefault.jpg",
     src: "assets/music/Ay9h07Z2vcI.m4a"
   },
   {
     title: "Volando bajo (ft. Ruzto)",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/6ovduwVuclc/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/6ovduwVuclc/hqdefault.jpg",
     src: "assets/music/6ovduwVuclc.m4a"
-  },
-  {
-    title: "Volver a empezar",
-    artist: "Penyair",
-    cover: "https://img.youtube.com/vi/X48zbOA3I8I/hqdefault.jpg",
-    src: "assets/music/X48zbOA3I8I.m4a"
   },
   {
     title: "Zenit",
     artist: "Penyair",
-    cover: "https://img.youtube.com/vi/scSt7nVbeC8/hqdefault.jpg",
+    cover: "https://i.ytimg.com/vi/scSt7nVbeC8/hqdefault.jpg",
     src: "assets/music/scSt7nVbeC8.m4a"
   },
   {
     title: "Éter",
     artist: "Penyair",
-    cover: "https://i.ytimg.com/vi_webp/3BcgyeNGCJ4/maxresdefault.webp",
+    cover: "https://i.ytimg.com/vi/3BcgyeNGCJ4/hqdefault.jpg",
     src: "assets/music/3BcgyeNGCJ4.m4a"
-  },];
+  }
+      ];
 
       let currentSongIndex = 0;
       let isPlaying = false;
@@ -3611,6 +3158,37 @@
       const durationTimeEl = document.getElementById('durationTime');
       const playlistItemsContainer = document.getElementById('playlistItems');
       const playlistSearch = document.getElementById('playlistSearch');
+      const playlistCount = document.getElementById('playlistCount');
+      const nowPlayingBtn = document.getElementById('nowPlayingBtn');
+      const nowPlayingCover = document.getElementById('nowPlayingCover');
+      const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+      const STORAGE_KEY = 'jardin-musica';
+
+      // Recordar la última canción y el punto donde iba (si el navegador lo permite)
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ src: playlist[currentSongIndex].src, time: audioPlayer.currentTime || 0 }));
+        } catch (e) {}
+      }
+      function readState() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        } catch (e) {
+          return null;
+        }
+      }
+      // Búsqueda sin importar tildes ni mayúsculas
+      const normalize = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+      function updateNowPlaying() {
+        if (!nowPlayingBtn) return;
+        const song = playlist[currentSongIndex];
+        nowPlayingTitle.textContent = song.title;
+        nowPlayingCover.style.backgroundImage = 'url("' + song.cover + '")';
+        const started = !audioPlayer.paused || audioPlayer.currentTime > 0;
+        nowPlayingBtn.classList.toggle('visible', started);
+        nowPlayingBtn.classList.toggle('playing', !audioPlayer.paused);
+      }
 
       const musicOverlay = document.getElementById('musicOverlay');
       const closeMusicBtn = document.getElementById('closeMusicBtn');
@@ -3701,6 +3279,8 @@ function loadSong(index) {
           playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
           albumArt.classList.add('playing');
         }
+        updateNowPlaying();
+        saveState();
       }
 
       function prevSong() {
@@ -3736,8 +3316,7 @@ function loadSong(index) {
         const duration = e.target.duration;
         const currentTime = e.target.currentTime;
         if(isNaN(duration)) return;
-        const progressPercent = (currentTime / duration) * 100;
-        progressBar.style.width = progressPercent + '%';
+        if (!seeking) progressBar.style.width = (currentTime / duration) * 100 + '%';
 
         let currentMins = Math.floor(currentTime / 60);
         let currentSecs = Math.floor(currentTime % 60);
@@ -3750,19 +3329,24 @@ function loadSong(index) {
         durationTimeEl.textContent = durationMins + ':' + durationSecs;
       }
 
-      function setProgress(e) {
-        const width = this.clientWidth;
-        const clickX = e.offsetX;
-        const duration = audioPlayer.duration;
-        audioPlayer.currentTime = (clickX / width) * duration;
+      // Tocar o arrastrar la barra (también con el dedo) para mover la canción
+      let seeking = false;
+      function seekTo(clientX) {
+        const rect = progressContainer.getBoundingClientRect();
+        const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+        progressBar.style.width = ratio * 100 + '%';
+        if (isFinite(audioPlayer.duration)) audioPlayer.currentTime = ratio * audioPlayer.duration;
       }
 
       function renderPlaylist(filter) {
         filter = filter || "";
         if(!playlistItemsContainer) return;
         playlistItemsContainer.innerHTML = '';
+        const query = normalize(filter.trim());
+        let shown = 0;
         playlist.forEach((song, index) => {
-          if (song.title.toLowerCase().includes(filter.toLowerCase()) || song.artist.toLowerCase().includes(filter.toLowerCase())) {
+          if (normalize(song.title).includes(query) || normalize(song.artist).includes(query)) {
+            shown += 1;
             const li = document.createElement('li');
             li.className = 'playlist-item ' + (index === currentSongIndex ? 'active-song' : '');
               li.dataset.index = index;
@@ -3792,6 +3376,15 @@ function loadSong(index) {
             playlistItemsContainer.appendChild(li);
           }
         });
+        if (playlistCount) {
+          playlistCount.textContent = query ? shown + ' de ' + playlist.length + ' canciones' : playlist.length + ' canciones';
+        }
+        if (shown === 0) {
+          const empty = document.createElement('li');
+          empty.className = 'playlist-empty';
+          empty.textContent = 'No encontré esa canción';
+          playlistItemsContainer.appendChild(empty);
+        }
       }
 
       
@@ -3840,11 +3433,44 @@ function loadSong(index) {
       }
       if(prevBtn) prevBtn.addEventListener('click', prevSong);
       if(nextBtn) nextBtn.addEventListener('click', () => nextSong(false));
-      if(progressContainer) progressContainer.addEventListener('click', setProgress);
+      if (progressContainer) {
+        progressContainer.addEventListener('pointerdown', (e) => {
+          seeking = true;
+          progressContainer.setPointerCapture(e.pointerId);
+          seekTo(e.clientX);
+        });
+        progressContainer.addEventListener('pointermove', (e) => { if (seeking) seekTo(e.clientX); });
+        const endSeek = () => { seeking = false; saveState(); };
+        progressContainer.addEventListener('pointerup', endSeek);
+        progressContainer.addEventListener('pointercancel', endSeek);
+      }
+      if (nowPlayingBtn) {
+        nowPlayingBtn.addEventListener('click', () => musicOverlay.classList.add('active'));
+      }
+      // Barra espaciadora: reproducir/pausar mientras el reproductor está abierto
+      document.addEventListener('keydown', (e) => {
+        if (e.code !== 'Space' || !musicOverlay.classList.contains('active')) return;
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON')) return;
+        e.preventDefault();
+        togglePlay();
+      });
+      let lastSaved = 0;
+      audioPlayer.addEventListener('timeupdate', () => {
+        if (Date.now() - lastSaved > 5000) { lastSaved = Date.now(); saveState(); }
+      });
       
       
       renderPlaylist("");
-      loadSong(0);
+      // Retoma la última canción escuchada, en el mismo punto
+      const saved = readState();
+      const savedIndex = saved ? playlist.findIndex((song) => song.src === saved.src) : -1;
+      loadSong(savedIndex >= 0 ? savedIndex : 0);
+      if (savedIndex >= 0 && saved.time > 0) {
+        audioPlayer.addEventListener('loadedmetadata', () => {
+          if (audioPlayer.currentTime === 0 && saved.time < audioPlayer.duration) audioPlayer.currentTime = saved.time;
+        }, { once: true });
+      }
+      updateNowPlaying();
 
       animate();
     </script>
