@@ -979,12 +979,12 @@
       const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
       const lowPower = compactViewport || coarsePointer || (navigator.hardwareConcurrency || 8) <= 4;
       // Escala de cantidades: el móvil recibe el mismo jardín pero más ligero.
-      const Q = lowPower ? 0.45 : 1;
+      const Q = lowPower ? 0.45 : 0.7;
       // Ajustes por tipo de equipo. En celulares todo lo caro (sombras, luces
       // reales, cielo y suelo calculados en cada píxel) se precalcula una vez.
       const TIER = lowPower
         ? { prStart: 1.5, prMax: 2, prMin: 0.8, fog: [16, 72], flowerCull: 48, grassCull: 22, lodNear: 13, lampLights: 0, shadows: false }
-        : { prStart: 1.5, prMax: 1.75, prMin: 0.75, fog: [22, 95], flowerCull: 85, grassCull: 40, lodNear: 24, lampLights: 4, shadows: true };
+        : { prStart: 1, prMax: 1.5, prMin: 0.7, fog: [18, 85], flowerCull: 65, grassCull: 30, lodNear: 18, lampLights: 0, shadows: false };
       // Material base: Lambert es mucho más barato en GPUs de gama baja
       const lit = (params) => {
         if (lowPower) {
@@ -2266,9 +2266,9 @@
       }
 
       // Detalle completo para las flores cercanas (un poco más ligero en celular)
-      const outerPetalGeometry = lowPower ? createTulipPetalGeometry(true, 9, 4) : createTulipPetalGeometry(true);
-      const innerPetalGeometry = lowPower ? createTulipPetalGeometry(false, 7, 3) : createTulipPetalGeometry(false);
-      const tulipLeafGeometry = lowPower ? createTulipLeafGeometry(8, 2) : createTulipLeafGeometry();
+      const outerPetalGeometry = createTulipPetalGeometry(true, 9, 4);
+      const innerPetalGeometry = createTulipPetalGeometry(false, 7, 3);
+      const tulipLeafGeometry = createTulipLeafGeometry(8, 2);
       // versiones ligeras para los campos grandes
       const lowOuterPetal = createTulipPetalGeometry(true, 6, 3);
       const lowInnerPetal = createTulipPetalGeometry(false, 5, 2);
@@ -2286,8 +2286,8 @@
       pistilStemGeometry.rotateX(Math.PI / 2);
       pistilStemGeometry.translate(0, 0, 0.19);
       const pistilTopGeometry = new THREE.SphereGeometry(0.045, 8, 6);
-      const calyxGeometry = new THREE.SphereGeometry(0.075, lowPower ? 6 : 10, lowPower ? 4 : 8);
-      const tulipInnerGeometry = new THREE.SphereGeometry(0.17, lowPower ? 7 : 10, lowPower ? 4 : 8);
+      const calyxGeometry = new THREE.SphereGeometry(0.075, 6, 4);
+      const tulipInnerGeometry = new THREE.SphereGeometry(0.17, 7, 4);
 
       // Los colores se guardan como "materiales" ligeros: al hornear la flor
       // cada pieza aporta su color al vértice y todo se dibuja en una sola llamada.
@@ -2300,17 +2300,7 @@
       const tulipPistilPaint = paint(0xb8c860);
 
       // Pétalos con brillo aterciopelado en computador; en celular, sombreado simple.
-      const makeFlowerMaterial = () => lowPower
-        ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, metalness: 0, side: THREE.DoubleSide })
-        : new THREE.MeshPhysicalMaterial({
-          vertexColors: true,
-          roughness: 0.62,
-          metalness: 0,
-          sheen: 0.55,
-          sheenRoughness: 0.55,
-          sheenColor: new THREE.Color(0xffffff),
-          side: THREE.DoubleSide
-        });
+      const makeFlowerMaterial = () => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, metalness: 0, side: THREE.DoubleSide });
       const flowerMaterial = enhance(makeFlowerMaterial(), { anchored: true });
 
       function bakePlant(group) {
@@ -2399,7 +2389,7 @@
         ]);
         const lp = !!config.lowPoly;
         const far = !!config.far;
-        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, far ? 2 : lp ? 4 : lowPower ? 6 : 14, 0.045 * config.scale * (far ? 1.4 : 1), far ? 3 : lp ? 4 : 6, false), tulipStemPaint));
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, far ? 2 : lp ? 4 : 6, 0.045 * config.scale * (far ? 1.4 : 1), far ? 3 : lp ? 4 : 6, false), tulipStemPaint));
 
         const leafCount = far ? 1 : 2 + (rnd(1) > 0.5 ? 1 : 0);
         for (let i = 0; i < leafCount; i++) {
@@ -2467,7 +2457,7 @@
         geometry.computeVertexNormals();
         return geometry;
       }
-      const spiderPetalGeometry = createSpiderPetalGeometry(lowPower ? 3 : 8);
+      const spiderPetalGeometry = createSpiderPetalGeometry(3);
       const lowSpiderPetal = createSpiderPetalGeometry(2);
       const farSpiderPetal = createSpiderPetalGeometry(1);
       const spiderStamenCurve = new THREE.CatmullRomCurve3([
@@ -2477,9 +2467,9 @@
         new THREE.Vector3(0, 0.92, 0.76),
         new THREE.Vector3(0, 0.88, 1.06)
       ]);
-      const spiderStamenGeometry = new THREE.TubeGeometry(spiderStamenCurve, lowPower ? 5 : 10, 0.012, lowPower ? 3 : 4, false);
+      const spiderStamenGeometry = new THREE.TubeGeometry(spiderStamenCurve, 5, 0.012, 3, false);
       const lowStamen = new THREE.TubeGeometry(spiderStamenCurve, 3, 0.016, 2, false);
-      const spiderAntherGeometry = new THREE.SphereGeometry(0.035, lowPower ? 4 : 6, lowPower ? 3 : 4);
+      const spiderAntherGeometry = new THREE.SphereGeometry(0.035, 4, 3);
       const spiderCenterGeometry = new THREE.SphereGeometry(0.085, 8, 6);
       const LYCORIS_COLORS = [0xd0182b, 0xe02a2d, 0xb8121f];
       const spiderStemPaint = paint(0x4f7a32);
@@ -2498,7 +2488,7 @@
         ]);
         const lp = !!config.lowPoly;
         const far = !!config.far;
-        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, far ? 2 : lp ? 4 : lowPower ? 6 : 12, 0.03 * config.scale * (far ? 1.5 : 1), far ? 3 : 4, false), spiderStemPaint));
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, far ? 2 : lp ? 4 : 6, 0.03 * config.scale * (far ? 1.5 : 1), far ? 3 : 4, false), spiderStemPaint));
         const head = new THREE.Group();
         head.position.copy(curve.getPoint(1));
         head.rotation.set(-Math.PI / 2 + config.tilt, 0, config.spin);
@@ -2506,7 +2496,7 @@
         const petalPaint = paint(config.color);
         // Umbela: 5–6 florecillas que miran hacia afuera, cada una con 6 tépalos
         // estrechos que se curvan hacia atrás y estambres largos que sobresalen.
-        const florets = far ? 3 : lp ? 4 : lowPower ? 5 : 5 + (config.seed > 0.5 ? 1 : 0);
+        const florets = far ? 3 : lp ? 4 : 5;
         if (!lp && !far) head.add(new THREE.Mesh(spiderCenterGeometry, spiderCenterPaint));
         for (let f = 0; f < florets; f += 1) {
           const floret = new THREE.Group();
@@ -2524,7 +2514,7 @@
             holder.add(petal);
             inner.add(holder);
           }
-          const stamens = far ? 0 : lp ? 3 : lowPower ? 4 : 6;
+          const stamens = far ? 0 : lp ? 3 : 4;
           for (let i = 0; i < stamens; i += 1) {
             const holder = new THREE.Group();
             holder.rotation.z = Math.PI / 6 + (i / stamens) * Math.PI * 2;
@@ -2784,7 +2774,7 @@
           });
         }
         const items = {};
-        const stepX = lowPower ? 0.5 : 0.36;
+        const stepX = lowPower ? 0.5 : 0.42;
         const rows = lowPower ? 2 : 3;
         const maxR = lowPower ? 28 : GARDEN.tulipField[1];
         for (let zi = 0; zi * STRIPE < maxR; zi += 1) {
@@ -3138,6 +3128,7 @@
 
       // ---------- POSTPROCESO ----------
       let composer = null;
+      let bloomOn = true;
       if (!lowPower) {
         composer = new EffectComposer(renderer);
         composer.addPass(new RenderPass(scene, camera));
@@ -3308,7 +3299,10 @@
         if (perf.warm > 0) { perf.warm -= 1.2; return; } // ignora los primeros segundos
         if (fps < 45) {
           perf.good = 0;
-          if (pixelRatio > minPixelRatio + 0.01) {
+          if (composer && bloomOn) {
+            // el resplandor es lo más caro: es lo primero que se apaga
+            bloomOn = false;
+          } else if (pixelRatio > minPixelRatio + 0.01) {
             pixelRatio = Math.max(minPixelRatio, pixelRatio - (fps < 30 ? 0.2 : 0.1));
             resize();
           } else if (detailScale > 0.55) {
@@ -3395,7 +3389,7 @@
         }
         adaptQuality(delta);
 
-        if (composer) composer.render();
+        if (composer && bloomOn) composer.render();
         else renderer.render(scene, camera);
       }
       // la pantalla de inicio se queda al menos un momento para que se vea
